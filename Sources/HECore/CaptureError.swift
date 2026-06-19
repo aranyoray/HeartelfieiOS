@@ -1,0 +1,41 @@
+import Foundation
+
+/// Errors that can abort or block a capture. `poorSignalQuality` is the most
+/// important: it is the mechanism by which the mandatory SQI gate prevents a
+/// metric from ever being computed off a rejected signal.
+public enum CaptureError: Error, Sendable, Hashable {
+    /// The capture cleared acquisition but failed the SQI gate. Carries the
+    /// quality result so the UI can coach the user with specific fixes.
+    case poorSignalQuality(SignalQuality)
+    /// The user aborted the capture.
+    case aborted
+    /// A device modality was requested but the Heartelfie device isn't connected.
+    case deviceNotConnected
+    /// Electrode/finger contact on the device was lost mid-capture.
+    case contactLost
+    /// A required permission was denied. Associated value names the permission.
+    case permissionDenied(String)
+    /// The capture ran past its time budget without enough clean signal.
+    case timeout
+    /// The sensor/source is unavailable on this hardware.
+    case sensorUnavailable
+
+    public var userMessage: String {
+        switch self {
+        case .poorSignalQuality:
+            return "We couldn't get a clean enough signal. Follow the on-screen tips and try again."
+        case .aborted:
+            return "Capture cancelled."
+        case .deviceNotConnected:
+            return "Connect your Heartelfie device to use this measurement."
+        case .contactLost:
+            return "Contact with the Heartelfie device was lost. Reposition and try again."
+        case .permissionDenied(let name):
+            return "Heartelfie needs \(name) access for this check. You can enable it in Settings."
+        case .timeout:
+            return "That took longer than expected without a clean signal. Let's try again."
+        case .sensorUnavailable:
+            return "This sensor isn't available on your device."
+        }
+    }
+}
