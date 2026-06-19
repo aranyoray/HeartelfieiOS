@@ -12,6 +12,7 @@ import HEDesign
 ///
 /// Navigation is a calm Back / Continue pair plus a step progress bar. Transitions
 /// respect Reduce Motion.
+@MainActor
 struct OnboardingView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.accessibilityReduceMotion) private var reduceMotion

@@ -4,6 +4,10 @@ import HEDesign
 
 /// Top-level view. Owns the `AppEnvironment`, injects it into the SwiftUI
 /// environment, and routes between onboarding and the main tab experience.
+///
+/// Marked `@MainActor` so the `@State` default expression can construct the
+/// `@MainActor`-isolated `AppEnvironment` from the explicit (public) initializer.
+@MainActor
 public struct RootView: View {
     @State private var env = AppEnvironment()
 

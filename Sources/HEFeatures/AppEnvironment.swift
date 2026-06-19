@@ -107,8 +107,13 @@ public final class AppEnvironment {
 
     private func observeBLE() {
         ble.$state
-            .receive(on: RunLoop.main)
-            .sink { [weak self] state in self?.deviceState = state }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                // `.receive(on: .main)` guarantees this runs on the main actor's
+                // executor, so assuming isolation here is safe and lets us touch
+                // the @MainActor-isolated `deviceState` synchronously.
+                MainActor.assumeIsolated { self?.deviceState = state }
+            }
             .store(in: &cancellables)
     }
 
