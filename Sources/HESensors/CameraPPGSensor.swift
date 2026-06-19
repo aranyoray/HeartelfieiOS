@@ -248,7 +248,7 @@ public actor MockCameraPPGSensor: CardioSensor {
                 durationSeconds: 1.0, sampleRate: sampleRate,
                 heartRateBPM: heartRateBPM, hrvMS: 28, noise: 0.01,
                 motionArtifact: 0.0, baselineWander: 0.05,
-                seed: seed &+ UInt64(batch &* 2_654_435)
+                seed: seed &+ (UInt64(truncatingIfNeeded: batch) &* 2_654_435)
             )
             // DC-offset the planes to camera-like 0...255 levels and scale colours
             // so a ratio-of-ratios is recoverable downstream.

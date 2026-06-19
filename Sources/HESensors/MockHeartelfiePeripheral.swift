@@ -210,7 +210,7 @@ actor MockHeartelfiePeripheral {
 
         while !Task.isCancelled {
             // Vary the seed per batch so successive buffers don't repeat verbatim.
-            let batchSeed = seed &+ UInt64(batch &* 7919)
+            let batchSeed = seed &+ (UInt64(truncatingIfNeeded: batch) &* 7919)
             let buffers = synthesize(
                 modality: modality, durationSeconds: bufferSeconds,
                 sampleRate: sampleRate, seed: batchSeed

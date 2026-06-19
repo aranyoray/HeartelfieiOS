@@ -148,7 +148,7 @@ public actor MockMotionSCGSensor: CardioSensor {
                 durationSeconds: 1.0, sampleRate: sampleRate,
                 heartRateBPM: heartRateBPM, hrvMS: 24, noise: 0.006,
                 motionArtifact: 0.0, baselineWander: 0.01,
-                seed: seed &+ UInt64(batch &* 15_485_863 % 1_000_003)
+                seed: seed &+ (UInt64(truncatingIfNeeded: batch) &* 15_485_863 % 1_000_003)
             )
             for i in 0..<pulse.count {
                 if Task.isCancelled { break }

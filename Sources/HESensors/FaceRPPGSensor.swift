@@ -148,11 +148,14 @@ extension FaceRPPGSensor: AVCaptureVideoDataOutputSampleBufferDelegate {
         let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
         guard width > 0, height > 0 else { return nil }
 
-        // Normalized (bottom-left) → pixel (top-left).
-        let x0 = max(Int(roi.minX * Double(width)), 0)
-        let x1 = min(Int(roi.maxX * Double(width)), width)
-        let yTop = max(Int((1.0 - roi.maxY) * Double(height)), 0)
-        let yBot = min(Int((1.0 - roi.minY) * Double(height)), height)
+        // Normalized (bottom-left) → pixel (top-left). Convert CGFloat ROI
+        // components to Double explicitly (CGFloat and Double don't mix implicitly).
+        let minX = Double(roi.minX), maxX = Double(roi.maxX)
+        let minY = Double(roi.minY), maxY = Double(roi.maxY)
+        let x0 = max(Int(minX * Double(width)), 0)
+        let x1 = min(Int(maxX * Double(width)), width)
+        let yTop = max(Int((1.0 - maxY) * Double(height)), 0)
+        let yBot = min(Int((1.0 - minY) * Double(height)), height)
         guard x1 > x0, yBot > yTop else { return nil }
 
         let ptr = base.assumingMemoryBound(to: UInt8.self)
@@ -234,7 +237,7 @@ public actor MockFaceRPPGSensor: CardioSensor {
                 durationSeconds: 1.0, sampleRate: sampleRate,
                 heartRateBPM: heartRateBPM, hrvMS: 30, noise: 0.05,
                 motionArtifact: 0.02, baselineWander: 0.12,
-                seed: seed &+ UInt64(batch &* 40_503)
+                seed: seed &+ (UInt64(truncatingIfNeeded: batch) &* 40_503)
             )
             for i in 0..<green.count {
                 if Task.isCancelled { break }

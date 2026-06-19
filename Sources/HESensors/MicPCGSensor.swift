@@ -46,6 +46,10 @@ public actor MicPCGSensor: CardioSensor {
             isTapInstalled = false
         }
         if engine.isRunning { engine.stop() }
+        #if os(iOS)
+        // Best-effort release of the audio session; ignore errors on teardown.
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        #endif
         #endif
         continuation?.finish()
         continuation = nil
@@ -67,6 +71,18 @@ public actor MicPCGSensor: CardioSensor {
     /// windows, emitting one `.audio` sample per window toward the modality's
     /// nominal rate. Only Sendable `Double`s leave the block.
     private func startEngine() -> AsyncStream<SignalFrame>? {
+        #if os(iOS)
+        // A record-capable audio session must be active before the input node has a
+        // valid format/route. If this fails (e.g. the Simulator), we fall back.
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(.record, mode: .measurement, options: [])
+            try audioSession.setActive(true)
+        } catch {
+            return nil
+        }
+        #endif
+
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
         let inputSampleRate = format.sampleRate

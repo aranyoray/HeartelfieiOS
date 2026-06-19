@@ -125,7 +125,7 @@ public actor MockHeartelfieDeviceSensor: CardioSensor {
         var batch = 0
 
         while !Task.isCancelled {
-            let batchSeed = seed &+ UInt64(batch &* 104_729)
+            let batchSeed = seed &+ (UInt64(truncatingIfNeeded: batch) &* 104_729)
             let buffers = synthesize(
                 modality: modality, sampleRate: sampleRate,
                 heartRateBPM: heartRateBPM, seed: batchSeed
