@@ -130,4 +130,49 @@ final class HECoreTests: XCTestCase {
         XCTAssertEqual(decoded.metrics.count, original.metrics.count)
         XCTAssertEqual(decoded.tier, original.tier)
     }
+
+    // MARK: HealthProfile (name / BMI / conditions)
+
+    func testProfileDefaultsToParticipantID() {
+        XCTAssertEqual(HealthProfile().name, "PID001")
+        // Empty names fall back to the participant ID.
+        XCTAssertEqual(HealthProfile(name: "").name, "PID001")
+    }
+
+    func testBMIComputation() throws {
+        let profile = HealthProfile(heightCM: 168, weightKG: 63)
+        let bmi = try XCTUnwrap(profile.bmi)
+        XCTAssertEqual(bmi, 22.3, accuracy: 0.1)
+        XCTAssertNil(HealthProfile(heightCM: nil, weightKG: 63).bmi)
+    }
+
+    func testBMICategoryBands() {
+        XCTAssertEqual(ClinicalConfig.bmiCategory(17).risk, .watch)
+        XCTAssertEqual(ClinicalConfig.bmiCategory(22).risk, .normal)
+        XCTAssertEqual(ClinicalConfig.bmiCategory(27).risk, .watch)
+        XCTAssertEqual(ClinicalConfig.bmiCategory(33).risk, .elevated)
+    }
+
+    func testPriorConditionsRoundTrip() throws {
+        var profile = HealthProfile(race: .asian)
+        profile.priorConditions = [.hypertension, .cardiac]
+        let data = try JSONEncoder().encode(profile)
+        let decoded = try JSONDecoder().decode(HealthProfile.self, from: data)
+        XCTAssertEqual(decoded.priorConditions, [.hypertension, .cardiac])
+        XCTAssertEqual(decoded.race, .asian)
+    }
+
+    /// Profiles saved before the new fields existed must still decode, defaulting
+    /// the missing keys rather than failing.
+    func testProfileDecodingResilientToMissingKeys() throws {
+        let legacyJSON = """
+        { "age": 40, "knownConditions": [], "unitSystem": "metric" }
+        """.data(using: .utf8)!
+        let decoded = try JSONDecoder().decode(HealthProfile.self, from: legacyJSON)
+        XCTAssertEqual(decoded.name, "PID001")
+        XCTAssertEqual(decoded.age, 40)
+        XCTAssertTrue(decoded.priorConditions.isEmpty)
+        XCTAssertNil(decoded.race)
+        XCTAssertEqual(decoded.unitSystem, .metric)
+    }
 }

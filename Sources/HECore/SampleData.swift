@@ -5,11 +5,14 @@ import Foundation
 public enum SampleData {
 
     public static let profile = HealthProfile(
+        name: "PID001",
         age: 34,
         biologicalSex: .female,
         heightCM: 168,
         weightKG: 63,
+        race: .asian,
         knownConditions: [],
+        priorConditions: [.hypertension],
         monkSkinTone: MonkSkinTone(value: 6),
         unitSystem: .metric
     )

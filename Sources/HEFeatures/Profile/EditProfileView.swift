@@ -2,32 +2,32 @@ import SwiftUI
 import HECore
 import HEDesign
 
-/// An accessible editor for the optional `HealthProfile`. Works on a local draft so
-/// edits can be reviewed and saved atomically through `env.updateProfile(_:)`.
+/// An accessible editor for the `HealthProfile`. Works on a local draft so edits
+/// can be reviewed and saved atomically through `env.updateProfile(_:)`.
 ///
-/// Height and weight are entered in the chosen unit system and converted to the
-/// canonical centimetre / kilogram storage on save. Nothing here is required, and
-/// nothing here is diagnostic — the profile only adds gentle context to screenings.
+/// Collects: name / participant ID, age, gender, height, weight (BMI is computed
+/// live), race, Monk Skin Tone (the full 10-box scale), and prior-condition
+/// checkboxes. Height/weight are entered in the chosen unit system and stored
+/// canonically in centimetres / kilograms. Nothing here is diagnostic — the
+/// profile only adds gentle context to screenings.
 struct EditProfileView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
 
     @State private var draft = ProfileDraft()
-    @State private var newCondition: String = ""
     @State private var isSaving = false
     @State private var hasLoaded = false
-
-    @FocusState private var conditionFieldFocused: Bool
 
     init() {}
 
     var body: some View {
         Form {
-            unitsSection
-            basicsSection
+            identitySection
             bodySection
-            conditionsSection
+            raceSection
             skinToneSection
+            priorConditionsSection
+            unitsSection
             disclosureSection
         }
         .scrollContentBackground(.hidden)
@@ -47,6 +47,173 @@ struct EditProfileView: View {
         }
     }
 
+    // MARK: - Identity (name, age, gender)
+
+    private var identitySection: some View {
+        Section {
+            HStack {
+                Text("Name")
+                Spacer()
+                TextField("Participant ID", text: $draft.name)
+                    .multilineTextAlignment(.trailing)
+                    .foregroundStyle(Color.heTextPrimary)
+                    .submitLabel(.done)
+                    .accessibilityLabel("Name or participant ID")
+            }
+
+            Stepper(value: $draft.age, in: 1...120) {
+                HStack {
+                    Text("Age")
+                    Spacer()
+                    Text("\(draft.age)")
+                        .foregroundStyle(Color.heTextSecondary)
+                        .monospacedDigit()
+                }
+            }
+            .accessibilityLabel("Age")
+            .accessibilityValue("\(draft.age) years")
+
+            Picker("Gender", selection: $draft.biologicalSex) {
+                Text("Not set").tag(Optional<BiologicalSex>.none)
+                ForEach(BiologicalSex.allCases) { sex in
+                    Text(sex.displayName).tag(Optional(sex))
+                }
+            }
+        } header: {
+            Text("About you")
+        } footer: {
+            Text("Your name defaults to a non-identifying ID. Everything here stays on your device.")
+        }
+    }
+
+    // MARK: - Body (height, weight, BMI)
+
+    private var bodySection: some View {
+        Section {
+            if draft.unitSystem == .metric {
+                measurementStepper(title: "Height", value: $draft.heightCM, range: 80...230, unit: "cm")
+                measurementStepper(title: "Weight", value: $draft.weightKG, range: 25...250, unit: "kg")
+            } else {
+                measurementStepper(title: "Height", value: $draft.heightIN, range: 30...90, unit: "in")
+                measurementStepper(title: "Weight", value: $draft.weightLB, range: 55...550, unit: "lb")
+            }
+
+            bmiRow
+        } header: {
+            Text("Body measurements")
+        } footer: {
+            Text("BMI is calculated from your height and weight. It's a general guide, not a diagnosis.")
+        }
+    }
+
+    @ViewBuilder
+    private var bmiRow: some View {
+        if let bmi = draft.bmi {
+            let category = ClinicalConfig.bmiCategory(bmi)
+            HStack(spacing: HESpacing.sm) {
+                Text("BMI")
+                Spacer()
+                Text(bmi.formatted(.number.precision(.fractionLength(1))))
+                    .font(.heBody.weight(.semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.heTextPrimary)
+                Text(category.label)
+                    .font(.heCaption.weight(.medium))
+                    .foregroundStyle(Color.heRisk(category.risk))
+                    .padding(.horizontal, HESpacing.sm)
+                    .padding(.vertical, 2)
+                    .background(
+                        Capsule().fill(Color.heRisk(category.risk).opacity(0.15))
+                    )
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("B M I \(bmi.formatted(.number.precision(.fractionLength(1)))), \(category.label)")
+        }
+    }
+
+    private func measurementStepper(
+        title: String,
+        value: Binding<Double>,
+        range: ClosedRange<Double>,
+        unit: String
+    ) -> some View {
+        Stepper(value: value, in: range, step: 1) {
+            HStack {
+                Text(title)
+                Spacer()
+                Text("\(Int(value.wrappedValue.rounded())) \(unit)")
+                    .foregroundStyle(Color.heTextSecondary)
+                    .monospacedDigit()
+            }
+        }
+        .accessibilityLabel(title)
+        .accessibilityValue("\(Int(value.wrappedValue.rounded())) \(unit)")
+    }
+
+    // MARK: - Race
+
+    private var raceSection: some View {
+        Section {
+            Picker("Race", selection: $draft.race) {
+                Text("Not set").tag(Optional<Race>.none)
+                ForEach(Race.allCases) { race in
+                    Text(race.displayName).tag(Optional(race))
+                }
+            }
+        } header: {
+            Text("Race")
+        } footer: {
+            Text("Optional and self-identified. Helps support equitable performance across people; never used to make a claim.")
+        }
+    }
+
+    // MARK: - Skin tone (10-box scale)
+
+    private var skinToneSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: HESpacing.md) {
+                MonkSkinToneScale(selection: $draft.monkSkinTone)
+
+                if draft.monkSkinTone != nil {
+                    Button("Clear selection") { draft.monkSkinTone = nil }
+                        .font(.heCallout)
+                        .foregroundStyle(Color.hePrimary)
+                }
+            }
+            .padding(.vertical, HESpacing.xs)
+        } header: {
+            Text("Monk Skin Tone")
+        } footer: {
+            Text(MonkSkinTone.usageDisclosure)
+        }
+    }
+
+    // MARK: - Prior conditions (checkboxes)
+
+    private var priorConditionsSection: some View {
+        Section {
+            ForEach(PriorCondition.allCases) { condition in
+                Toggle(isOn: conditionBinding(condition)) {
+                    Label(condition.displayName, systemImage: condition.systemImage)
+                }
+            }
+        } header: {
+            Text("Prior conditions")
+        } footer: {
+            Text("Optional. Helps Heartelfie phrase insights more carefully. Stored only on your device.")
+        }
+    }
+
+    private func conditionBinding(_ condition: PriorCondition) -> Binding<Bool> {
+        Binding(
+            get: { draft.priorConditions.contains(condition) },
+            set: { isOn in
+                if isOn { draft.priorConditions.insert(condition) }
+                else { draft.priorConditions.remove(condition) }
+            }
+        )
+    }
+
     // MARK: - Units
 
     private var unitsSection: some View {
@@ -61,193 +228,6 @@ struct EditProfileView: View {
             Text("Units")
         } footer: {
             Text("Switching units re-labels height and weight; your entries are kept.")
-        }
-    }
-
-    // MARK: - Basics
-
-    private var basicsSection: some View {
-        Section {
-            Toggle("Include age", isOn: $draft.includeAge)
-            if draft.includeAge {
-                Stepper(value: $draft.age, in: 1...120) {
-                    HStack {
-                        Text("Age")
-                        Spacer()
-                        Text("\(draft.age)")
-                            .foregroundStyle(Color.heTextSecondary)
-                            .monospacedDigit()
-                    }
-                }
-                .accessibilityLabel("Age")
-                .accessibilityValue("\(draft.age) years")
-            }
-
-            Picker("Biological sex", selection: $draft.biologicalSex) {
-                Text("Not set").tag(Optional<BiologicalSex>.none)
-                ForEach(BiologicalSex.allCases) { sex in
-                    Text(sex.displayName).tag(Optional(sex))
-                }
-            }
-        } header: {
-            Text("Basics")
-        } footer: {
-            Text("Used only to put screenings in context. Biological sex helps interpret some metrics.")
-        }
-    }
-
-    // MARK: - Body measurements
-
-    private var bodySection: some View {
-        Section {
-            Toggle("Include height", isOn: $draft.includeHeight)
-            if draft.includeHeight {
-                if draft.unitSystem == .metric {
-                    measurementStepper(
-                        title: "Height",
-                        value: $draft.heightCM,
-                        range: 80...230,
-                        step: 1,
-                        unit: "cm"
-                    )
-                } else {
-                    measurementStepper(
-                        title: "Height",
-                        value: $draft.heightIN,
-                        range: 30...90,
-                        step: 1,
-                        unit: "in"
-                    )
-                }
-            }
-
-            Toggle("Include weight", isOn: $draft.includeWeight)
-            if draft.includeWeight {
-                if draft.unitSystem == .metric {
-                    measurementStepper(
-                        title: "Weight",
-                        value: $draft.weightKG,
-                        range: 25...250,
-                        step: 1,
-                        unit: "kg"
-                    )
-                } else {
-                    measurementStepper(
-                        title: "Weight",
-                        value: $draft.weightLB,
-                        range: 55...550,
-                        step: 1,
-                        unit: "lb"
-                    )
-                }
-            }
-        } header: {
-            Text("Body measurements")
-        }
-    }
-
-    private func measurementStepper(
-        title: String,
-        value: Binding<Double>,
-        range: ClosedRange<Double>,
-        step: Double,
-        unit: String
-    ) -> some View {
-        Stepper(value: value, in: range, step: step) {
-            HStack {
-                Text(title)
-                Spacer()
-                Text("\(Int(value.wrappedValue.rounded())) \(unit)")
-                    .foregroundStyle(Color.heTextSecondary)
-                    .monospacedDigit()
-            }
-        }
-        .accessibilityLabel(title)
-        .accessibilityValue("\(Int(value.wrappedValue.rounded())) \(unit)")
-    }
-
-    // MARK: - Known conditions
-
-    private var conditionsSection: some View {
-        Section {
-            ForEach(draft.knownConditions, id: \.self) { condition in
-                Text(condition)
-            }
-            .onDelete { offsets in
-                draft.knownConditions.remove(atOffsets: offsets)
-            }
-
-            HStack(spacing: HESpacing.sm) {
-                TextField("Add a condition", text: $newCondition)
-                    .focused($conditionFieldFocused)
-                    .submitLabel(.done)
-                    .onSubmit(addCondition)
-                Button(action: addCondition) {
-                    Image(systemName: "plus.circle.fill")
-                }
-                .disabled(trimmedNewCondition.isEmpty)
-                .accessibilityLabel("Add condition")
-            }
-        } header: {
-            Text("Known conditions")
-        } footer: {
-            Text("Optional. Helps Heartelfie phrase insights more carefully. Stored only on your device.")
-        }
-    }
-
-    private var trimmedNewCondition: String {
-        newCondition.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private func addCondition() {
-        let trimmed = trimmedNewCondition
-        guard !trimmed.isEmpty else { return }
-        if !draft.knownConditions.contains(trimmed) {
-            draft.knownConditions.append(trimmed)
-        }
-        newCondition = ""
-        conditionFieldFocused = false
-    }
-
-    // MARK: - Skin tone
-
-    private var skinToneSection: some View {
-        Section {
-            VStack(alignment: .leading, spacing: HESpacing.md) {
-                skinToneGrid
-
-                if draft.monkSkinTone != nil {
-                    Button("Clear selection") {
-                        draft.monkSkinTone = nil
-                    }
-                    .font(.heCallout)
-                    .foregroundStyle(Color.hePrimary)
-                }
-            }
-            .padding(.vertical, HESpacing.xs)
-        } header: {
-            Text("Skin tone")
-        } footer: {
-            Text(MonkSkinTone.usageDisclosure)
-        }
-    }
-
-    private var skinToneGrid: some View {
-        let columns = Array(
-            repeating: GridItem(.flexible(), spacing: HESpacing.sm),
-            count: 5
-        )
-        return LazyVGrid(columns: columns, spacing: HESpacing.md) {
-            ForEach(MonkSkinTone.all) { tone in
-                Button {
-                    draft.monkSkinTone = tone
-                } label: {
-                    MonkSkinToneSwatch(tone: tone, isSelected: draft.monkSkinTone == tone)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(tone.accessibilityLabel)
-                .accessibilityAddTraits(draft.monkSkinTone == tone ? [.isSelected] : [])
-            }
         }
     }
 
@@ -280,63 +260,60 @@ struct EditProfileView: View {
 /// A mutable, unit-aware editing buffer for `HealthProfile`. Keeps both metric and
 /// imperial entries in sync so toggling units never loses the user's input.
 private struct ProfileDraft {
+    var name: String = "PID001"
     var unitSystem: UnitSystem = .metric
-
-    var includeAge: Bool = false
     var age: Int = 35
-
     var biologicalSex: BiologicalSex?
-
-    var includeHeight: Bool = false
     var heightCM: Double = 170
-
-    var includeWeight: Bool = false
     var weightKG: Double = 70
-
-    var knownConditions: [String] = []
+    var race: Race?
+    var priorConditions: Set<PriorCondition> = []
     var monkSkinTone: MonkSkinTone?
+    /// Carried through unchanged (legacy / "other" free-form conditions).
+    var knownConditions: [String] = []
 
     // Imperial mirrors, derived from / written back to the canonical metric values.
     var heightIN: Double {
         get { heightCM / 2.54 }
         set { heightCM = newValue * 2.54 }
     }
-
     var weightLB: Double {
         get { weightKG * 2.2046226218 }
         set { weightKG = newValue / 2.2046226218 }
     }
 
+    /// Live BMI from the canonical metric height/weight.
+    var bmi: Double? {
+        guard heightCM > 0 else { return nil }
+        let meters = heightCM / 100.0
+        return weightKG / (meters * meters)
+    }
+
     init() {}
 
     init(profile: HealthProfile) {
+        name = profile.name
         unitSystem = profile.unitSystem
-
-        if let age = profile.age {
-            includeAge = true
-            self.age = age
-        }
+        age = profile.age ?? 35
         biologicalSex = profile.biologicalSex
-
-        if let cm = profile.heightCM {
-            includeHeight = true
-            heightCM = cm
-        }
-        if let kg = profile.weightKG {
-            includeWeight = true
-            weightKG = kg
-        }
-        knownConditions = profile.knownConditions
+        heightCM = profile.heightCM ?? 170
+        weightKG = profile.weightKG ?? 70
+        race = profile.race
+        priorConditions = profile.priorConditions
         monkSkinTone = profile.monkSkinTone
+        knownConditions = profile.knownConditions
     }
 
     func toProfile() -> HealthProfile {
         HealthProfile(
-            age: includeAge ? age : nil,
+            name: name,
+            age: age,
             biologicalSex: biologicalSex,
-            heightCM: includeHeight ? heightCM : nil,
-            weightKG: includeWeight ? weightKG : nil,
+            heightCM: heightCM,
+            weightKG: weightKG,
+            race: race,
             knownConditions: knownConditions,
+            priorConditions: priorConditions,
             monkSkinTone: monkSkinTone,
             unitSystem: unitSystem
         )

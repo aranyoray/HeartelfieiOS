@@ -3,8 +3,8 @@ import HECore
 import HEDesign
 
 /// The Profile tab root: a calm, accessible `Form` that summarises the person's
-/// optional health profile, surfaces the Heartelfie device status, and links out
-/// to the data, privacy, export, about, and developer screens.
+/// health profile, surfaces the Heartelfie device status, and links out to the
+/// data, privacy, export, about, and developer screens.
 ///
 /// All copy is wellness-grade and explicitly non-diagnostic. Nothing here is a
 /// measurement; the profile only adds gentle context to screenings.
@@ -16,8 +16,8 @@ struct ProfileView: View {
     var body: some View {
         Form {
             headerSection
-            profileSection
-            unitsSection
+            detailsSection
+            editSection
             deviceSection
             healthSection
             dataSection
@@ -38,7 +38,7 @@ struct ProfileView: View {
                 avatar
 
                 VStack(alignment: .leading, spacing: HESpacing.xxs) {
-                    Text(HeartelfieConfig.appName)
+                    Text(env.profile.name)
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
                     Text(profileSummary)
@@ -50,7 +50,7 @@ struct ProfileView: View {
             }
             .padding(.vertical, HESpacing.xs)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Your profile. \(profileSummary)")
+            .accessibilityLabel("Profile for \(env.profile.name). \(profileSummary)")
         }
     }
 
@@ -61,7 +61,10 @@ struct ProfileView: View {
                 .frame(width: 56, height: 56)
 
             if let tone = env.profile.monkSkinTone {
-                MonkSkinToneSwatch(tone: tone, isSelected: false)
+                Circle()
+                    .fill(Color(hex: tone.swatchHex))
+                    .frame(width: 44, height: 44)
+                    .overlay(Circle().strokeBorder(Color.heSeparator, lineWidth: 1))
                     .accessibilityHidden(true)
             } else {
                 Image(systemName: "person.crop.circle.fill")
@@ -72,14 +75,12 @@ struct ProfileView: View {
         }
     }
 
-    /// A name-less, privacy-minimal summary line. Heartelfie never stores a name.
     private var profileSummary: String {
         var parts: [String] = []
-        if let age = env.profile.age {
-            parts.append("Age \(age)")
-        }
-        if let sex = env.profile.biologicalSex {
-            parts.append(sex.displayName)
+        if let age = env.profile.age { parts.append("Age \(age)") }
+        if let sex = env.profile.biologicalSex { parts.append(sex.displayName) }
+        if let bmi = env.profile.bmi {
+            parts.append("BMI \(bmi.formatted(.number.precision(.fractionLength(1))))")
         }
         if parts.isEmpty {
             return "Add optional details to give your checks more context."
@@ -87,26 +88,128 @@ struct ProfileView: View {
         return parts.joined(separator: " · ")
     }
 
-    // MARK: - Profile
+    // MARK: - Health profile details
 
-    private var profileSection: some View {
+    private var detailsSection: some View {
+        Section {
+            detailRow("Age", env.profile.age.map(String.init))
+            detailRow("Gender", env.profile.biologicalSex?.displayName)
+            detailRow("Height", heightText)
+            detailRow("Weight", weightText)
+            bmiRow
+            detailRow("Race", env.profile.race?.displayName)
+            skinToneRow
+            priorConditionsRow
+        } header: {
+            Text("Health profile")
+        } footer: {
+            Text("All details are optional and stay on your device. BMI is a general guide, not a diagnosis.")
+        }
+    }
+
+    private func detailRow(_ title: String, _ value: String?) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Text(value ?? "Not set")
+                .foregroundStyle(value == nil ? Color.heTextTertiary : Color.heTextSecondary)
+                .multilineTextAlignment(.trailing)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title): \(value ?? "Not set")")
+    }
+
+    @ViewBuilder
+    private var bmiRow: some View {
+        if let bmi = env.profile.bmi {
+            let category = ClinicalConfig.bmiCategory(bmi)
+            HStack(spacing: HESpacing.sm) {
+                Text("BMI")
+                Spacer()
+                Text(bmi.formatted(.number.precision(.fractionLength(1))))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.heTextPrimary)
+                Text(category.label)
+                    .font(.heCaption.weight(.medium))
+                    .foregroundStyle(Color.heRisk(category.risk))
+                    .padding(.horizontal, HESpacing.sm)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(Color.heRisk(category.risk).opacity(0.15)))
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("B M I \(bmi.formatted(.number.precision(.fractionLength(1)))), \(category.label)")
+        }
+    }
+
+    private var skinToneRow: some View {
+        HStack(spacing: HESpacing.sm) {
+            Text("Monk Skin Tone")
+            Spacer()
+            if let tone = env.profile.monkSkinTone {
+                Circle()
+                    .fill(Color(hex: tone.swatchHex))
+                    .frame(width: 22, height: 22)
+                    .overlay(Circle().strokeBorder(Color.heSeparator, lineWidth: 1))
+                    .accessibilityHidden(true)
+                Text("\(tone.value)")
+                    .monospacedDigit()
+                    .foregroundStyle(Color.heTextSecondary)
+            } else {
+                Text("Not set").foregroundStyle(Color.heTextTertiary)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(env.profile.monkSkinTone.map { "Monk skin tone \($0.value)" } ?? "Monk skin tone not set")
+    }
+
+    private var priorConditionsRow: some View {
+        HStack(alignment: .top) {
+            Text("Prior conditions")
+            Spacer()
+            if env.profile.priorConditions.isEmpty {
+                Text("None").foregroundStyle(Color.heTextTertiary)
+            } else {
+                Text(sortedConditions)
+                    .multilineTextAlignment(.trailing)
+                    .foregroundStyle(Color.heTextSecondary)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Prior conditions: \(env.profile.priorConditions.isEmpty ? "none" : sortedConditions)")
+    }
+
+    private var sortedConditions: String {
+        env.profile.priorConditions
+            .sorted { $0.displayName < $1.displayName }
+            .map(\.displayName)
+            .joined(separator: ", ")
+    }
+
+    private var heightText: String? {
+        guard let cm = env.profile.heightCM else { return nil }
+        if env.profile.unitSystem == .imperial {
+            return "\(Int((cm / 2.54).rounded())) in"
+        }
+        return "\(Int(cm.rounded())) cm"
+    }
+
+    private var weightText: String? {
+        guard let kg = env.profile.weightKG else { return nil }
+        if env.profile.unitSystem == .imperial {
+            return "\(Int((kg * 2.2046226218).rounded())) lb"
+        }
+        return "\(Int(kg.rounded())) kg"
+    }
+
+    // MARK: - Edit + units
+
+    private var editSection: some View {
         Section {
             NavigationLink {
                 EditProfileView()
             } label: {
                 Label("Edit profile", systemImage: "person.text.rectangle")
             }
-        } header: {
-            Text("Profile")
-        } footer: {
-            Text("All profile details are optional and stay on your device.")
-        }
-    }
-
-    // MARK: - Units
-
-    private var unitsSection: some View {
-        Section {
             Picker(selection: unitBinding) {
                 ForEach(UnitSystem.allCases) { system in
                     Text(system.displayName).tag(system)
@@ -114,15 +217,11 @@ struct ProfileView: View {
             } label: {
                 Label("Units", systemImage: "ruler")
             }
-        } header: {
-            Text("Units")
         } footer: {
-            Text("Used to display height and weight.")
+            Text("Edit your details any time. Units change how height and weight are shown.")
         }
     }
 
-    /// Edits a single field on a value-type profile, then persists the whole
-    /// profile through the environment.
     private var unitBinding: Binding<UnitSystem> {
         Binding(
             get: { env.profile.unitSystem },

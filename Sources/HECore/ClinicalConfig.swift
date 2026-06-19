@@ -118,6 +118,20 @@ public enum ClinicalConfig {
         return min(max(estimate, 70), 100)
     }
 
+    // MARK: - BMI categories (placeholders)
+
+    /// Map a BMI value to a softened, non-diagnostic category + risk band.
+    /// Standard adult cut-points used as labelled placeholders — replace/contextualise
+    /// (age, pregnancy, athleticism, ethnicity-specific cut-points) before real use.
+    public static func bmiCategory(_ bmi: Double) -> (label: String, risk: RiskLevel) {
+        switch bmi {
+        case ..<18.5: return ("Underweight", .watch)
+        case ..<25: return ("Healthy range", .normal)
+        case ..<30: return ("Overweight", .watch)
+        default: return ("Higher range", .elevated)
+        }
+    }
+
     // MARK: - "When to seek care" signals (configurable, labelled placeholders)
 
     /// Non-diagnostic guidance thresholds that, when crossed, surface a gentle

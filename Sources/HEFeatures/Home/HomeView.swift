@@ -24,6 +24,7 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
                 greetingHeader
                 snapshotSection
+                HomeTrendsCard()
                 StreakCard(streak: env.streak, recentReadings: env.recentReadings)
                 deviceSection
                 quickStartSection
