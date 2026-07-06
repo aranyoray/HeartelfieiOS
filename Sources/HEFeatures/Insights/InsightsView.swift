@@ -216,6 +216,7 @@ struct InsightsView: View {
                     ForEach(seekCareSignals) { signal in
                         seekCareCard(signal)
                     }
+                    CareAccessCard(tier: .screening, risk: .watch)
                 }
             }
         }

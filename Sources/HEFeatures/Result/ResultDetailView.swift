@@ -34,6 +34,13 @@ struct ResultDetailView: View {
                 qualitySection
                 metricsSection
                 interpretationSection
+                if CareGuidance.shouldSurfaceCare(tier: reading.tier, risk: reading.overallRisk) {
+                    CareAccessCard(
+                        tier: reading.tier,
+                        risk: reading.overallRisk,
+                        lowConfidence: reading.confidence.isLow
+                    )
+                }
                 provenanceSection
                 actionsSection
                 NonDiagnosticFooter()
