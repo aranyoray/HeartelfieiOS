@@ -31,7 +31,7 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
         case .scg: return "Seismocardiography"
         case .pcg: return "Heart Sounds (PCG)"
         case .deviceMultiWavelengthPPG: return "Multi-Wavelength PPG"
-        case .deviceECG: return "ECG"
+        case .deviceECG: return "Heart Rhythm"
         case .deviceBioZ: return "Bio-Impedance"
         }
     }
@@ -43,7 +43,7 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
         case .scg: return "SCG"
         case .pcg: return "PCG"
         case .deviceMultiWavelengthPPG: return "MW-PPG"
-        case .deviceECG: return "ECG"
+        case .deviceECG: return "Rhythm"
         case .deviceBioZ: return "BioZ"
         }
     }
@@ -122,9 +122,9 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
         case .pcg:
             return "Hold the microphone to your chest to listen to your heart sounds."
         case .deviceMultiWavelengthPPG:
-            return "Use the Heartelfie device clip for a multi-wavelength blood reading."
+            return "Use the Heartelfie device clip for a multi-wavelength wellness reading."
         case .deviceECG:
-            return "Hold the Heartelfie device electrodes for a rhythm reading."
+            return "Hold the Heartelfie device electrodes for a heart-rhythm wellness reading."
         case .deviceBioZ:
             return "Use the Heartelfie device to estimate hydration via bio-impedance."
         }

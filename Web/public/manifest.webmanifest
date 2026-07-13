@@ -1,0 +1,20 @@
+{
+  "name": "Heartelfie — U.S. Cardiovascular Health Atlas",
+  "short_name": "Heartelfie",
+  "description": "Interactive atlas of U.S. county and state cardiovascular health (CDC PLACES). For information only — not medical advice.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0d17",
+  "theme_color": "#0b0d17",
+  "categories": ["health", "education", "reference"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

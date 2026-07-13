@@ -257,7 +257,7 @@ struct ProfileView: View {
         } header: {
             Text("Apple Health")
         } footer: {
-            Text("Optionally sync supported readings with Apple Health. Custom waveforms and hemoglobin estimates stay on your device.")
+            Text("Optionally sync supported readings with Apple Health. Custom waveforms and device wellness estimates stay on your device.")
         }
     }
 

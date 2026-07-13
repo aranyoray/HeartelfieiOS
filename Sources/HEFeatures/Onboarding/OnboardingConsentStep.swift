@@ -30,6 +30,16 @@ struct OnboardingConsentStep: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Summary. \(Disclaimers.consentSummary)")
 
+            HECard {
+                Label(Disclaimers.notMedicalDevice, systemImage: "info.circle")
+                    .font(.heCaption)
+                    .foregroundStyle(Color.heTextSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(Disclaimers.notMedicalDevice)
+
             EmergencyNotice()
 
             privacyCard

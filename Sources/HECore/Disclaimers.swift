@@ -19,6 +19,13 @@ public enum Disclaimers {
     or rule out any medical condition.
     """
 
+    /// Explicit medical-device disclaimer for App Store review and onboarding.
+    public static let notMedicalDevice = """
+    Heartelfie is not a medical device and is not intended to diagnose, treat, cure, \
+    or prevent any disease or condition. All readings are wellness and screening \
+    insights only. Always consult a qualified healthcare professional about your health.
+    """
+
     /// Consent summary shown at onboarding.
     public static let consentSummary = """
     Heartelfie helps you keep an eye on your cardiovascular wellness with daily \
@@ -37,7 +44,7 @@ public enum Disclaimers {
         case .pcg:
             return "This experimental check listens to your heart sounds and flags anything that sounds unusual for you to follow up on."
         case .deviceMultiWavelengthPPG:
-            return "Your Heartelfie device uses multiple light wavelengths for a higher-confidence blood and oxygen reading."
+            return "Your Heartelfie device uses multiple light wavelengths for a higher-confidence oxygen-carry and oxygen wellness reading."
         case .deviceECG:
             return "Your Heartelfie device records the electrical rhythm of your heart for a higher-confidence rhythm reading."
         case .deviceBioZ:

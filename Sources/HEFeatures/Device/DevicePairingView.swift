@@ -212,10 +212,10 @@ struct DevicePairingView: View {
                         .foregroundStyle(Color.heTextPrimary)
 
                     VStack(alignment: .leading, spacing: HESpacing.xs) {
-                        tierItem("Hemoglobin estimate")
-                        tierItem("Clinical-grade SpO₂")
-                        tierItem("Single-lead ECG")
-                        tierItem("Bioimpedance (BioZ)")
+                        tierItem("Oxygen-carry wellness estimate")
+                        tierItem("Higher-confidence oxygen wellness")
+                        tierItem("Single-lead heart-rhythm insight")
+                        tierItem("Bio-impedance (BioZ)")
                     }
 
                     Text("These signals are device-only and still wellness and screening insights — not a diagnosis.")

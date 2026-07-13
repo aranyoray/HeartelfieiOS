@@ -21,21 +21,25 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
 
     public var id: String { rawValue }
 
+    /// User-facing labels are deliberately **wellness-framed** (non-diagnostic) so
+    /// the app can ship on consumer app stores: no metric name asserts a clinical
+    /// measurement or diagnosis. The underlying `rawValue` keys are unchanged, so
+    /// persistence, ML routing, and device gating are unaffected.
     public var displayName: String {
         switch self {
         case .heartRate: return "Heart Rate"
-        case .hrvSDNN: return "HRV (SDNN)"
-        case .hrvRMSSD: return "HRV (RMSSD)"
-        case .rhythmIrregularity: return "Rhythm Irregularity"
-        case .spo2Estimate: return "SpO₂ (approx.)"
-        case .spo2Clinical: return "Blood Oxygen"
-        case .hemoglobin: return "Hemoglobin"
-        case .anemiaRisk: return "Anemia Risk"
-        case .perfusionIndex: return "Perfusion Index"
-        case .hydration: return "Hydration"
-        case .respiratoryRate: return "Respiratory Rate"
+        case .hrvSDNN: return "Heart-Rate Variability (SDNN)"
+        case .hrvRMSSD: return "Heart-Rate Variability (RMSSD)"
+        case .rhythmIrregularity: return "Rhythm Variation"
+        case .spo2Estimate: return "Oxygen Wellness (approx.)"
+        case .spo2Clinical: return "Oxygen Wellness"
+        case .hemoglobin: return "Oxygen-Carry Wellness"
+        case .anemiaRisk: return "Iron-Level Wellness"
+        case .perfusionIndex: return "Perfusion Wellness"
+        case .hydration: return "Hydration Wellness"
+        case .respiratoryRate: return "Breathing Rate"
         case .beatTiming: return "Beat Timing"
-        case .murmurFlag: return "Heart-Sound Flag"
+        case .murmurFlag: return "Heart-Sound Insight"
         }
     }
 
@@ -43,15 +47,15 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
     public var shortName: String {
         switch self {
         case .heartRate: return "HR"
-        case .hrvSDNN: return "SDNN"
-        case .hrvRMSSD: return "RMSSD"
+        case .hrvSDNN: return "HRV·SDNN"
+        case .hrvRMSSD: return "HRV·RMSSD"
         case .rhythmIrregularity: return "Rhythm"
-        case .spo2Estimate, .spo2Clinical: return "SpO₂"
-        case .hemoglobin: return "Hb"
-        case .anemiaRisk: return "Anemia"
-        case .perfusionIndex: return "PI"
+        case .spo2Estimate, .spo2Clinical: return "O₂"
+        case .hemoglobin: return "O₂-Carry"
+        case .anemiaRisk: return "Iron"
+        case .perfusionIndex: return "Perfusion"
         case .hydration: return "Hydration"
-        case .respiratoryRate: return "Resp"
+        case .respiratoryRate: return "Breath"
         case .beatTiming: return "Beat"
         case .murmurFlag: return "Sound"
         }
