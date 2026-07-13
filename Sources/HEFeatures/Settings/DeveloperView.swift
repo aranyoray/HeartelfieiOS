@@ -117,7 +117,7 @@ struct DeveloperView: View {
                     Divider().overlay(Color.heSeparator)
                     uuidRow(label: "PPG stream", uuid: HeartelfieConfig.BLE.ppgStreamCharacteristic)
                     Divider().overlay(Color.heSeparator)
-                    uuidRow(label: "ECG stream", uuid: HeartelfieConfig.BLE.ecgStreamCharacteristic)
+                    uuidRow(label: "Rhythm stream", uuid: HeartelfieConfig.BLE.ecgStreamCharacteristic)
                     Divider().overlay(Color.heSeparator)
                     uuidRow(label: "BioZ stream", uuid: HeartelfieConfig.BLE.bioZStreamCharacteristic)
                     Divider().overlay(Color.heSeparator)

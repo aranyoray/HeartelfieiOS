@@ -58,7 +58,7 @@ public enum SampleData {
                 modelVersion: "0.3-mock",
                 attribution: "PPG foundation model — mock response. Attribution required in production."
             ),
-            interpretation: "Your multi-wavelength reading looks typical. Hemoglobin and oxygen estimates are within the configured range.",
+            interpretation: "Your multi-wavelength wellness reading looks typical. Oxygen-carry and oxygen wellness estimates are within the configured range.",
             monkSkinTone: profile.monkSkinTone,
             waveformPreview: syntheticWave(count: 120)
         )

@@ -94,7 +94,7 @@ struct AboutView: View {
                     tier(
                         icon: "sensor.tag.radiowaves.forward.fill",
                         title: "Measurement — with the device",
-                        detail: "The Heartelfie device adds higher-confidence signals like ECG, clinical SpO₂, hemoglobin, and bioimpedance. Still wellness and screening — never a diagnosis."
+                        detail: "The Heartelfie device adds higher-confidence signals like heart-rhythm insight, oxygen wellness, oxygen-carry wellness, and bio-impedance. Still wellness and screening — never a diagnosis."
                     )
                 }
             }

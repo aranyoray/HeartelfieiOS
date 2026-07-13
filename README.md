@@ -1,15 +1,22 @@
 # Heartelfie
 
-A premium, production-grade iOS app for **daily cardiovascular self-checks**.
+A premium, production-grade iOS app for **daily cardiovascular wellness
+self-checks**, plus a companion **web wellness atlas** (see [`Web/`](Web/)).
 
 Heartelfie is the companion app for the **Heartelfie hardware device** (a
-multi-wavelength PPG finger-clip biosensor with ECG and bio-impedance) *and*
-offers phone-only wellness screening when the device isn't connected.
+multi-wavelength finger-clip biosensor with heart-rhythm and bio-impedance
+sensing) *and* offers phone-only wellness screening when the device isn't
+connected.
 
-> **Heartelfie offers wellness and screening insights. It does not diagnose,
-> treat, or rule out any medical condition.** If you think you're having a
-> cardiac event, call your local emergency services right away — do not rely on
-> this app.
+> **Heartelfie offers wellness and screening insights. It is not a medical
+> device and does not diagnose, treat, cure, or prevent any medical condition.**
+> If you think you're having a cardiac event, call your local emergency services
+> right away — do not rely on this app.
+
+> **App Store framing.** Every user-facing metric is intentionally
+> **wellness-framed** and non-diagnostic. Clinical/measurement terms
+> (blood pressure, hemoglobin, SpO₂, ECG…) are never shown as claims — see
+> [App Store compliance & wellness framing](#app-store-compliance--wellness-framing).
 
 ---
 
@@ -25,12 +32,13 @@ much to trust it**. This is enforced in the type system, not just the UI.
 | **Screening** | The phone's own sensors (camera, mic, motion) | Wellness-grade, lower confidence — *"not a medical measurement."* |
 | **Measurement** | The connected Heartelfie hardware device (BLE) | Higher-accuracy, clinical-grade path. |
 
-**A smartphone has no ECG sensor.** ECG, clinical-grade SpO₂, and hemoglobin come
-*only* from the Heartelfie device. The phone produces wellness screening signals
-only (camera→PPG/rPPG, accelerometer→SCG, mic→PCG). `MetricKind.isDeviceOnly`
-makes it impossible for a phone modality to surface a device-only metric, and a
-unit test (`HECoreTests.testPhoneModalitiesNeverExposeDeviceOnlyMetrics`) guards
-it.
+**A smartphone has no rhythm-sensing electrode.** The higher-confidence
+device-only signals (surfaced under wellness labels — *Heart Rhythm*, *Oxygen
+Wellness*, *Oxygen-Carry Wellness*) come *only* from the Heartelfie hardware. The
+phone produces wellness screening signals only (camera→PPG/rPPG,
+accelerometer→SCG, mic→PCG). `MetricKind.isDeviceOnly` makes it impossible for a
+phone modality to surface a device-only metric, and a unit test
+(`HECoreTests.testPhoneModalitiesNeverExposeDeviceOnlyMetrics`) guards it.
 
 ### Every reading is self-describing (`CardioReading`)
 
@@ -168,16 +176,79 @@ Everything replaceable is a clearly-labeled placeholder.
 
 - **On-device first.** Health data is stored in an AES-GCM-encrypted local store
   with the key held in the Keychain (`HEPersistence`). Minimal PII.
-- **HealthKit bridge** reads HR, HRV, resting HR, blood oxygen, respiratory rate,
-  and (optionally, as a supplementary source) Apple Watch ECG; writes the
-  HealthKit-supported sample types. Custom waveforms / hemoglobin stay only in
-  the encrypted store.
+- **HealthKit bridge** reads HR, HRV, resting HR, oxygen-saturation, respiratory
+  rate, and (optionally, as a supplementary source) Apple Watch heart-rhythm data
+  from Apple Health; writes the HealthKit-supported sample types. Custom waveforms
+  and device wellness estimates stay only in the encrypted store.
 - **Transport:** TLS with a certificate-pinning hook for the cloud API.
 - **User control:** full export (PDF/CSV) and full delete.
 
 This is built as a **wellness / screening** app; the architecture is ready to
 gate clinical features behind future SaMD clearance. No diagnostic claims are
 made anywhere.
+
+---
+
+## App Store compliance & wellness framing
+
+Heartelfie is positioned as a **wellness** app, not a medical device. To keep it
+reviewable on consumer app stores, clinically-restricted or diagnostic terms are
+**never surfaced to the user as claims** — they are replaced end-to-end with
+wellness-framed labels. Internal type/`rawValue` identifiers are unchanged (so
+persistence, ML routing, and device gating still work); only the user-facing
+copy is reframed.
+
+| Restricted / measurement term | Heartelfie wellness label |
+|-------------------------------|---------------------------|
+| High blood pressure / hypertension (atlas) | **Circulatory Strain** |
+| Coronary heart disease (atlas) | **Heart Health** |
+| Stroke (atlas) | **Brain Circulation** |
+| Hemoglobin | **Oxygen-Carry Wellness** |
+| Anemia risk | **Iron-Level Wellness** |
+| SpO₂ / blood oxygen | **Oxygen Wellness** |
+| ECG / electrocardiogram | **Heart Rhythm** / **Heart-Rhythm Insight** |
+| Rhythm irregularity | **Rhythm Variation** |
+
+Additional guardrails:
+
+- **Non-diagnostic disclaimers everywhere** — `Disclaimers.notMedicalDevice` and
+  `Disclaimers.notDiagnostic` are surfaced at onboarding (consent gate), on every
+  result/detail screen (`NonDiagnosticFooter`), and in About. The user must
+  affirmatively accept before using the app.
+- **Persistent emergency notice** (`Disclaimers.emergency`) directing users to
+  emergency services for suspected cardiac events.
+- **Device-only metrics are hardware-gated** at the type level; the phone never
+  claims a device-only wellness signal.
+- Before submission, set a real **support / privacy / terms** URL (the `Web/`
+  companion hosts `/support`, `/privacy`, `/terms`) and a monitored support
+  email (placeholder: `support@heartelfie.app`).
+
+---
+
+## Web companion — Heartelfie Wellness Atlas (`Web/`)
+
+The [`Web/`](Web/) folder is the Heartelfie **web companion**: an interactive 3D
+atlas of U.S. county- and state-level **heart & circulatory wellness awareness**,
+built from public CDC PLACES community-health estimates (React + TypeScript +
+Vite + deck.gl). It was rebranded and reframed to the same wellness vocabulary
+as the iOS app.
+
+Because it is a **static web app** (a different stack from this native Swift
+package), it is co-located rather than code-merged — the two ship from one repo
+and share one brand, disclaimer voice, and terminology. The web app also provides
+the **`/privacy`, `/support`, and `/terms` pages** an App Store / Play Store
+submission links to for review.
+
+```bash
+cd Web
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # tsc + vite build + route prerender
+```
+
+All atlas figures describe **geographic areas, never individuals**, and the
+shipped dataset is a clearly-badged synthetic placeholder until real CDC data is
+loaded (`npm run data:scrape`). See [`Web/README.md`](Web/README.md).
 
 ---
 

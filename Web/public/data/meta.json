@@ -1,0 +1,77 @@
+{
+  "title": "Heartelfie — U.S. Heart & Circulatory Wellness Atlas",
+  "source": "SYNTHETIC PLACEHOLDER — schema-compatible with CDC PLACES (age-adjusted prevalence). Not real data.",
+  "sourceUrl": "https://www.cdc.gov/places/",
+  "isPlaceholder": true,
+  "adjustment": "Age-adjusted prevalence",
+  "generated": "2026-06-20",
+  "years": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022
+  ],
+  "measures": [
+    {
+      "id": "BPHIGH",
+      "label": "Circulatory Strain",
+      "short": "Circulatory",
+      "unit": "% of adults",
+      "description": "Community-level heart & circulatory wellness-awareness indicator for adults aged ≥18, from CDC PLACES public-health estimates (age-adjusted). Describes geographic areas, never individuals.",
+      "colorDomain": [
+        28.6,
+        48.8
+      ],
+      "elevationDomain": [
+        18,
+        55
+      ],
+      "dataMin": 23.7,
+      "dataMax": 49.9
+    },
+    {
+      "id": "CHD",
+      "label": "Heart Health",
+      "short": "Heart",
+      "unit": "% of adults",
+      "description": "Community-level heart-health awareness indicator for adults aged ≥18, from CDC PLACES public-health estimates (age-adjusted). Describes geographic areas, never individuals.",
+      "colorDomain": [
+        4.7,
+        11.5
+      ],
+      "elevationDomain": [
+        2,
+        15
+      ],
+      "dataMin": 2.9,
+      "dataMax": 12
+    },
+    {
+      "id": "STROKE",
+      "label": "Brain Circulation",
+      "short": "Brain",
+      "unit": "% of adults",
+      "description": "Community-level brain-circulation wellness-awareness indicator for adults aged ≥18, from CDC PLACES public-health estimates (age-adjusted). Describes geographic areas, never individuals.",
+      "colorDomain": [
+        2.6,
+        6.8
+      ],
+      "elevationDomain": [
+        1,
+        9
+      ],
+      "dataMin": 1.5,
+      "dataMax": 7.1
+    }
+  ],
+  "countyCount": 3142,
+  "notes": [
+    "These numbers are SYNTHETIC and for layout/QA only — do not cite them.",
+    "Geography is realistic (the Southeast & Appalachia run higher) but values are generated, not measured.",
+    "State values are the unweighted mean of their counties.",
+    "Run `npm run data:scrape` after allowlisting data.cdc.gov to replace with real CDC PLACES data."
+  ]
+}

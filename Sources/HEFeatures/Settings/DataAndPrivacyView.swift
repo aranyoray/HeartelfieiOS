@@ -106,7 +106,7 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "iphone.gen3",
                         title: "Sensitive signals stay local",
-                        detail: "Custom waveforms and hemoglobin estimates are processed on your device and are not uploaded."
+                        detail: "Custom waveforms and device wellness estimates are processed on your device and are not uploaded."
                     )
                 }
             }
@@ -127,12 +127,12 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "arrow.down.heart.fill",
                         title: "What Heartelfie reads",
-                        detail: "With your permission: heart rate, heart rate variability, resting heart rate, blood oxygen, and respiratory rate — plus Apple Watch ECG when available."
+                        detail: "With your permission: heart rate, heart-rate variability, resting heart rate, oxygen wellness, and breathing rate — plus Apple Watch heart-rhythm readings when available."
                     )
                     privacyPoint(
                         icon: "arrow.up.heart.fill",
                         title: "What Heartelfie writes",
-                        detail: "Only the supported subset of your readings is written back to Apple Health. Custom waveforms and hemoglobin estimates stay on your device."
+                        detail: "Only the supported subset of your readings is written back to Apple Health. Custom waveforms and device wellness estimates stay on your device."
                     )
                     Text("You can change these permissions any time in the Health app.")
                         .font(.heCaption)
