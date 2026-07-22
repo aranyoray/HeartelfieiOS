@@ -7,7 +7,7 @@ import HEPersistence
 ///
 /// - A daily cardio summary composed from today's readings (score + what changed).
 /// - Plain-language trend callouts derived from recent time series.
-/// - "When to seek care" signals surfaced via `ClinicalConfig.seekCareSignal`,
+/// - "Wellness notice" signals surfaced via `ClinicalConfig.seekCareSignal`,
 ///   labelled clearly and never alarmist.
 /// - Gentle wellness guidance plus the persistent `EmergencyNotice`.
 struct InsightsView: View {
@@ -182,12 +182,12 @@ struct InsightsView: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    // MARK: - When to seek care
+    // MARK: - Wellness notices
 
     private var seekCareSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
             HESectionHeader(
-                title: "When to seek care",
+                title: "Wellness notices",
                 subtitle: "Gentle, configurable prompts — never a diagnosis.",
                 systemImage: "stethoscope"
             )
@@ -230,7 +230,7 @@ struct InsightsView: View {
                 .frame(width: 32)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: HESpacing.xs) {
-                Text("Consider a professional check")
+                Text("Compare with your trend")
                     .font(.heHeadline)
                     .foregroundStyle(Color.heTextPrimary)
                 Text(signal.message)
@@ -255,7 +255,7 @@ struct InsightsView: View {
                 .strokeBorder(Color.heRisk(.watch).opacity(0.28), lineWidth: 1)
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Consider a professional check. \(signal.message) Based on your \(signal.kind.displayName) screenings. This is wellness guidance, not a diagnosis.")
+        .accessibilityLabel("Compare with your trend. \(signal.message) Based on your \(signal.kind.displayName) screenings. This is wellness guidance, not a diagnosis.")
     }
 
     // MARK: - Guidance
@@ -266,7 +266,7 @@ struct InsightsView: View {
                 Label("How to read your insights", systemImage: "lightbulb.fill")
                     .font(.heHeadline)
                     .foregroundStyle(Color.heTextPrimary)
-                Text("Heartelfie surfaces wellness patterns from your phone and device checks. A single reading rarely means much — trends over days and weeks are what's useful. These insights are not a diagnosis and can't confirm or rule out any condition. If something feels wrong, talk to a clinician.")
+                Text("Heartelfie surfaces wellness patterns from your phone and device checks. A single reading rarely means much — trends over days and weeks are what's useful. These insights are not a diagnosis and can't confirm or rule out any condition. If something feels wrong, do not rely on this app.")
                     .font(.heCallout)
                     .foregroundStyle(Color.heTextSecondary)
                     .fixedSize(horizontal: false, vertical: true)

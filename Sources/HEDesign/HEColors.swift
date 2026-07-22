@@ -1,5 +1,10 @@
 import SwiftUI
 import HECore
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 // MARK: - Hex helper
 
@@ -29,23 +34,38 @@ public extension Color {
 
 private extension Color {
     /// Builds a programmatic light/dark dynamic color (no asset catalog).
-    static func heDynamic(light: UInt32, dark: UInt32) -> Color {
-        Color(uiColor: UIColor { trait in
-            trait.userInterfaceStyle == .dark
-                ? UIColor(hexValue: dark)
-                : UIColor(hexValue: light)
-        })
-    }
+static func heDynamic(light: UInt32, dark: UInt32) -> Color {
+#if canImport(UIKit)
+Color(uiColor: UIColor { trait in
+trait.userInterfaceStyle == .dark
+? UIColor(hexValue: dark)
+: UIColor(hexValue: light)
+})
+#else
+Color(nsColor: NSColor(hexValue: light))
+#endif
+}
 }
 
+#if canImport(UIKit)
 private extension UIColor {
-    convenience init(hexValue: UInt32) {
-        let r = CGFloat((hexValue & 0xFF0000) >> 16) / 255.0
-        let g = CGFloat((hexValue & 0x00FF00) >> 8) / 255.0
-        let b = CGFloat(hexValue & 0x0000FF) / 255.0
-        self.init(red: r, green: g, blue: b, alpha: 1.0)
-    }
+convenience init(hexValue: UInt32) {
+let r = CGFloat((hexValue & 0xFF0000) >> 16) / 255.0
+let g = CGFloat((hexValue & 0x00FF00) >> 8) / 255.0
+let b = CGFloat(hexValue & 0x0000FF) / 255.0
+self.init(red: r, green: g, blue: b, alpha: 1.0)
 }
+}
+#elseif canImport(AppKit)
+private extension NSColor {
+convenience init(hexValue: UInt32) {
+let r = CGFloat((hexValue & 0xFF0000) >> 16) / 255.0
+let g = CGFloat((hexValue & 0x00FF00) >> 8) / 255.0
+let b = CGFloat(hexValue & 0x0000FF) / 255.0
+self.init(srgbRed: r, green: g, blue: b, alpha: 1.0)
+}
+}
+#endif
 
 // MARK: - Semantic palette
 

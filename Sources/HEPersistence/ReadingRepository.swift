@@ -232,7 +232,7 @@ public enum ReadingAggregator {
             }
             return "A few readings were a little outside your typical range. Keep tracking the trend."
         case .elevated:
-            return "Some readings were outside your typical range today. This isn't a diagnosis — consider discussing the trend with a clinician."
+            return "Some readings were outside your typical range today. This isn't a diagnosis — keep watching the trend over time."
         case .unknown:
             return "Take today's first check to see your score."
         }

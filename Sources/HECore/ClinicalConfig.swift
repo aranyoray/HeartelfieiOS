@@ -132,10 +132,10 @@ public enum ClinicalConfig {
         }
     }
 
-    // MARK: - "When to seek care" signals (configurable, labelled placeholders)
+    // MARK: - "Wellness notices" signals (configurable, labelled placeholders)
 
     /// Non-diagnostic guidance thresholds that, when crossed, surface a gentle
-    /// "consider seeking care" prompt in Insights. Labelled placeholders.
+    /// "compare with your trend" prompt in Insights. Labelled placeholders.
     public struct SeekCareSignal: Sendable, Hashable {
         public let kind: MetricKind
         public let message: String
@@ -145,13 +145,13 @@ public enum ClinicalConfig {
         switch kind {
         case .spo2Estimate, .spo2Clinical:
             guard value < 92 else { return nil }
-            return SeekCareSignal(kind: kind, message: "Repeated low oxygen screenings are worth discussing with a clinician.")
+            return SeekCareSignal(kind: kind, message: "Repeated low oxygen-wellness readings can be compared with your recent baseline.")
         case .heartRate:
             guard value > 120 || value < 40 else { return nil }
-            return SeekCareSignal(kind: kind, message: "A resting heart rate this far outside the typical range is worth a professional check.")
+            return SeekCareSignal(kind: kind, message: "This heart-rate reading is far from the typical wellness range. Retake it while rested and compare with your trend.")
         case .rhythmIrregularity:
             guard value > 15 else { return nil }
-            return SeekCareSignal(kind: kind, message: "Frequent rhythm irregularities are worth reviewing with a clinician.")
+            return SeekCareSignal(kind: kind, message: "Rhythm-variation readings are best interpreted as trends, not as a diagnosis from one check.")
         default:
             return nil
         }

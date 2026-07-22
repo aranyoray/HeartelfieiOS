@@ -91,7 +91,7 @@ public final class SensorFactory: SensorProviding, @unchecked Sendable {
     }
 
     /// Whether this build is running in the iOS Simulator (no real camera/IMU/BLE).
-    static var isSimulator: Bool {
+public static var isSimulator: Bool {
         #if targetEnvironment(simulator)
         return true
         #else

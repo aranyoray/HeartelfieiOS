@@ -180,7 +180,7 @@ struct HomeView: View {
                     Text("Insights")
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
-                    Text("Daily summary, trend callouts, and when to seek care.")
+                    Text("Daily summary, trend callouts, and wellness notices.")
                         .font(.heCaption)
                         .foregroundStyle(Color.heTextSecondary)
                         .multilineTextAlignment(.leading)
@@ -204,7 +204,7 @@ struct HomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Insights. Daily summary, trend callouts, and when to seek care.")
+        .accessibilityLabel("Insights. Daily summary, trend callouts, and wellness notices.")
         .accessibilityAddTraits(.isButton)
     }
 }

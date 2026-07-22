@@ -43,7 +43,7 @@ public enum RiskLevel: String, Codable, Sendable, CaseIterable, Hashable, Compar
         case .watch:
             return "This reading is a little outside the typical range. Re-check when relaxed and keep tracking the trend."
         case .elevated:
-            return "This reading is outside the typical range. It is not a diagnosis — consider discussing your trend with a clinician."
+            return "This reading is outside the typical range. It is not a diagnosis. Retake it while rested and compare it with your trend."
         case .unknown:
             return "There wasn't enough clean signal to interpret this reading."
         }

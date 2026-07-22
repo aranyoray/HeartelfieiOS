@@ -1,54 +1,48 @@
 import Foundation
 
-/// Non-diagnostic, actionable care guidance for a reading context. Centralised so
-/// the tips and the "should we surface care access" decision live in one place and
-/// stay consistent across the result and insights screens.
+/// Non-diagnostic wellness context for a reading.
 ///
-/// Nothing here is a diagnosis. Tips are calm, general self-care and care-access
-/// prompts — never instructions to treat a condition.
+/// Nothing here diagnoses, treats, or directs medical care. The app may give
+/// retake and trend-comparison tips, while the general emergency notice remains
+/// separate and user-symptom based.
 public enum CareGuidance {
-
-    /// How urgently to frame care access for a reading.
     public enum Urgency: Sendable, Hashable {
-        case emergency   // elevated — lead with immediate help
-        case routine     // clinical / watch — lead with next steps
+        case elevatedContext
+        case routine
     }
 
-    /// Whether to surface the care-access card for this reading context.
-    ///
-    /// Shown for **clinical (device measurement) readings** — where the user asked
-    /// for tips + immediate care links — and for any **elevated** reading on any
-    /// tier, where reaching care matters most.
+    /// Whether to surface extra wellness context for this reading.
     public static func shouldSurfaceCare(tier: MeasurementTier, risk: RiskLevel) -> Bool {
-        tier == .measurement || risk == .elevated
+        risk == .elevated || risk == .watch || tier == .measurement
     }
 
     public static func urgency(risk: RiskLevel) -> Urgency {
-        risk == .elevated ? .emergency : .routine
+        risk == .elevated ? .elevatedContext : .routine
     }
 
-    /// Ordered, non-diagnostic tips for a reading context (most relevant first).
     public static func tips(tier: MeasurementTier, risk: RiskLevel, lowConfidence: Bool) -> [String] {
         var tips: [String] = []
 
         if lowConfidence {
-            tips.append("This reading was low confidence — re-check when you're relaxed and still before drawing any conclusion.")
+            tips.append("This reading was low confidence. Re-check while relaxed and still before comparing it with your trend.")
         }
 
         switch risk {
         case .elevated:
-            tips.append("Sit down, rest, and breathe calmly, then take another reading.")
-            tips.append("Note any symptoms — chest pain or pressure, shortness of breath, dizziness, or fainting — and when they began.")
-            tips.append("If symptoms are severe, sudden, or getting worse, treat it as an emergency and get help now.")
+            tips.append("Sit down, rest, breathe calmly, then take another reading.")
+            tips.append("Compare this result with your recent trend instead of relying on one reading.")
+            tips.append("If you feel severe, sudden, or worsening symptoms, use local emergency services rather than this app.")
         case .watch:
-            tips.append("Re-check later today when you're rested; a single reading rarely means much on its own.")
-            tips.append("Keep tracking the trend and share it with a clinician if it continues.")
-        case .normal, .unknown:
-            tips.append("Bring this reading and your recent trend to a clinician at your next visit.")
+            tips.append("Re-check later today when relaxed and compare with your recent baseline.")
+            tips.append("Use the trend view to see whether this looks like an isolated reading or a pattern.")
+        case .normal:
+            tips.append("Keep tracking your baseline. Trends are more useful than a single reading.")
+        case .unknown:
+            tips.append("Try another reading with better lighting, steadier contact, or less movement.")
         }
 
-        if tier == .measurement {
-            tips.append("Avoid caffeine, nicotine, and exercise right before a measurement for the cleanest reading.")
+        if tier == .screening {
+            tips.append("Avoid caffeine, nicotine, and exercise right before a check for the cleanest reading.")
         }
 
         return tips

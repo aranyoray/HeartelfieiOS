@@ -117,11 +117,11 @@ acquire (CardioSensor → AsyncStream<SignalFrame>)
 ```
 
 When a **device** measurement's confidence is low, the result screen offers a
-recheck and a "visit a partner clinic for a lab check" pathway.
+recheck and a "retake when rested" pathway.
 
 On **clinical (device measurement) results and any elevated reading**, a
 `CareAccessCard` surfaces non-diagnostic tips plus **immediate care links** — a
-one-tap call to emergency services (`tel:`) and a "find nearby hospitals" Maps
+no reading-driven emergency-call or hospital-finder
 search (`maps.apple.com`) — escalating to "get care now" framing when a reading
 is elevated. Phone numbers and the map query are placeholders in
 `HeartelfieConfig.Care` (localize per region — emergency numbers vary by

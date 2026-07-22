@@ -336,7 +336,7 @@ struct TrendsView: View {
             Image(systemName: "flag.fill")
                 .foregroundStyle(Color.heRisk(.elevated))
                 .accessibilityHidden(true)
-            Text("\(anomalyCount) \(anomalyCount == 1 ? "reading is" : "readings are") flagged as worth a check. This isn't a diagnosis — consider discussing the trend with a clinician.")
+            Text("\(anomalyCount) \(anomalyCount == 1 ? "reading is" : "readings are") flagged as worth a check. This isn't a diagnosis — keep watching the trend over time.")
                 .font(.heCaption)
                 .foregroundStyle(Color.heTextSecondary)
         }
@@ -628,7 +628,7 @@ struct ExportShareSheet: View {
                 Text("Your export is ready")
                     .font(.heTitle)
                     .foregroundStyle(Color.heTextPrimary)
-                Text("This file carries the non-diagnostic disclaimer. Share it with a clinician or save it for your records.")
+                Text("This file carries the non-diagnostic disclaimer. Save it for your records or share it outside Heartelfie if you choose.")
                     .font(.heCallout)
                     .foregroundStyle(Color.heTextSecondary)
                     .multilineTextAlignment(.center)

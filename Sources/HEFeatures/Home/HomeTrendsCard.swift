@@ -106,19 +106,21 @@ private struct MiniTrendChart: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    @ViewBuilder
-    private var trendGlyph: some View {
-        switch trendDirection {
-        case .up:
-            Image(systemName: "arrow.up.right").foregroundStyle(Color.heTextSecondary)
-        case .down:
-            Image(systemName: "arrow.down.right").foregroundStyle(Color.heTextSecondary)
-        case .steady:
-            Image(systemName: "arrow.right").foregroundStyle(Color.heTextTertiary)
-        }
-        .font(.heCaption.weight(.bold))
-        .accessibilityHidden(true)
-    }
+@ViewBuilder
+private var trendGlyph: some View {
+Group {
+switch trendDirection {
+case .up:
+Image(systemName: "arrow.up.right").foregroundStyle(Color.heTextSecondary)
+case .down:
+Image(systemName: "arrow.down.right").foregroundStyle(Color.heTextSecondary)
+case .steady:
+Image(systemName: "arrow.right").foregroundStyle(Color.heTextTertiary)
+}
+}
+.font(.heCaption.weight(.bold))
+.accessibilityHidden(true)
+}
 
     private var chart: some View {
         Chart {

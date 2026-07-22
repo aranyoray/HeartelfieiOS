@@ -255,9 +255,9 @@ struct ProfileView: View {
         Section {
             AppleHealthRow()
         } header: {
-            Text("Apple Health")
+            Text("Apple Health / HealthKit")
         } footer: {
-            Text("Optionally sync supported readings with Apple Health. Custom waveforms and device wellness estimates stay on your device.")
+            Text("HealthKit integration is optional. Heartelfie can read supported Apple Health values and write supported reading summaries only after you approve access.")
         }
     }
 
@@ -325,19 +325,19 @@ private struct AppleHealthRow: View {
                 Image(systemName: "heart.fill")
                     .foregroundStyle(Color.hePrimary)
                     .accessibilityHidden(true)
-                Text("Connect Apple Health")
+                    Text("Apple Health / HealthKit")
                     .font(.heBody)
                     .foregroundStyle(Color.heTextPrimary)
                 Spacer(minLength: 0)
             }
 
             if didRequest {
-                Label("Health permission requested in Settings.", systemImage: "checkmark.circle.fill")
+                Label("HealthKit permission requested. You can change it in the Health app.", systemImage: "checkmark.circle.fill")
                     .font(.heCaption)
                     .foregroundStyle(Color.heTextSecondary)
             } else {
                 HESecondaryButton(
-                    "Connect Apple Health",
+                    "Continue",
                     systemImage: "heart.fill",
                     isLoading: isConnecting
                 ) {

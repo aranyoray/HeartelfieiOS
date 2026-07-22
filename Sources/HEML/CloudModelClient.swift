@@ -88,13 +88,14 @@ public final class CloudModelClient: ModelClient {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
-        urlRequest.httpBody = payload
+urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+urlRequest.httpBody = payload
+let request = urlRequest
 
-        let session = self.session
-        let data = try await queue.perform {
-            try await Self.performOnce(urlRequest, session: session)
-        }
+let session = self.session
+let data = try await queue.perform {
+try await Self.performOnce(request, session: session)
+}
         do {
             return try decoder.decode(Res.self, from: data)
         } catch {

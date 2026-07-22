@@ -2,9 +2,8 @@ import SwiftUI
 import HECore
 import HEDesign
 
-/// Plain-language transparency about how Heartelfie stores and protects data, what
-/// it syncs with Apple Health, and how to delete everything. Calm, honest, and
-/// explicitly non-diagnostic.
+/// Plain-language transparency about storage, face data, Apple Health syncing,
+/// and deletion.
 struct DataAndPrivacyView: View {
     @Environment(AppEnvironment.self) private var env
 
@@ -19,6 +18,7 @@ struct DataAndPrivacyView: View {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
                 consentSection
                 storageSection
+                faceDataSection
                 cloudSection
                 healthKitSection
                 deleteSection
@@ -33,11 +33,9 @@ struct DataAndPrivacyView: View {
             Button("Delete everything", role: .destructive) { deleteAll() }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This permanently removes every reading and your profile from this device. This can't be undone.")
+            Text("This permanently removes every reading and profile value stored on this device. This cannot be undone.")
         }
     }
-
-    // MARK: - Consent
 
     private var consentSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
@@ -56,8 +54,6 @@ struct DataAndPrivacyView: View {
         }
     }
 
-    // MARK: - On-device storage
-
     private var storageSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
             HESectionHeader(
@@ -70,55 +66,87 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "lock.fill",
                         title: "Encrypted at rest",
-                        detail: "Your readings are stored on this device in an AES-GCM encrypted database."
+                        detail: "Your readings are stored on this device in an encrypted local database."
                     )
                     privacyPoint(
                         icon: "key.fill",
-                        title: "Keys in the Keychain",
+                        title: "Keys in Keychain",
                         detail: "The encryption key lives in the iOS Keychain and never leaves your device."
                     )
                     privacyPoint(
                         icon: "person.crop.circle.badge.minus",
                         title: "Minimal personal data",
-                        detail: "Heartelfie keeps no name or contact details — only the optional health profile you choose to add."
+                        detail: "Heartelfie keeps no account, email address, contact list, photos, or advertising profile."
                     )
                 }
             }
         }
     }
 
-    // MARK: - Cloud
+    private var faceDataSection: some View {
+        VStack(alignment: .leading, spacing: HESpacing.md) {
+            HESectionHeader(
+                title: "Face data",
+                subtitle: "Used only for contactless pulse screening.",
+                systemImage: "face.smiling"
+            )
+
+            HECard {
+                VStack(alignment: .leading, spacing: HESpacing.md) {
+                    privacyPoint(
+                        icon: "camera.viewfinder",
+                        title: "What is collected",
+                        detail: "During a facial rPPG check, the front camera video stream is processed on device to find a face region and read color-change signals used to estimate pulse. Heartelfie does not create Face ID templates or identify you."
+                    )
+                    privacyPoint(
+                        icon: "iphone",
+                        title: "Processing and storage",
+                        detail: "Raw face images and video frames are processed in memory on device and are not saved after the check. The saved reading contains derived wellness metrics, signal-quality values, timestamps, and a small waveform preview."
+                    )
+                    privacyPoint(
+                        icon: "person.2.slash",
+                        title: "No sharing",
+                        detail: "Face data is not sold, used for advertising, or shared with third parties. It is not uploaded to Heartelfie servers."
+                    )
+                    privacyPoint(
+                        icon: "trash",
+                        title: "Retention and deletion",
+                        detail: "Raw face frames are discarded immediately after processing. Derived readings remain on this device until you delete them, export them, or remove the app."
+                    )
+                }
+            }
+        }
+    }
 
     private var cloudSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
             HESectionHeader(
-                title: "When data reaches the cloud",
+                title: "Network use",
                 systemImage: "cloud.fill"
             )
 
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.md) {
                     privacyPoint(
-                        icon: "lock.icloud.fill",
-                        title: "Encrypted in transit",
-                        detail: "Cloud model requests use TLS with certificate pinning, so the connection can't be quietly intercepted."
-                    )
-                    privacyPoint(
                         icon: "iphone.gen3",
                         title: "Sensitive signals stay local",
-                        detail: "Custom waveforms and device wellness estimates are processed on your device and are not uploaded."
+                        detail: "Camera frames, face regions, custom waveforms, and device wellness signals are processed on device and are not uploaded by default."
+                    )
+                    privacyPoint(
+                        icon: "lock.icloud.fill",
+                        title: "Encrypted in transit",
+                        detail: "If you choose to use a network-backed model in a future release, requests will use encrypted transport and will be disclosed before use."
                     )
                 }
             }
         }
     }
 
-    // MARK: - HealthKit
-
     private var healthKitSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
             HESectionHeader(
-                title: "Apple Health",
+                title: "Apple Health / HealthKit",
+                subtitle: "Optional integration controlled by the Health app.",
                 systemImage: "heart.fill"
             )
 
@@ -127,22 +155,20 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "arrow.down.heart.fill",
                         title: "What Heartelfie reads",
-                        detail: "With your permission: heart rate, heart-rate variability, resting heart rate, oxygen wellness, and breathing rate — plus Apple Watch heart-rhythm readings when available."
+                        detail: "With your permission, Heartelfie reads supported Apple Health values such as heart rate, heart-rate variability, resting heart rate, oxygen wellness, breathing rate, and available Apple Watch rhythm data."
                     )
                     privacyPoint(
                         icon: "arrow.up.heart.fill",
                         title: "What Heartelfie writes",
-                        detail: "Only the supported subset of your readings is written back to Apple Health. Custom waveforms and device wellness estimates stay on your device."
+                        detail: "With your permission, Heartelfie writes only supported reading summaries back to Apple Health. Face frames, custom waveforms, and device-only wellness estimates are not written to HealthKit."
                     )
-                    Text("You can change these permissions any time in the Health app.")
+                    Text("You can change Apple Health permissions any time in the Health app.")
                         .font(.heCaption)
                         .foregroundStyle(Color.heTextTertiary)
                 }
             }
         }
     }
-
-    // MARK: - Delete
 
     private var deleteSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
@@ -154,11 +180,11 @@ struct DataAndPrivacyView: View {
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.md) {
                     if didDelete {
-                        Label("All data deleted from this device.", systemImage: "checkmark.circle.fill")
+                        Label("All local Heartelfie data has been deleted from this device.", systemImage: "checkmark.circle.fill")
                             .font(.heCallout)
                             .foregroundStyle(Color.heTextSecondary)
                     } else {
-                        Text("Permanently remove every reading and your profile from this device.")
+                        Text("Permanently remove every reading and profile value stored on this device.")
                             .font(.heCallout)
                             .foregroundStyle(Color.heTextSecondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -178,8 +204,6 @@ struct DataAndPrivacyView: View {
             }
         }
     }
-
-    // MARK: - Helpers
 
     private func privacyPoint(icon: String, title: String, detail: String) -> some View {
         HStack(alignment: .top, spacing: HESpacing.md) {

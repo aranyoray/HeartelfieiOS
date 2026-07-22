@@ -2,20 +2,17 @@ import SwiftUI
 import HECore
 import HEDesign
 
-/// Step 2 — Staged permission priming.
+/// Step 2 - staged permission priming.
 ///
-/// Explains *why* Heartelfie will ask for each capability before iOS ever shows a
-/// system prompt. This is rationale-only: tapping through here does **not** trigger
-/// the real camera/motion/microphone/Bluetooth/notification permission dialogs —
-/// those are requested in context at first use. The one exception is HealthKit,
-/// which offers an opt-in "Connect" action wired to
-/// `AppEnvironment.enableHealthKit()`.
+/// Explains why Heartelfie asks for each capability before iOS shows a system
+/// prompt. Camera, motion, microphone, Bluetooth, and notifications are requested
+/// in context at first use. HealthKit has an explicit opt-in action here.
 struct OnboardingPermissionsStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: HESpacing.lg) {
             HESectionHeader(
                 title: "What Heartelfie may ask for",
-                subtitle: "We only request something when it's needed for a check — and we'll explain why each time.",
+                subtitle: "We only request access when it is needed for a check, and we explain why first.",
                 systemImage: "hand.raised.fill"
             )
 
@@ -27,7 +24,7 @@ struct OnboardingPermissionsStep: View {
 
             HealthKitPrimingCard()
 
-            Label("You stay in control. You can change any of these later in Settings, and skip the ones you don't need.", systemImage: "lock.shield")
+            Label("You stay in control. You can change permissions later in Settings and skip ones you do not need.", systemImage: "lock.shield")
                 .font(.heCaption)
                 .foregroundStyle(Color.heTextSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -36,7 +33,7 @@ struct OnboardingPermissionsStep: View {
     }
 }
 
-/// A single capability with the plain-language reason Heartelfie needs it.
+/// A single capability and the plain-language reason Heartelfie needs it.
 private struct PermissionPrimer: Identifiable {
     let id: String
     let title: String
@@ -48,37 +45,35 @@ private struct PermissionPrimer: Identifiable {
             id: "camera",
             title: "Camera",
             systemImage: "camera.fill",
-            rationale: "Reads subtle color changes in your fingertip or face to estimate your pulse."
+            rationale: "Reads subtle color changes in your fingertip or face to estimate pulse for a wellness screening."
         ),
         PermissionPrimer(
             id: "motion",
             title: "Motion & fitness",
             systemImage: "figure.walk.motion",
-            rationale: "Senses the tiny vibrations of your heartbeat and helps flag movement that blurs a reading."
+            rationale: "Senses tiny heartbeat vibrations and helps flag movement that can blur a reading."
         ),
         PermissionPrimer(
             id: "microphone",
             title: "Microphone",
             systemImage: "mic.fill",
-            rationale: "Listens to your heart sounds for the experimental sound-based check."
+            rationale: "Listens for heart sounds during an experimental sound-based wellness check."
         ),
         PermissionPrimer(
             id: "bluetooth",
             title: "Bluetooth",
             systemImage: "sensor.tag.radiowaves.forward.fill",
-            rationale: "Connects to your Heartelfie device for higher-confidence measurements."
+            rationale: "Connects the optional Heartelfie wellness device for higher-confidence check-ins."
         ),
         PermissionPrimer(
             id: "notifications",
             title: "Notifications",
             systemImage: "bell.fill",
-            rationale: "Optional, gentle reminders so a daily check-in becomes an easy habit."
+            rationale: "Sends optional, gentle reminders so a daily check-in is easier to remember."
         )
     ]
 }
 
-/// One rationale row. Combined into a single accessibility element so VoiceOver
-/// reads the capability and its reason together.
 private struct PermissionRow: View {
     let primer: PermissionPrimer
 
@@ -100,6 +95,7 @@ private struct PermissionRow: View {
                         .foregroundStyle(Color.heTextSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+
                 Spacer(minLength: 0)
             }
         }
@@ -108,9 +104,7 @@ private struct PermissionRow: View {
     }
 }
 
-/// HealthKit gets its own card because it offers an explicit opt-in here. The state
-/// reflects whether the user has tapped Connect this session; the real
-/// authorization sheet is presented by `AppEnvironment.enableHealthKit()`.
+/// HealthKit gets its own card because it offers an explicit opt-in here.
 private struct HealthKitPrimingCard: View {
     @Environment(AppEnvironment.self) private var env
     @State private var isConnecting = false
@@ -130,28 +124,29 @@ private struct HealthKitPrimingCard: View {
                         Text("Apple Health")
                             .font(.heHeadline)
                             .foregroundStyle(Color.heTextPrimary)
-                        Text("Optionally save your readings to Apple Health, so they live alongside the rest of your wellness data.")
+                        Text("Optionally save supported readings to Apple Health so they can live alongside the rest of your wellness data.")
                             .font(.heCallout)
                             .foregroundStyle(Color.heTextSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+
                     Spacer(minLength: 0)
                 }
 
                 if didRequest {
-                    Label("Health permission requested. You can fine-tune what's shared in the Health app.", systemImage: "checkmark.circle.fill")
+                    Label("Health permission requested. You can fine-tune what is shared in the Health app.", systemImage: "checkmark.circle.fill")
                         .font(.heCaption)
                         .foregroundStyle(Color.heRisk(.normal))
                         .accessibilityElement(children: .combine)
                 } else {
                     HESecondaryButton(
-                        "Connect Apple Health",
+                        "Continue",
                         systemImage: "heart.fill",
                         isLoading: isConnecting
                     ) {
                         connect()
                     }
-                    .accessibilityHint("Opens the system Health permission sheet")
+                    .accessibilityHint("Opens the system Health permission sheet.")
                 }
             }
         }

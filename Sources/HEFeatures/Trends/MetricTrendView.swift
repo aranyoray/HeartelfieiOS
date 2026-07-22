@@ -333,7 +333,7 @@ struct MetricTrendView: View {
         }
         let direction = slope > 0 ? "trending up" : "trending down"
         let magnitude = formatted(abs(slope))
-        return "Your \(name.lowercased()) has been \(direction) by about \(magnitude) \(metric.unit) over the last \(range.title). Trends are more meaningful than any single reading; keep tracking and bring patterns to a clinician if you're unsure."
+        return "Your \(name.lowercased()) has been \(direction) by about \(magnitude) \(metric.unit) over the last \(range.title). Trends are more meaningful than any single reading; keep tracking and compare patterns with your baseline if you are unsure."
     }
 
     private var chartAccessibilitySummary: String {

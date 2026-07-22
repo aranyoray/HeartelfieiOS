@@ -4,7 +4,7 @@ import HECore
 import HESignal
 
 #if canImport(CoreBluetooth)
-import CoreBluetooth
+@preconcurrency import CoreBluetooth
 #endif
 
 /// Central coordinator for the Heartelfie hardware device over BLE.
@@ -453,7 +453,7 @@ extension HeartelfieBLEManager {
 /// `CBCharacteristic`) across an isolation boundary — they never leave the main
 /// thread.
 private final class BLEDelegate: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
-    weak var owner: HeartelfieBLEManager?
+nonisolated(unsafe) weak var owner: HeartelfieBLEManager?
 
     init(owner: HeartelfieBLEManager) { self.owner = owner }
 
@@ -515,4 +515,5 @@ private final class BLEDelegate: NSObject, CBCentralManagerDelegate, CBPeriphera
         MainActor.assumeIsolated { owner?.didUpdateValue(for: characteristic) }
     }
 }
+extension BLEDelegate: @unchecked Sendable {}
 #endif

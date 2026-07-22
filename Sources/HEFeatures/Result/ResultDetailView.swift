@@ -9,7 +9,7 @@ import HEPersistence
 /// rendered waveform, the trust tier, the full metric set, confidence, signal
 /// quality, and model provenance (with any license attribution always visible).
 /// Adds the non-diagnostic interpretation, what-it-means / what-it-doesn't-mean
-/// copy, PDF/CSV export, a "discuss with a clinician" CTA, and — when confidence
+/// copy, PDF/CSV export, a wellness-context card, and - when confidence
 /// is low — a calm recheck prompt with a partner-clinic pathway.
 struct ResultDetailView: View {
     @Environment(AppEnvironment.self) private var env
@@ -129,10 +129,10 @@ struct ResultDetailView: View {
             .buttonStyle(PrimaryButtonStyle())
             .accessibilityHint("Starts a new \(reading.modality.displayName) check.")
 
-            HESecondaryButton("Find a partner clinic for a lab check", systemImage: "building.2") {
+            HESecondaryButton("Retake when rested", systemImage: "building.2") {
                 // Placeholder pathway — partner-clinic directory not yet wired.
             }
-            .accessibilityHint("Opens a partner clinic pathway. Coming soon.")
+            .accessibilityHint("Starts a fresh reading when you are ready.")
         }
         .padding(HESpacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -348,14 +348,14 @@ struct ResultDetailView: View {
         .accessibilityLabel("\(label): \(value)")
     }
 
-    // MARK: - Actions (share + clinician CTA)
+    // MARK: - Actions (share and retake)
 
     private var actionsSection: some View {
         VStack(spacing: HESpacing.md) {
-            HEPrimaryButton("Discuss with a clinician", systemImage: "stethoscope") {
+            HEPrimaryButton("Export PDF", systemImage: "stethoscope") {
                 Task { await prepareExport(.pdf) }
             }
-            .accessibilityHint("Prepares a PDF of this reading to share with a clinician.")
+            .accessibilityHint("Prepares a PDF of this reading to share outside Heartelfie if you choose.")
 
             HSplitButtons(
                 onCSV: { Task { await prepareExport(.csv) } },
@@ -428,7 +428,7 @@ struct ResultDetailView: View {
     }
 }
 
-/// A two-up row of secondary export buttons (CSV / PDF) used under the clinician CTA.
+/// A two-up row of secondary export buttons (CSV / PDF) used under the wellness actions.
 private struct HSplitButtons: View {
     let onCSV: () -> Void
     let onPDF: () -> Void

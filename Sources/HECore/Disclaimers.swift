@@ -55,9 +55,9 @@ public enum Disclaimers {
     public static func whatItDoesNotMean(for modality: Modality) -> String {
         switch modality {
         case .fingerPPG, .facialRPPG, .scg, .pcg:
-            return "This is a screening, not a diagnosis. It can't confirm or rule out any heart condition. If something feels wrong, talk to a clinician."
+            return "This is a screening, not a diagnosis. It can't confirm or rule out any heart condition. If something feels wrong, do not rely on this app."
         case .deviceMultiWavelengthPPG, .deviceECG, .deviceBioZ:
-            return "Even with the device, this is a wellness reading — not a diagnosis. Unusual results are a reason to talk to a clinician, not a conclusion."
+            return "Even with the device, this is a wellness reading — not a diagnosis. Unusual results are a reason to retake and compare with your trend, not a conclusion."
         }
     }
 
