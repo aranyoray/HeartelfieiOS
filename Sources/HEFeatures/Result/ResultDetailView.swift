@@ -128,11 +128,6 @@ struct ResultDetailView: View {
             }
             .buttonStyle(PrimaryButtonStyle())
             .accessibilityHint("Starts a new \(reading.modality.displayName) check.")
-
-            HESecondaryButton("Retake when rested", systemImage: "building.2") {
-                // Placeholder pathway — partner-clinic directory not yet wired.
-            }
-            .accessibilityHint("Starts a fresh reading when you are ready.")
         }
         .padding(HESpacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -352,7 +347,7 @@ struct ResultDetailView: View {
 
     private var actionsSection: some View {
         VStack(spacing: HESpacing.md) {
-            HEPrimaryButton("Export PDF", systemImage: "stethoscope") {
+            HEPrimaryButton("Export PDF", systemImage: "square.and.arrow.up") {
                 Task { await prepareExport(.pdf) }
             }
             .accessibilityHint("Prepares a PDF of this reading to share outside Heartelfie if you choose.")

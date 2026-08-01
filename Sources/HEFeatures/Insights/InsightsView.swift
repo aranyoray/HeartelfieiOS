@@ -189,7 +189,7 @@ struct InsightsView: View {
             HESectionHeader(
                 title: "Wellness notices",
                 subtitle: "Gentle, configurable prompts — never a diagnosis.",
-                systemImage: "stethoscope"
+                systemImage: "bell.badge"
             )
 
             if seekCareSignals.isEmpty {

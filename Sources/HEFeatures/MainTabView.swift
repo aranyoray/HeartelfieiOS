@@ -60,6 +60,8 @@ public struct MainTabView: View {
             AboutView()
         case .developer:
             DeveloperView()
+        case .legal(let document):
+            LegalDocumentView(document: document)
         }
     }
 }

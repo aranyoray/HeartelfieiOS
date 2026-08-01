@@ -61,17 +61,21 @@ struct EditProfileView: View {
                     .accessibilityLabel("Name or participant ID")
             }
 
-            Stepper(value: $draft.age, in: 1...120) {
-                HStack {
-                    Text("Age")
-                    Spacer()
-                    Text("\(draft.age)")
-                        .foregroundStyle(Color.heTextSecondary)
-                        .monospacedDigit()
+            Toggle("Include age", isOn: $draft.includeAge)
+                .tint(Color.hePrimary)
+            if draft.includeAge {
+                Stepper(value: $draft.age, in: 1...120) {
+                    HStack {
+                        Text("Age")
+                        Spacer()
+                        Text("\(draft.age)")
+                            .foregroundStyle(Color.heTextSecondary)
+                            .monospacedDigit()
+                    }
                 }
+                .accessibilityLabel("Age")
+                .accessibilityValue("\(draft.age) years")
             }
-            .accessibilityLabel("Age")
-            .accessibilityValue("\(draft.age) years")
 
             Picker("Gender", selection: $draft.biologicalSex) {
                 Text("Not set").tag(Optional<BiologicalSex>.none)
@@ -90,19 +94,31 @@ struct EditProfileView: View {
 
     private var bodySection: some View {
         Section {
-            if draft.unitSystem == .metric {
-                measurementStepper(title: "Height", value: $draft.heightCM, range: 80...230, unit: "cm")
-                measurementStepper(title: "Weight", value: $draft.weightKG, range: 25...250, unit: "kg")
-            } else {
-                measurementStepper(title: "Height", value: $draft.heightIN, range: 30...90, unit: "in")
-                measurementStepper(title: "Weight", value: $draft.weightLB, range: 55...550, unit: "lb")
+            Toggle("Include height", isOn: $draft.includeHeight)
+                .tint(Color.hePrimary)
+            if draft.includeHeight {
+                if draft.unitSystem == .metric {
+                    measurementStepper(title: "Height", value: $draft.heightCM, range: 80...230, unit: "cm")
+                } else {
+                    measurementStepper(title: "Height", value: $draft.heightIN, range: 30...90, unit: "in")
+                }
+            }
+
+            Toggle("Include weight", isOn: $draft.includeWeight)
+                .tint(Color.hePrimary)
+            if draft.includeWeight {
+                if draft.unitSystem == .metric {
+                    measurementStepper(title: "Weight", value: $draft.weightKG, range: 25...250, unit: "kg")
+                } else {
+                    measurementStepper(title: "Weight", value: $draft.weightLB, range: 55...550, unit: "lb")
+                }
             }
 
             bmiRow
         } header: {
             Text("Body measurements")
         } footer: {
-            Text("BMI is calculated from your height and weight. It's a general guide, not a diagnosis.")
+            Text("Age, height, and weight are optional. When included, BMI is calculated from your height and weight — a general guide, not a diagnosis.")
         }
     }
 
@@ -262,9 +278,15 @@ struct EditProfileView: View {
 private struct ProfileDraft {
     var name: String = "PID001"
     var unitSystem: UnitSystem = .metric
+    // Age / height / weight are optional in the profile. Each carries an "include"
+    // flag so a user who opted out during onboarding is never silently assigned a
+    // fabricated value when they open and save the editor.
+    var includeAge: Bool = false
     var age: Int = 35
     var biologicalSex: BiologicalSex?
+    var includeHeight: Bool = false
     var heightCM: Double = 170
+    var includeWeight: Bool = false
     var weightKG: Double = 70
     var race: Race?
     var priorConditions: Set<PriorCondition> = []
@@ -282,9 +304,9 @@ private struct ProfileDraft {
         set { weightKG = newValue / 2.2046226218 }
     }
 
-    /// Live BMI from the canonical metric height/weight.
+    /// Live BMI — only when both height and weight are included.
     var bmi: Double? {
-        guard heightCM > 0 else { return nil }
+        guard includeHeight, includeWeight, heightCM > 0 else { return nil }
         let meters = heightCM / 100.0
         return weightKG / (meters * meters)
     }
@@ -294,9 +316,12 @@ private struct ProfileDraft {
     init(profile: HealthProfile) {
         name = profile.name
         unitSystem = profile.unitSystem
+        includeAge = profile.age != nil
         age = profile.age ?? 35
         biologicalSex = profile.biologicalSex
+        includeHeight = profile.heightCM != nil
         heightCM = profile.heightCM ?? 170
+        includeWeight = profile.weightKG != nil
         weightKG = profile.weightKG ?? 70
         race = profile.race
         priorConditions = profile.priorConditions
@@ -307,10 +332,10 @@ private struct ProfileDraft {
     func toProfile() -> HealthProfile {
         HealthProfile(
             name: name,
-            age: age,
+            age: includeAge ? age : nil,
             biologicalSex: biologicalSex,
-            heightCM: heightCM,
-            weightKG: weightKG,
+            heightCM: includeHeight ? heightCM : nil,
+            weightKG: includeWeight ? weightKG : nil,
             race: race,
             knownConditions: knownConditions,
             priorConditions: priorConditions,

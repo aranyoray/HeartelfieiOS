@@ -23,7 +23,9 @@ struct DevicePairingView: View {
                 contactSection
                 detailsSection
                 actionSection
+                #if DEBUG
                 simulateSection
+                #endif
                 measurementTierSection
                 EmergencyNotice()
             }
@@ -173,8 +175,9 @@ struct DevicePairingView: View {
         }
     }
 
-    // MARK: - Simulate toggle
+    // MARK: - Simulate toggle (debug builds only)
 
+    #if DEBUG
     private var simulateSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.sm) {
             HESectionHeader(title: "Demos", systemImage: "wand.and.stars")
@@ -198,6 +201,7 @@ struct DevicePairingView: View {
             }
         }
     }
+    #endif
 
     // MARK: - Measurement tier note
 

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		44DD1160C62E7C3736F66084 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BC08935662D38572C2F40DB /* Assets.xcassets */; };
+		FE01AA0000000000000000B1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FE01AA0000000000000000B2 /* PrivacyInfo.xcprivacy */; };
 		C017D1E177DF4BC0D873CABD /* HEFeatures in Frameworks */ = {isa = PBXBuildFile; productRef = 339DA5FD5ED1D39AF98AA585 /* HEFeatures */; };
 		E01266402692B9558B473A7D /* HeartelfieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */; };
 /* End PBXBuildFile section */
@@ -17,6 +18,7 @@
 		5540C1FBC6BA2BEBC6509DC8 /* Heartelfie.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Heartelfie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartelfieApp.swift; sourceTree = "<group>"; };
 		7CB9F99B2263DF0F53E2F9AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		FE01AA0000000000000000B2 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		84606288F395FDAAE56551B4 /* HeartelfieiOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HeartelfieiOS; path = .; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -55,6 +57,7 @@
 				3BC08935662D38572C2F40DB /* Assets.xcassets */,
 				6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */,
 				7CB9F99B2263DF0F53E2F9AE /* Info.plist */,
+				FE01AA0000000000000000B2 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Heartelfie;
 			sourceTree = "<group>";
@@ -141,6 +144,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				44DD1160C62E7C3736F66084 /* Assets.xcassets in Resources */,
+				FE01AA0000000000000000B1 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

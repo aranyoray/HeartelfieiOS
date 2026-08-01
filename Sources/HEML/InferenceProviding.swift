@@ -120,7 +120,7 @@ public final class InferenceCoordinator: InferenceProviding {
                 metrics: metrics,
                 provenance: provenance,
                 confidence: Confidence(response.confidence),
-                interpretation: "Blood readings from the Heartelfie device. Screening insight, not a diagnosis."
+                interpretation: "Device wellness readings from the Heartelfie sensor. Screening insight, not a diagnosis."
             )
         } catch {
             // Offline / failure: no clinical metrics, but keep attribution provenance

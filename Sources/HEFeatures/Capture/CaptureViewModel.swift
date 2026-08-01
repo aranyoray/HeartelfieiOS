@@ -49,6 +49,7 @@ public final class CaptureViewModel {
     private let processor = SignalProcessor()
     private var sensor: (any CardioSensor)?
     private var streamTask: Task<Void, Never>?
+    private var processingTask: Task<Void, Never>?
     private var channelBuffers: [SignalChannel: [Double]] = [:]
     private var timestamps: [TimeInterval] = []
     private var captureStartTimestamp: TimeInterval?
@@ -104,6 +105,8 @@ public final class CaptureViewModel {
 
     /// Abort the capture and tear down the sensor.
     public func abort() async {
+        processingTask?.cancel()
+        processingTask = nil
         await stopSensor()
         phase = .idle
         resetBuffers()
@@ -140,7 +143,7 @@ public final class CaptureViewModel {
                 captureProgress = min(elapsedSeconds / captureWindow, 1.0)
                 if elapsedSeconds >= captureWindow, !isFinishing {
                     isFinishing = true
-                    Task { await finishCapture() }
+                    processingTask = Task { await finishCapture() }
                 }
             }
         }
@@ -193,6 +196,9 @@ public final class CaptureViewModel {
             processor.process(channels: channels, sampleRate: sr, modality: modality, profile: profile)
         }.value
 
+        // The user may have left the screen (abort) while we were processing.
+        guard phase == .processing, !Task.isCancelled else { return }
+
         switch result {
         case .failure(let error):
             phase = .failed(error)
@@ -208,13 +214,37 @@ public final class CaptureViewModel {
                 skinTone: skinTone
             )
 
+            // Re-check after the inference await — the capture may have been aborted.
+            guard phase == .processing, !Task.isCancelled else { return }
+
+            // Merge inference on top of DSP. When inference produces a metric of a
+            // kind the DSP stage already computed (e.g. the device ECG model's
+            // refined heart rate / rhythm, or the finger-PPG on-device rhythm
+            // screen), the inferred value *replaces* the DSP one so the refined
+            // result is what the user sees — not silently discarded.
             var metrics = processed.metrics
-            for metric in inferred.metrics where !metrics.contains(where: { $0.kind == metric.kind }) {
-                metrics.append(metric)
+            for metric in inferred.metrics {
+                if let idx = metrics.firstIndex(where: { $0.kind == metric.kind }) {
+                    metrics[idx] = metric
+                } else {
+                    metrics.append(metric)
+                }
             }
 
-            let provenance = inferred.metrics.isEmpty ? Provenance.onDeviceDSP : inferred.provenance
-            let confidence = inferred.confidence ?? processed.confidence
+            // Provenance and confidence follow the trust tier. Device modalities are
+            // authoritative (cloud / on-device CoreML clinical results), so their
+            // provenance and confidence win. Phone modalities keep the DSP+SQI
+            // confidence and on-device provenance: an optional, approximate on-device
+            // screen must never override the real reading confidence (which would
+            // otherwise cap a clean capture below "high" and trigger spurious
+            // low-confidence rechecks).
+            let isDeviceTier = modality.requiresDevice
+            let provenance: Provenance = (isDeviceTier && !inferred.metrics.isEmpty)
+                ? inferred.provenance
+                : .onDeviceDSP
+            let confidence: Confidence = isDeviceTier
+                ? (inferred.confidence ?? processed.confidence)
+                : processed.confidence
             let interpretation = inferred.interpretation
                 ?? Self.interpretation(metrics: metrics, confidence: confidence, tier: modality.tier)
 

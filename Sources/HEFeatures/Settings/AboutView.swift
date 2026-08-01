@@ -88,7 +88,7 @@ struct AboutView: View {
                     tier(
                         icon: "iphone",
                         title: "Screening — phone only",
-                        detail: "Camera and microphone checks give you a quick, low-friction screening. Convenient, but lower confidence."
+                        detail: "Camera-based checks give you a quick, low-friction screening. Convenient, but lower confidence."
                     )
                     Divider().overlay(Color.heSeparator)
                     tier(
@@ -167,16 +167,34 @@ struct AboutView: View {
 
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.sm) {
-                    creditRow(title: "Privacy Policy", detail: "Coming soon")
+                    legalRow(title: "Privacy Policy", document: .privacyPolicy)
                     Divider().overlay(Color.heSeparator)
-                    creditRow(title: "Terms of Use", detail: "Coming soon")
+                    legalRow(title: "Terms of Use", document: .termsOfUse)
                     Divider().overlay(Color.heSeparator)
-                    creditRow(title: "Acknowledgements", detail: "Coming soon")
+                    legalRow(title: "Acknowledgements", document: .acknowledgements)
                     Divider().overlay(Color.heSeparator)
                     creditRow(title: "© \(currentYear) \(HeartelfieConfig.appName)", detail: "")
                 }
             }
         }
+    }
+
+    private func legalRow(title: String, document: LegalDocument) -> some View {
+        NavigationLink(value: AppRoute.legal(document)) {
+            HStack {
+                Text(title)
+                    .font(.heCallout)
+                    .foregroundStyle(Color.heTextPrimary)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.heCaption.weight(.semibold))
+                    .foregroundStyle(Color.heTextTertiary)
+                    .accessibilityHidden(true)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens \(title).")
     }
 
     private func creditRow(title: String, detail: String) -> some View {

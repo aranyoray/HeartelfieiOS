@@ -36,16 +36,15 @@
 	<string>Heartelfie uses the camera to take a gentle heart-rate screening from your fingertip or face. This is a wellness screening, not a medical measurement.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Heartelfie connects over Bluetooth to your Heartelfie device for higher-confidence measurements.</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Heartelfie connects over Bluetooth to your Heartelfie device for higher-confidence measurements.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Heartelfie can read heart-health data (like heart rate and HRV) to give you a fuller picture of your trends. You stay in control of what is shared.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Heartelfie can save your screening results (like heart rate and HRV) to Apple Health so your data stays portable.</string>
 
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>bluetooth-central</string>
-	</array>
+	<!-- The app uses only standard/exempt encryption (Apple CryptoKit AES-GCM for
+	     local data at rest and HTTPS/ATS for transport), so it is exempt from
+	     export-compliance documentation. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

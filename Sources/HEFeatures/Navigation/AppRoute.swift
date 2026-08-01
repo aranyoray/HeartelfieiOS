@@ -48,4 +48,6 @@ public enum AppRoute: Hashable, Sendable {
     case exportData
     case about
     case developer
+    /// A self-contained legal document (privacy policy, terms, acknowledgements).
+    case legal(LegalDocument)
 }

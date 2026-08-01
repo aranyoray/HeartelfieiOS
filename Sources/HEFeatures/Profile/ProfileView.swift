@@ -283,9 +283,11 @@ struct ProfileView: View {
             NavigationLink(value: AppRoute.about) {
                 Label("About \(HeartelfieConfig.appName)", systemImage: "info.circle")
             }
+            #if DEBUG
             NavigationLink(value: AppRoute.developer) {
                 Label("Developer", systemImage: "hammer")
             }
+            #endif
         }
     }
 
