@@ -16,8 +16,6 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
     case perfusionIndex        // device only
     case hydration             // device only (bio-impedance)
     case respiratoryRate
-    case beatTiming
-    case murmurFlag            // experimental phone PCG screen
 
     public var id: String { rawValue }
 
@@ -38,8 +36,6 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
         case .perfusionIndex: return "Perfusion Wellness"
         case .hydration: return "Hydration Wellness"
         case .respiratoryRate: return "Breathing Rate"
-        case .beatTiming: return "Beat Timing"
-        case .murmurFlag: return "Heart-Sound Insight"
         }
     }
 
@@ -56,8 +52,6 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
         case .perfusionIndex: return "Perfusion"
         case .hydration: return "Hydration"
         case .respiratoryRate: return "Breath"
-        case .beatTiming: return "Beat"
-        case .murmurFlag: return "Sound"
         }
     }
 
@@ -72,8 +66,6 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
         case .perfusionIndex: return "%"
         case .hydration: return "%"
         case .respiratoryRate: return "br/min"
-        case .beatTiming: return "ms"
-        case .murmurFlag: return ""
         }
     }
 
@@ -88,8 +80,6 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
         case .perfusionIndex: return "wave.3.right"
         case .hydration: return "humidity.fill"
         case .respiratoryRate: return "lungs.fill"
-        case .beatTiming: return "metronome.fill"
-        case .murmurFlag: return "ear.badge.waveform"
         }
     }
 
@@ -110,12 +100,10 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
         case .heartRate, .respiratoryRate, .spo2Estimate, .spo2Clinical,
              .rhythmIrregularity, .anemiaRisk, .hydration:
             return 0
-        case .hrvSDNN, .hrvRMSSD, .beatTiming:
+        case .hrvSDNN, .hrvRMSSD:
             return 0
         case .hemoglobin, .perfusionIndex:
             return 1
-        case .murmurFlag:
-            return 0
         }
     }
 }

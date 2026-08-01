@@ -54,7 +54,6 @@ public enum ClinicalConfig {
     public static func minimumCaptureSeconds(for modality: Modality) -> Double {
         switch modality {
         case .fingerPPG, .facialRPPG, .deviceMultiWavelengthPPG: return 20
-        case .scg, .pcg: return 15
         case .deviceECG: return 30
         case .deviceBioZ: return 5
         }
@@ -90,10 +89,6 @@ public enum ClinicalConfig {
             return ClinicalRange(low: 50, high: 65, unit: "%")
         case .respiratoryRate:
             return ClinicalRange(low: 12, high: 20, unit: "br/min")
-        case .beatTiming:
-            return nil
-        case .murmurFlag:
-            return nil
         }
     }
 

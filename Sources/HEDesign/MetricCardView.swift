@@ -103,9 +103,6 @@ public struct MetricCardView: View {
                     profile: SampleData.profile
                 )
             )
-            MetricCardView(
-                metric: CardioMetric(kind: .murmurFlag, value: 0, profile: SampleData.profile)
-            )
         }
         .padding()
     }

@@ -6,9 +6,6 @@ public enum SignalChannel: String, Codable, Sendable, CaseIterable, Hashable {
     case infrared, infrared2     // device multi-wavelength
     case ecg                     // device electrodes
     case bioImpedance            // device BioZ
-    case audio                   // microphone PCG
-    case accelMagnitude          // motion SCG
-    case gyroMagnitude           // motion gyrocardiography
 }
 
 /// A single timestamped sample on one channel.

@@ -34,10 +34,6 @@
 	<!-- Permission usage strings: calm, specific, non-alarmist. -->
 	<key>NSCameraUsageDescription</key>
 	<string>Heartelfie uses the camera to take a gentle heart-rate screening from your fingertip or face. This is a wellness screening, not a medical measurement.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Heartelfie uses the microphone for an experimental heart-sound screening when you hold your phone to your chest.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>Heartelfie uses motion sensors for an experimental heartbeat screening when you rest your phone on your chest.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Heartelfie connects over Bluetooth to your Heartelfie device for higher-confidence measurements.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>

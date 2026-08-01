@@ -39,10 +39,6 @@ public enum Disclaimers {
         switch modality {
         case .fingerPPG, .facialRPPG:
             return "This gives you a quick wellness snapshot of your heart rate and its variability, useful for spotting day-to-day trends."
-        case .scg:
-            return "This experimental check senses the mechanical vibration of your heartbeat to estimate rate and beat timing."
-        case .pcg:
-            return "This experimental check listens to your heart sounds and flags anything that sounds unusual for you to follow up on."
         case .deviceMultiWavelengthPPG:
             return "Your Heartelfie device uses multiple light wavelengths for a higher-confidence oxygen-carry and oxygen wellness reading."
         case .deviceECG:
@@ -54,7 +50,7 @@ public enum Disclaimers {
 
     public static func whatItDoesNotMean(for modality: Modality) -> String {
         switch modality {
-        case .fingerPPG, .facialRPPG, .scg, .pcg:
+        case .fingerPPG, .facialRPPG:
             return "This is a screening, not a diagnosis. It can't confirm or rule out any heart condition. If something feels wrong, do not rely on this app."
         case .deviceMultiWavelengthPPG, .deviceECG, .deviceBioZ:
             return "Even with the device, this is a wellness reading — not a diagnosis. Unusual results are a reason to retake and compare with your trend, not a conclusion."

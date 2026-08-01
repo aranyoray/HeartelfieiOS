@@ -29,14 +29,14 @@ much to trust it**. This is enforced in the type system, not just the UI.
 
 | Tier | Source | Meaning |
 |------|--------|---------|
-| **Screening** | The phone's own sensors (camera, mic, motion) | Wellness-grade, lower confidence — *"not a medical measurement."* |
+| **Screening** | The phone's own camera | Wellness-grade, lower confidence — *"not a medical measurement."* |
 | **Measurement** | The connected Heartelfie hardware device (BLE) | Higher-accuracy, clinical-grade path. |
 
 **A smartphone has no rhythm-sensing electrode.** The higher-confidence
 device-only signals (surfaced under wellness labels — *Heart Rhythm*, *Oxygen
 Wellness*, *Oxygen-Carry Wellness*) come *only* from the Heartelfie hardware. The
-phone produces wellness screening signals only (camera→PPG/rPPG,
-accelerometer→SCG, mic→PCG). `MetricKind.isDeviceOnly` makes it impossible for a
+phone produces wellness screening signals only (camera→PPG/rPPG).
+`MetricKind.isDeviceOnly` makes it impossible for a
 phone modality to surface a device-only metric, and a unit test
 (`HECoreTests.testPhoneModalitiesNeverExposeDeviceOnlyMetrics`) guards it.
 
@@ -84,8 +84,8 @@ HESignal      DSP: vDSP-backed bandpass biquad filters, peak detection, HR/HRV
               that scopes metrics to each modality. Seedable synthetic PPG/ECG
               generators. Depends on HECore.
 
-HESensors     Protocol-oriented sensor layer: CameraPPG / FaceRPPG / MotionSCG /
-              MicPCG / HeartelfieDevice sensors, each with a Mock variant + a
+HESensors     Protocol-oriented sensor layer: CameraPPG / FaceRPPG /
+              HeartelfieDevice sensors, each with a Mock variant + a
               BLE manager and simulated peripheral. Depends on HECore, HESignal.
 
 HEML          On-device CoreML wrappers (with stub fallbacks) + a cloud model

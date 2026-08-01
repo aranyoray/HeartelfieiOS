@@ -181,7 +181,7 @@ public final class HealthKitBridge {
 
         // No standard HealthKit type — kept only in the encrypted store.
         case .hrvRMSSD, .rhythmIrregularity, .hemoglobin, .anemiaRisk,
-             .perfusionIndex, .hydration, .beatTiming, .murmurFlag:
+             .perfusionIndex, .hydration:
             return nil
         }
     }

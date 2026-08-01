@@ -48,7 +48,7 @@ public struct SQIClassifier: Sendable {
         let normalizedAmplitude = dc > 1e-6 ? acRange / dc : acRange
         let amplitudeScore = clamp01(normalizedAmplitude / amplitudeReference(for: modality))
         if amplitudeScore < 0.2 {
-            issues.append(modality.source == .microphone ? .ambientNoise : .lowAmplitude)
+            issues.append(.lowAmplitude)
         }
 
         // 3. Clipping / saturation: fraction of samples pinned at the extremes.
@@ -141,7 +141,6 @@ public struct SQIClassifier: Sendable {
         switch modality {
         case .fingerPPG, .deviceMultiWavelengthPPG: return 0.02 // ~2% perfusion
         case .facialRPPG: return 0.005
-        case .scg, .pcg: return 0.05
         case .deviceECG: return 0.1
         case .deviceBioZ: return 0.01
         }
@@ -149,7 +148,7 @@ public struct SQIClassifier: Sendable {
 
     private func prioritise(_ issues: [SQIIssue]) -> [SQIIssue] {
         let order: [SQIIssue] = [.noContact, .saturation, .motion, .lowLight, .lowAmplitude,
-                                 .ambientNoise, .faceNotFound, .irregularCadence, .tooShort]
+                                 .faceNotFound, .irregularCadence, .tooShort]
         let unique = Array(Set(issues))
         return unique.sorted { (order.firstIndex(of: $0) ?? 99) < (order.firstIndex(of: $1) ?? 99) }
     }

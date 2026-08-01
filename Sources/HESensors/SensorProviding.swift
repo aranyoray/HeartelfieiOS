@@ -13,7 +13,7 @@ public protocol SensorProviding: Sendable {
 /// Default `SensorProviding`.
 ///
 /// Resolution rules:
-/// * **Phone modalities** (`.fingerPPG`, `.facialRPPG`, `.scg`, `.pcg`) → the real
+/// * **Phone modalities** (`.fingerPPG`, `.facialRPPG`) → the real
 ///   sensor on a physical device, the `Mock…` sensor in the Simulator or when
 ///   `forceSimulation` is set. (Each real sensor also self-falls-back to its mock if
 ///   its framework is unavailable at runtime, so this is belt-and-braces.)
@@ -56,10 +56,6 @@ public final class SensorFactory: SensorProviding, @unchecked Sendable {
             return simulate ? MockCameraPPGSensor() : makeCameraPPG()
         case .facialRPPG:
             return simulate ? MockFaceRPPGSensor() : makeFaceRPPG()
-        case .scg:
-            return simulate ? MockMotionSCGSensor() : MotionSCGSensor()
-        case .pcg:
-            return simulate ? MockMicPCGSensor() : MicPCGSensor()
         case .deviceMultiWavelengthPPG, .deviceECG, .deviceBioZ:
             // Use the real device sensor only when we have a BLE manager and aren't
             // force-simulating; otherwise emit synthetic device frames.

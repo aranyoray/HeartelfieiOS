@@ -81,7 +81,7 @@ public final class InferenceCoordinator: InferenceProviding {
             return inferBioZ(channels: channels, profile: profile)
         case .fingerPPG:
             return inferFingerPPGRhythmScreen(modality: modality, channels: channels, sampleRate: sampleRate, profile: profile)
-        case .facialRPPG, .scg, .pcg:
+        case .facialRPPG:
             // DSP already produced the supported metrics for these phone modalities.
             return .dspOnly
         }

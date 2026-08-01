@@ -160,7 +160,7 @@ struct ModalityInfoView: View {
 
 #Preview("Modality info — phone") {
     NavigationStack {
-        ModalityInfoView(modality: .pcg)
+        ModalityInfoView(modality: .fingerPPG)
             .environment(AppEnvironment.preview())
     }
 }

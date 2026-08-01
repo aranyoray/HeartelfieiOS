@@ -232,7 +232,7 @@ struct FlowLayout: Layout {
         ScrollView {
             VStack(spacing: HESpacing.md) {
                 ModalityRow(modality: .fingerPPG, isAvailable: true)
-                ModalityRow(modality: .pcg, isAvailable: true)
+                ModalityRow(modality: .facialRPPG, isAvailable: true)
                 ModalityRow(modality: .deviceECG, isAvailable: false)
                 ModalityRow(modality: .deviceMultiWavelengthPPG, isAvailable: true)
             }

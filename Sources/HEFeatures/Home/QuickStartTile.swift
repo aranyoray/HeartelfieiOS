@@ -110,7 +110,7 @@ struct ExperimentalChip: View {
     NavigationStack {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: HESpacing.md) {
             QuickStartTile(modality: .fingerPPG, isAvailable: true)
-            QuickStartTile(modality: .pcg, isAvailable: true)
+            QuickStartTile(modality: .facialRPPG, isAvailable: true)
             QuickStartTile(modality: .deviceECG, isAvailable: false)
             QuickStartTile(modality: .deviceMultiWavelengthPPG, isAvailable: true)
         }

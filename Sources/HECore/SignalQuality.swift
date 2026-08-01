@@ -11,7 +11,6 @@ public enum SQIIssue: String, Codable, Sendable, CaseIterable, Hashable, Identif
     case noContact
     case tooShort
     case irregularCadence
-    case ambientNoise
     case faceNotFound
 
     public var id: String { rawValue }
@@ -26,7 +25,6 @@ public enum SQIIssue: String, Codable, Sendable, CaseIterable, Hashable, Identif
         case .noContact: return "Reposition your finger to fully cover the camera."
         case .tooShort: return "Stay in place a little longer to capture enough beats."
         case .irregularCadence: return "Keep steady — the beat-to-beat timing looks noisy."
-        case .ambientNoise: return "Find a quieter spot and press the mic to your chest."
         case .faceNotFound: return "Center your face in the frame with even lighting."
         }
     }
@@ -40,7 +38,6 @@ public enum SQIIssue: String, Codable, Sendable, CaseIterable, Hashable, Identif
         case .noContact: return "hand.point.up.braille"
         case .tooShort: return "timer"
         case .irregularCadence: return "waveform.path"
-        case .ambientNoise: return "speaker.wave.3"
         case .faceNotFound: return "face.dashed"
         }
     }

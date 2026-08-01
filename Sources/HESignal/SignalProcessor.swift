@@ -103,9 +103,6 @@ public struct SignalProcessor: Sendable {
         if allowed.contains(.rhythmIrregularity) {
             metrics.append(CardioMetric(kind: .rhythmIrregularity, value: features.irregularityPercent.rounded(), profile: profile))
         }
-        if allowed.contains(.beatTiming), let meanRR = rr.isEmpty ? nil : Vector.mean(rr) {
-            metrics.append(CardioMetric(kind: .beatTiming, value: meanRR.rounded(), profile: profile))
-        }
 
         // Screening SpO₂ estimate — phone tier only, requires red + green channels.
         if allowed.contains(.spo2Estimate),
@@ -147,8 +144,6 @@ public struct SignalProcessor: Sendable {
         case .fingerPPG, .facialRPPG: return .green
         case .deviceMultiWavelengthPPG: return .infrared
         case .deviceECG: return .ecg
-        case .scg: return .accelMagnitude
-        case .pcg: return .audio
         case .deviceBioZ: return .bioImpedance
         }
     }

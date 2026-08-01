@@ -11,10 +11,6 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
     case fingerPPG
     /// Contactless facial rPPG via the front camera + Vision face ROI.
     case facialRPPG
-    /// Seismocardiography / gyrocardiography via accelerometer + gyro.
-    case scg
-    /// Phonocardiography (heart sounds) via the microphone.
-    case pcg
     /// Multi-wavelength PPG via the Heartelfie device.
     case deviceMultiWavelengthPPG
     /// ECG via the Heartelfie device electrodes. Device-only — never from phone.
@@ -28,8 +24,6 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
         switch self {
         case .fingerPPG: return "Finger PPG"
         case .facialRPPG: return "Facial rPPG"
-        case .scg: return "Seismocardiography"
-        case .pcg: return "Heart Sounds (PCG)"
         case .deviceMultiWavelengthPPG: return "Multi-Wavelength PPG"
         case .deviceECG: return "Heart Rhythm"
         case .deviceBioZ: return "Bio-Impedance"
@@ -40,8 +34,6 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
         switch self {
         case .fingerPPG: return "Finger PPG"
         case .facialRPPG: return "Face rPPG"
-        case .scg: return "SCG"
-        case .pcg: return "PCG"
         case .deviceMultiWavelengthPPG: return "MW-PPG"
         case .deviceECG: return "Rhythm"
         case .deviceBioZ: return "BioZ"
@@ -50,7 +42,7 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
 
     public var tier: MeasurementTier {
         switch self {
-        case .fingerPPG, .facialRPPG, .scg, .pcg:
+        case .fingerPPG, .facialRPPG:
             return .screening
         case .deviceMultiWavelengthPPG, .deviceECG, .deviceBioZ:
             return .measurement
@@ -61,19 +53,12 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
         switch self {
         case .fingerPPG: return .rearCamera
         case .facialRPPG: return .frontCamera
-        case .scg: return .motion
-        case .pcg: return .microphone
         case .deviceMultiWavelengthPPG, .deviceECG, .deviceBioZ: return .device
         }
     }
 
     /// Experimental modalities carry an extra "experimental" qualifier in the UI.
-    public var isExperimental: Bool {
-        switch self {
-        case .scg, .pcg: return true
-        default: return false
-        }
-    }
+    public var isExperimental: Bool { false }
 
     public var requiresDevice: Bool { source == .device }
 
@@ -85,10 +70,6 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
             return [.heartRate, .hrvSDNN, .hrvRMSSD, .rhythmIrregularity, .spo2Estimate, .respiratoryRate]
         case .facialRPPG:
             return [.heartRate, .hrvSDNN, .hrvRMSSD]
-        case .scg:
-            return [.heartRate, .beatTiming]
-        case .pcg:
-            return [.heartRate, .murmurFlag]
         case .deviceMultiWavelengthPPG:
             return [.hemoglobin, .anemiaRisk, .spo2Clinical, .perfusionIndex, .heartRate]
         case .deviceECG:
@@ -102,8 +83,6 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
         switch self {
         case .fingerPPG: return "hand.point.up.left.fill"
         case .facialRPPG: return "face.smiling"
-        case .scg: return "iphone.gen3.radiowaves.left.and.right"
-        case .pcg: return "waveform.and.mic"
         case .deviceMultiWavelengthPPG: return "rays"
         case .deviceECG: return "waveform.path.ecg"
         case .deviceBioZ: return "drop.degreesign"
@@ -117,10 +96,6 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
             return "Place a fingertip over the rear camera and torch to screen heart rate and rhythm."
         case .facialRPPG:
             return "Look at the front camera for a contactless heart-rate screen."
-        case .scg:
-            return "Rest the phone on your chest to sense the tiny vibrations of each heartbeat."
-        case .pcg:
-            return "Hold the microphone to your chest to listen to your heart sounds."
         case .deviceMultiWavelengthPPG:
             return "Use the Heartelfie device clip for a multi-wavelength wellness reading."
         case .deviceECG:
@@ -134,8 +109,6 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
     public var nominalSampleRate: Double {
         switch self {
         case .fingerPPG, .facialRPPG: return 30      // video frame rate
-        case .scg: return 100                         // CoreMotion
-        case .pcg: return 2000                        // decimated audio for heart sounds
         case .deviceMultiWavelengthPPG: return 125
         case .deviceECG: return 250
         case .deviceBioZ: return 50

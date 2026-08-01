@@ -75,17 +75,13 @@ public struct BandpassFilter: Sendable {
 
 /// Recommended bandpass passband (Hz) for each modality's primary channel.
 public enum FilterBand {
-    /// Cardiac band for PPG/ECG (~30–210 bpm). PCG heart sounds sit much higher.
+    /// Cardiac band for PPG/ECG (~30–210 bpm).
     public static func passband(for modality: Modality) -> (low: Double, high: Double) {
         switch modality {
         case .fingerPPG, .facialRPPG, .deviceMultiWavelengthPPG:
             return (0.7, 3.5)
-        case .scg:
-            return (0.7, 4.0)
         case .deviceECG:
             return (0.5, 40.0)
-        case .pcg:
-            return (20.0, 250.0)        // heart-sound band
         case .deviceBioZ:
             return (0.05, 1.0)
         }
