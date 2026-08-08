@@ -121,7 +121,7 @@ struct ModalityInfoView: View {
         if !modality.supportedMetrics.isEmpty {
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.sm) {
-                    Text("What it measures")
+                    Text(modality.tier == .measurement ? "What it measures" : "What it screens for")
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
 
@@ -160,7 +160,7 @@ struct ModalityInfoView: View {
 
 #Preview("Modality info — phone") {
     NavigationStack {
-        ModalityInfoView(modality: .pcg)
+        ModalityInfoView(modality: .facialRPPG)
             .environment(AppEnvironment.preview())
     }
 }

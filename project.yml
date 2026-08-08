@@ -29,6 +29,21 @@ settings:
     DEVELOPMENT_TEAM: "" # set your team for device builds
     CODE_SIGN_STYLE: Automatic
 
+schemes:
+  Heartelfie:
+    build:
+      targets:
+        Heartelfie: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - package: Heartelfie/HECoreTests
+        - package: Heartelfie/HESignalTests
+    archive:
+      config: Release
+
 targets:
   Heartelfie:
     type: application
@@ -39,12 +54,17 @@ targets:
     dependencies:
       - package: Heartelfie
         product: HEFeatures
+    entitlements:
+      path: App/Heartelfie/Heartelfie.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.app
         PRODUCT_NAME: Heartelfie
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "1"
+        CURRENT_PROJECT_VERSION: "3"
         INFOPLIST_FILE: App/Heartelfie/Info.plist
         TARGETED_DEVICE_FAMILY: "1,2"
         ENABLE_PREVIEWS: "YES"

@@ -10,10 +10,6 @@ public enum SignalSource: String, Codable, Sendable, CaseIterable, Hashable {
     case rearCamera
     /// Front camera (contactless facial rPPG via Vision face ROI).
     case frontCamera
-    /// Accelerometer / gyroscope (seismocardiography).
-    case motion
-    /// Microphone (phonocardiography / heart sounds).
-    case microphone
     /// The connected Heartelfie hardware device over BLE.
     case device
 
@@ -21,8 +17,6 @@ public enum SignalSource: String, Codable, Sendable, CaseIterable, Hashable {
         switch self {
         case .rearCamera: return "Rear camera + torch"
         case .frontCamera: return "Front camera"
-        case .motion: return "Motion sensors"
-        case .microphone: return "Microphone"
         case .device: return "Heartelfie device"
         }
     }
@@ -32,8 +26,6 @@ public enum SignalSource: String, Codable, Sendable, CaseIterable, Hashable {
         switch self {
         case .rearCamera: return "camera.fill"
         case .frontCamera: return "person.crop.square.badge.video"
-        case .motion: return "gyroscope"
-        case .microphone: return "waveform.and.mic"
         case .device: return "sensor.tag.radiowaves.forward.fill"
         }
     }

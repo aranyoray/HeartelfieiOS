@@ -34,9 +34,6 @@ public struct CardioMetric: Identifiable, Codable, Sendable, Hashable {
 
     /// Value formatted to the metric's natural precision (no unit).
     public var formattedValue: String {
-        if kind == .murmurFlag {
-            return value >= 0.5 ? "Flagged" : "Clear"
-        }
         return value.formatted(.number.precision(.fractionLength(kind.fractionDigits)))
     }
 

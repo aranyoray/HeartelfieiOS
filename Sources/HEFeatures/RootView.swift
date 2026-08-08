@@ -19,6 +19,7 @@ public struct RootView: View {
                 MainTabView()
             } else {
                 OnboardingView()
+                    .heContentWidthCapped()
             }
         }
         .environment(env)

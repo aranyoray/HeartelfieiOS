@@ -87,7 +87,9 @@ public struct MetricCardView: View {
 #Preview("Metric card") {
     ScrollView {
         VStack(spacing: HESpacing.md) {
-            MetricCardView(metric: SampleData.fingerPPGReading().metrics.first!)
+            if let metric = SampleData.fingerPPGReading().metrics.first {
+                MetricCardView(metric: metric)
+            }
             MetricCardView(
                 metric: CardioMetric(
                     kind: .spo2Estimate,
@@ -104,7 +106,7 @@ public struct MetricCardView: View {
                 )
             )
             MetricCardView(
-                metric: CardioMetric(kind: .murmurFlag, value: 0, profile: SampleData.profile)
+                metric: CardioMetric(kind: .respiratoryRate, value: 16, profile: SampleData.profile)
             )
         }
         .padding()

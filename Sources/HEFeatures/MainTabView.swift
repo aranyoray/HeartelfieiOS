@@ -15,8 +15,10 @@ public struct MainTabView: View {
             ForEach(AppTab.allCases) { tab in
                 NavigationStack {
                     rootView(for: tab)
+                        .heContentWidthCapped()
                         .navigationDestination(for: AppRoute.self) { route in
                             destination(for: route)
+                                .heContentWidthCapped()
                         }
                 }
                 .tabItem { Label(tab.title, systemImage: tab.systemImage) }

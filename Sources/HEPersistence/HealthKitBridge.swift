@@ -35,8 +35,8 @@ public enum HealthKitError: Error, Sendable, CustomStringConvertible {
 /// **Write** scope: heart rate, HRV (SDNN), blood oxygen, respiratory rate only.
 ///
 /// - Important: Heartelfie's custom waveforms and device-only metrics (hemoglobin,
-///   anemia risk, perfusion index, hydration, beat timing, rhythm-irregularity %,
-///   murmur flag) are **not** representable as standard HealthKit sample types and
+///   anemia risk, perfusion index, hydration, rhythm-irregularity %) are
+///   **not** representable as standard HealthKit sample types and
 ///   are therefore never written to HealthKit — they live only in the encrypted
 ///   on-device store. ``write(reading:)`` silently skips them.
 ///
@@ -149,6 +149,17 @@ public final class HealthKitBridge {
             }
         }
         guard !samples.isEmpty else { return }
+
+        // Surface a denied/undetermined share grant as an explicit `.notAuthorized`
+        // rather than the opaque error `HKHealthStore.save` throws. Unlike reads,
+        // HealthKit reports share (write) authorization status accurately, and
+        // `save` is all-or-nothing — one unauthorized type fails the whole batch.
+        let sampleTypes = Set(samples.map(\.sampleType))
+        let allAuthorized = sampleTypes.allSatisfy {
+            store.authorizationStatus(for: $0) == .sharingAuthorized
+        }
+        guard allAuthorized else { throw HealthKitError.notAuthorized }
+
         try await store.save(samples)
     }
 
@@ -168,7 +179,10 @@ public final class HealthKitBridge {
             let unit = HKUnit.secondUnit(with: .milli)
             return quantitySample(type: type, unit: unit, value: metric.value, date: timestamp)
 
-        case .spo2Estimate, .spo2Clinical:
+        case .spo2Clinical:
+            // Only device-grade clinical SpO₂ is written to Health. The phone
+            // camera's `.spo2Estimate` is screening-grade and unvalidated, so it is
+            // never written as a HealthKit oxygenSaturation sample (see skip case).
             guard let type = HKObjectType.quantityType(forIdentifier: .oxygenSaturation) else { return nil }
             // Heartelfie stores % (0–100); HealthKit expects a 0...1 fraction.
             let unit = HKUnit.percent()
@@ -179,9 +193,10 @@ public final class HealthKitBridge {
             let unit = HKUnit.count().unitDivided(by: .minute())
             return quantitySample(type: type, unit: unit, value: metric.value, date: timestamp)
 
-        // No standard HealthKit type — kept only in the encrypted store.
-        case .hrvRMSSD, .rhythmIrregularity, .hemoglobin, .anemiaRisk,
-             .perfusionIndex, .hydration, .beatTiming, .murmurFlag:
+        // No standard HealthKit type, or an unvalidated phone-screening estimate —
+        // kept only in the encrypted on-device store, never written to Health.
+        case .spo2Estimate, .hrvRMSSD, .rhythmIrregularity, .hemoglobin, .anemiaRisk,
+             .perfusionIndex, .hydration:
             return nil
         }
     }

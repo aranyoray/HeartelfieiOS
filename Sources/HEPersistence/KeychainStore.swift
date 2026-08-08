@@ -92,18 +92,33 @@ public struct KeychainStore: Sendable {
     }
 
     /// Persists the given key bytes, replacing any existing item.
+    ///
+    /// Uses an in-place `SecItemUpdate`, falling back to `SecItemAdd` only when no
+    /// item exists yet. This is deliberately **not** delete-then-add: a crash
+    /// between a delete and a subsequent add would leave no key at all, rendering
+    /// every existing encrypted reading permanently unrecoverable. Update-or-add
+    /// never removes the live key until a replacement is in place.
     public func storeKeyData(_ data: Data) throws {
         #if canImport(Security)
-        // Remove any stale item first so we can cleanly add a fresh one.
-        SecItemDelete(baseQuery() as CFDictionary)
-
-        var attributes = baseQuery()
-        attributes[kSecValueData as String] = data
         // Available after first unlock; survives reboot but not restore-to-new-device.
-        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        let mutableAttributes: [String: Any] = [
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        ]
 
-        let status = SecItemAdd(attributes as CFDictionary, nil)
-        guard status == errSecSuccess else { throw KeychainError.unhandled(status) }
+        let updateStatus = SecItemUpdate(baseQuery() as CFDictionary, mutableAttributes as CFDictionary)
+        switch updateStatus {
+        case errSecSuccess:
+            return
+        case errSecItemNotFound:
+            // First run — no existing item to update, so add a fresh one.
+            var attributes = baseQuery()
+            for (key, value) in mutableAttributes { attributes[key] = value }
+            let addStatus = SecItemAdd(attributes as CFDictionary, nil)
+            guard addStatus == errSecSuccess else { throw KeychainError.unhandled(addStatus) }
+        default:
+            throw KeychainError.unhandled(updateStatus)
+        }
         #else
         Self.fallback.store(data, service: service, account: account)
         #endif

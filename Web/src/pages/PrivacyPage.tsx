@@ -22,8 +22,8 @@ export default function PrivacyPage() {
 
       <h2>2. Information Processed by the App</h2>
       <p>
-        Heartelfie may process camera, microphone, motion, Bluetooth, notification, Apple Health,
-        and optional profile information only when you choose features that need those capabilities.
+        Heartelfie may process camera, Bluetooth, Apple Health, and optional profile
+        information only when you choose features that need those capabilities.
         The optional profile may include values such as age range, biological sex, height, weight,
         general health context, units, and self-selected Monk Skin Tone. These values are used to
         personalize wellness screening context and improve signal-quality handling.

@@ -18,6 +18,8 @@ struct ResultDetailView: View {
 
     @State private var exportDocs: ExportDocuments?
     @State private var isPreparingExport = false
+    @State private var didAppear = false
+    @State private var exportReadyTick = 0
 
     init(reading: CardioReading) {
         self.reading = reading
@@ -54,6 +56,13 @@ struct ResultDetailView: View {
         .toolbar { exportToolbarItem }
         .sheet(item: $exportDocs) { docs in
             ExportShareSheet(documents: docs)
+        }
+        // A gentle completion cue the first time a saved reading is opened.
+        .sensoryFeedback(reading.confidence.isLow ? .warning : .success, trigger: didAppear)
+        .sensoryFeedback(.success, trigger: exportReadyTick)
+        .onAppear {
+            guard !didAppear else { return }
+            didAppear = true
         }
     }
 
@@ -128,11 +137,6 @@ struct ResultDetailView: View {
             }
             .buttonStyle(PrimaryButtonStyle())
             .accessibilityHint("Starts a new \(reading.modality.displayName) check.")
-
-            HESecondaryButton("Retake when rested", systemImage: "building.2") {
-                // Placeholder pathway — partner-clinic directory not yet wired.
-            }
-            .accessibilityHint("Starts a fresh reading when you are ready.")
         }
         .padding(HESpacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -352,16 +356,15 @@ struct ResultDetailView: View {
 
     private var actionsSection: some View {
         VStack(spacing: HESpacing.md) {
-            HEPrimaryButton("Export PDF", systemImage: "stethoscope") {
+            HEPrimaryButton("Export PDF", systemImage: "doc.richtext") {
                 Task { await prepareExport(.pdf) }
             }
             .accessibilityHint("Prepares a PDF of this reading to share outside Heartelfie if you choose.")
 
-            HSplitButtons(
-                onCSV: { Task { await prepareExport(.csv) } },
-                onPDF: { Task { await prepareExport(.pdf) } },
-                isBusy: isPreparingExport
-            )
+            HESecondaryButton("Export CSV", systemImage: "tablecells", isLoading: isPreparingExport) {
+                Task { await prepareExport(.csv) }
+            }
+            .accessibilityHint("Prepares a CSV of this reading to share outside Heartelfie if you choose.")
         }
     }
 
@@ -418,6 +421,7 @@ struct ResultDetailView: View {
 
         if let url {
             exportDocs = ExportDocuments(url: url, format: format)
+            exportReadyTick += 1
         }
     }
 
@@ -425,20 +429,6 @@ struct ResultDetailView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd-HHmmss"
         return formatter.string(from: date)
-    }
-}
-
-/// A two-up row of secondary export buttons (CSV / PDF) used under the wellness actions.
-private struct HSplitButtons: View {
-    let onCSV: () -> Void
-    let onPDF: () -> Void
-    let isBusy: Bool
-
-    var body: some View {
-        HStack(spacing: HESpacing.md) {
-            HESecondaryButton("Export PDF", systemImage: "doc.richtext", isLoading: isBusy, action: onPDF)
-            HESecondaryButton("Export CSV", systemImage: "tablecells", action: onCSV)
-        }
     }
 }
 

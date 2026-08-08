@@ -26,7 +26,7 @@ public enum SQIIssue: String, Codable, Sendable, CaseIterable, Hashable, Identif
         case .noContact: return "Reposition your finger to fully cover the camera."
         case .tooShort: return "Stay in place a little longer to capture enough beats."
         case .irregularCadence: return "Keep steady — the beat-to-beat timing looks noisy."
-        case .ambientNoise: return "Find a quieter spot and press the mic to your chest."
+        case .ambientNoise: return "Find a quieter spot to reduce background noise."
         case .faceNotFound: return "Center your face in the frame with even lighting."
         }
     }

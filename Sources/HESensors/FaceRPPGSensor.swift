@@ -41,12 +41,17 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
         await stop()
         #if canImport(AVFoundation) && canImport(Vision)
         if configureSession() {
+            await startSession()
+            // Guard against a configured-but-not-running session (camera busy),
+            // which would otherwise return a stream that never emits and hang the UI.
+            guard session.isRunning else {
+                return await startFallback()
+            }
             let (stream, continuation) = AsyncStream<SignalFrame>.makeStream()
             self.continuation = continuation
             continuation.onTermination = { [weak self] _ in
                 Task { @MainActor in await self?.stop() }
             }
-            session.startRunning()
             return stream
         }
         #endif
@@ -55,7 +60,7 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
 
     public func stop() async {
         #if canImport(AVFoundation)
-        if session.isRunning { session.stopRunning() }
+        await stopSession()
         #endif
         continuation?.finish()
         continuation = nil
@@ -90,6 +95,30 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
         session.addOutput(output)
         session.commitConfiguration()
         return true
+    }
+
+    /// Start the capture session on the dedicated capture queue, not the main actor.
+    /// `startRunning()` blocks for 100s of milliseconds; running it on `@MainActor`
+    /// stalls the UI. Awaits completion so the caller can read `session.isRunning`.
+    private func startSession() async {
+        nonisolated(unsafe) let session = self.session
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+            sampleQueue.async {
+                session.startRunning()
+                cont.resume()
+            }
+        }
+    }
+
+    /// Stop the session off the main actor for the same reason as `startSession()`.
+    private func stopSession() async {
+        nonisolated(unsafe) let session = self.session
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+            sampleQueue.async {
+                if session.isRunning { session.stopRunning() }
+                cont.resume()
+            }
+        }
     }
     #endif
 }

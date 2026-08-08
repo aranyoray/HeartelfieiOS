@@ -28,6 +28,44 @@ public actor EncryptedReadingStore: ReadingRepository {
 
         static let currentSchema = 1
         static let empty = Snapshot(schema: currentSchema, readings: [], profile: nil)
+
+        init(schema: Int, readings: [CardioReading], profile: HealthProfile?) {
+            self.schema = schema
+            self.readings = readings
+            self.profile = profile
+        }
+
+        private enum CodingKeys: String, CodingKey { case schema, readings, profile }
+
+        /// Resilient decode: any reading that no longer maps to a current enum case
+        /// (e.g. a modality or metric removed in a later version) is skipped rather
+        /// than throwing and bricking the entire store. Valid readings survive.
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            schema = try c.decodeIfPresent(Int.self, forKey: .schema) ?? Self.currentSchema
+            // Decode the profile through the same `Lossy` wrapper used for readings:
+            // a valid (incl. legacy) profile is preserved, and only a genuinely
+            // corrupt one is dropped — deliberately, not via a silent bare `try?`.
+            profile = (try? c.decode(Lossy<HealthProfile>.self, forKey: .profile))?.value
+            let lossy = (try? c.decode([Lossy<CardioReading>].self, forKey: .readings)) ?? []
+            readings = lossy.compactMap(\.value)
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(schema, forKey: .schema)
+            try c.encode(readings, forKey: .readings)
+            try c.encodeIfPresent(profile, forKey: .profile)
+        }
+    }
+
+    /// Decodes `T` if possible, otherwise holds `nil` — lets an array skip elements
+    /// that fail to decode (used to drop readings with retired enum rawValues).
+    private struct Lossy<T: Decodable>: Decodable {
+        let value: T?
+        init(from decoder: Decoder) throws {
+            value = try? T(from: decoder)
+        }
     }
 
     // MARK: Stored state

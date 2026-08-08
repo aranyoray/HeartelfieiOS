@@ -88,7 +88,7 @@ struct AboutView: View {
                     tier(
                         icon: "iphone",
                         title: "Screening — phone only",
-                        detail: "Camera and microphone checks give you a quick, low-friction screening. Convenient, but lower confidence."
+                        detail: "Camera checks give you a quick, low-friction screening. Convenient, but lower confidence."
                     )
                     Divider().overlay(Color.heSeparator)
                     tier(
@@ -167,11 +167,19 @@ struct AboutView: View {
 
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.sm) {
-                    creditRow(title: "Privacy Policy", detail: "Coming soon")
+                    NavigationLink {
+                        LegalDocumentView(document: .privacyPolicy)
+                    } label: {
+                        creditRow(title: "Privacy Policy", detail: "", showsChevron: true)
+                    }
+                    .buttonStyle(.plain)
                     Divider().overlay(Color.heSeparator)
-                    creditRow(title: "Terms of Use", detail: "Coming soon")
-                    Divider().overlay(Color.heSeparator)
-                    creditRow(title: "Acknowledgements", detail: "Coming soon")
+                    NavigationLink {
+                        LegalDocumentView(document: .termsOfUse)
+                    } label: {
+                        creditRow(title: "Terms of Use", detail: "", showsChevron: true)
+                    }
+                    .buttonStyle(.plain)
                     Divider().overlay(Color.heSeparator)
                     creditRow(title: "© \(currentYear) \(HeartelfieConfig.appName)", detail: "")
                 }
@@ -179,7 +187,7 @@ struct AboutView: View {
         }
     }
 
-    private func creditRow(title: String, detail: String) -> some View {
+    private func creditRow(title: String, detail: String, showsChevron: Bool = false) -> some View {
         HStack {
             Text(title)
                 .font(.heCallout)
@@ -190,8 +198,15 @@ struct AboutView: View {
                     .font(.heCaption)
                     .foregroundStyle(Color.heTextTertiary)
             }
+            if showsChevron {
+                Image(systemName: "chevron.right")
+                    .font(.heCaption.weight(.semibold))
+                    .foregroundStyle(Color.heTextTertiary)
+            }
         }
+        .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(showsChevron ? .isButton : [])
     }
 
     private var currentYear: String {

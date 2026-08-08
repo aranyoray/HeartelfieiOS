@@ -35,7 +35,7 @@ struct TrendsView: View {
 
     /// The default metric set; device-only metrics are appended when present in data.
     private static let baseMetrics: [MetricKind] = [
-        .heartRate, .hrvSDNN, .spo2Estimate, .respiratoryRate
+        .heartRate, .hrvSDNN, .respiratoryRate
     ]
 
     var body: some View {

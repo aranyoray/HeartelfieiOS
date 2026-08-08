@@ -69,15 +69,16 @@ struct ModalityRow: View {
     @ViewBuilder
     private var metricsChips: some View {
         if !modality.supportedMetrics.isEmpty {
+            let heading = modality.tier == .measurement ? "Measures" : "Screens for"
             VStack(alignment: .leading, spacing: HESpacing.xs) {
-                Text("Measures")
+                Text(heading)
                     .font(.heCaption.weight(.semibold))
                     .foregroundStyle(Color.heTextTertiary)
 
                 MetricChipsFlow(metrics: modality.supportedMetrics)
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Measures: " + modality.supportedMetrics
+            .accessibilityLabel(heading + ": " + modality.supportedMetrics
                 .map(\.displayName)
                 .joined(separator: ", "))
         }
@@ -232,7 +233,7 @@ struct FlowLayout: Layout {
         ScrollView {
             VStack(spacing: HESpacing.md) {
                 ModalityRow(modality: .fingerPPG, isAvailable: true)
-                ModalityRow(modality: .pcg, isAvailable: true)
+                ModalityRow(modality: .facialRPPG, isAvailable: true)
                 ModalityRow(modality: .deviceECG, isAvailable: false)
                 ModalityRow(modality: .deviceMultiWavelengthPPG, isAvailable: true)
             }

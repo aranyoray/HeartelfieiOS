@@ -40,13 +40,20 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
         await stop()
         #if canImport(AVFoundation)
         if configureSession() {
+            enableTorch(true)
+            await startSession()
+            // Configuration can succeed yet the session still fail to start (camera
+            // busy, resource contention). Without this guard we'd return a stream
+            // that never emits and the capture UI would hang — fall back to the mock.
+            guard session.isRunning else {
+                enableTorch(false)
+                return await startFallback()
+            }
             let (stream, continuation) = AsyncStream<SignalFrame>.makeStream()
             self.continuation = continuation
             continuation.onTermination = { [weak self] _ in
                 Task { @MainActor in await self?.stop() }
             }
-            enableTorch(true)
-            session.startRunning()
             return stream
         }
         #endif
@@ -56,8 +63,8 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
 
     public func stop() async {
         #if canImport(AVFoundation)
-        if session.isRunning { session.stopRunning() }
         enableTorch(false)
+        await stopSession()
         #endif
         continuation?.finish()
         continuation = nil
@@ -109,6 +116,30 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
             try? device.setTorchModeOn(level: AVCaptureDevice.maxAvailableTorchLevel)
         } else {
             device.torchMode = .off
+        }
+    }
+
+    /// Start the capture session on the dedicated capture queue, not the main actor.
+    /// `startRunning()` blocks for 100s of milliseconds; running it on `@MainActor`
+    /// stalls the UI. Awaits completion so the caller can read `session.isRunning`.
+    private func startSession() async {
+        nonisolated(unsafe) let session = self.session
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+            sampleQueue.async {
+                session.startRunning()
+                cont.resume()
+            }
+        }
+    }
+
+    /// Stop the session off the main actor for the same reason as `startSession()`.
+    private func stopSession() async {
+        nonisolated(unsafe) let session = self.session
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+            sampleQueue.async {
+                if session.isRunning { session.stopRunning() }
+                cont.resume()
+            }
         }
     }
     #endif

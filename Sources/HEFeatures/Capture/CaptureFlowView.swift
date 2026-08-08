@@ -33,6 +33,14 @@ public struct CaptureFlowView: View {
         .background(Color.heBackground)
         .navigationTitle(modality.shortName)
         .navigationBarTitleDisplayMode(.inline)
+        .sensoryFeedback(trigger: vm?.phase) { _, newPhase in
+            switch newPhase {
+            case .capturing: return .impact(weight: .medium)
+            case .completed: return .success
+            case .failed: return .error
+            default: return nil
+            }
+        }
         .task {
             if vm == nil {
                 let model = env.makeCaptureViewModel(for: modality)

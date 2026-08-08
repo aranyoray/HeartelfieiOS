@@ -6,6 +6,13 @@
 	<string>Heartelfie</string>
 	<key>CFBundleName</key>
 	<string>Heartelfie</string>
+	<!-- Declared explicitly: Xcode 26 does not auto-inject these into a custom
+	     INFOPLIST_FILE, so without them the packaged bundle has no CFBundleExecutable
+	     and App Store upload fails with "does not contain a bundle executable" (90207). -->
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleShortVersionString</key>
@@ -14,6 +21,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
@@ -33,11 +42,7 @@
 
 	<!-- Permission usage strings: calm, specific, non-alarmist. -->
 	<key>NSCameraUsageDescription</key>
-	<string>Heartelfie uses the camera to take a gentle heart-rate screening from your fingertip or face. This is a wellness screening, not a medical measurement.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Heartelfie uses the microphone for an experimental heart-sound screening when you hold your phone to your chest.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>Heartelfie uses motion sensors for an experimental heartbeat screening when you rest your phone on your chest.</string>
+	<string>Heartelfie uses the camera to take a gentle heart-rate screening from your fingertip or face. Camera frames are processed on your device only and are never saved or uploaded. This is a wellness screening, not a medical measurement.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Heartelfie connects over Bluetooth to your Heartelfie device for higher-confidence measurements.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
@@ -46,10 +51,5 @@
 	<string>Heartelfie can read heart-health data (like heart rate and HRV) to give you a fuller picture of your trends. You stay in control of what is shared.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Heartelfie can save your screening results (like heart rate and HRV) to Apple Health so your data stays portable.</string>
-
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>bluetooth-central</string>
-	</array>
 </dict>
 </plist>

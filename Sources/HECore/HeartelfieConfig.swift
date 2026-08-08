@@ -12,23 +12,6 @@ public enum HeartelfieConfig {
     public static let deviceName = "Heartelfie Device"
     public static let deviceShortName = "Heartelfie"
 
-    // MARK: - Care resources (placeholders — localize per region)
-
-    /// Immediate-care contact details surfaced on clinical / elevated results.
-    /// Every value here is a **placeholder**: emergency numbers vary by country
-    /// (911 US, 112 EU, 999 UK, 000 AU, …). Localize these — ideally from the
-    /// user's region — before production.
-    public enum Care {
-        /// Local emergency services number. PLACEHOLDER.
-        public static let emergencyNumber = "911"
-        /// Optional non-emergency nurse / advice line. `nil` hides the button.
-        public static let adviceLineNumber: String? = nil
-        /// Map search query used to find nearby hospitals.
-        public static let hospitalSearchQuery = "Hospital"
-        /// Map search query for urgent / emergency care.
-        public static let emergencyRoomSearchQuery = "Emergency room"
-    }
-
     // MARK: - Cloud model API (placeholders — wire to real endpoints)
 
     public enum CloudAPI {

@@ -49,10 +49,14 @@ public final class CaptureViewModel {
     private let processor = SignalProcessor()
     private var sensor: (any CardioSensor)?
     private var streamTask: Task<Void, Never>?
+    private var watchdogTask: Task<Void, Never>?
     private var channelBuffers: [SignalChannel: [Double]] = [:]
     private var timestamps: [TimeInterval] = []
     private var captureStartTimestamp: TimeInterval?
     private var isFinishing = false
+    /// True while we are intentionally stopping the sensor, so the stream's natural
+    /// end (from our own `stop()`) isn't mistaken for an unexpected drop.
+    private var isTearingDown = false
 
     /// Length of the capture window in seconds (modality minimum + a small margin).
     private var captureWindow: Double { ClinicalConfig.minimumCaptureSeconds(for: modality) + 2 }
@@ -86,8 +90,12 @@ public final class CaptureViewModel {
         phase = .coaching
         streamTask = Task { [weak self] in
             for await frame in stream {
-                await self?.ingest(frame)
+                self?.ingest(frame)
             }
+            // Stream ended. If it ended while we were still waiting/capturing, the
+            // source dropped (camera stalled, device disconnected) — surface it
+            // instead of leaving the UI stuck.
+            await self?.streamEnded()
         }
     }
 
@@ -100,6 +108,50 @@ public final class CaptureViewModel {
         elapsedSeconds = 0
         isFinishing = false
         phase = .capturing
+        startWatchdog()
+    }
+
+    /// Wall-clock backstop. The timestamp-driven finish in `ingest` only fires when a
+    /// new frame arrives, so if frames stall mid-window the capture would hang forever.
+    /// This guarantees it resolves within the window plus a grace margin.
+    private func startWatchdog() {
+        watchdogTask?.cancel()
+        let deadline = captureWindow + 4
+        watchdogTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(deadline))
+            guard let self, !Task.isCancelled else { return }
+            await self.captureDeadlineReached()
+        }
+    }
+
+    /// Resolve a capture whose frames stopped arriving. Process what we have if it is
+    /// enough for the SQI gate to judge; otherwise fail with a clear timeout.
+    private func captureDeadlineReached() async {
+        guard phase == .capturing, !isFinishing else { return }
+        isFinishing = true
+        let primary = channelBuffers[SignalProcessor.primaryChannel(for: modality)]
+            ?? channelBuffers.values.first ?? []
+        if primary.count > 30 {
+            await finishCapture()
+        } else {
+            await stopSensor()
+            phase = .failed(.timeout)
+        }
+    }
+
+    /// The sensor stream finished. If it ended while we were still waiting for signal
+    /// or mid-capture, the source dropped (camera stalled, device disconnected) —
+    /// surface it instead of leaving the UI stuck. Ignored during intentional teardown.
+    private func streamEnded() async {
+        guard !isTearingDown else { return }
+        switch phase {
+        case .preparing, .coaching, .countdown:
+            phase = .failed(modality.requiresDevice ? .contactLost : .sensorUnavailable)
+        case .capturing:
+            await captureDeadlineReached()
+        default:
+            break
+        }
     }
 
     /// Abort the capture and tear down the sensor.
@@ -250,6 +302,9 @@ public final class CaptureViewModel {
     // MARK: - Teardown
 
     private func stopSensor() async {
+        isTearingDown = true
+        watchdogTask?.cancel()
+        watchdogTask = nil
         streamTask?.cancel()
         streamTask = nil
         if let sensor { await sensor.stop() }
@@ -261,6 +316,7 @@ public final class CaptureViewModel {
         timestamps.removeAll()
         captureStartTimestamp = nil
         isFinishing = false
+        isTearingDown = false
     }
 
     private var isFailed: Bool {

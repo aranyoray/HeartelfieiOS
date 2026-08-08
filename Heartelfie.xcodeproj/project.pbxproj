@@ -8,16 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		44DD1160C62E7C3736F66084 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BC08935662D38572C2F40DB /* Assets.xcassets */; };
+		B83889979688491E5383B08D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = EF4240B880297B4E0175ED7F /* PrivacyInfo.xcprivacy */; };
 		C017D1E177DF4BC0D873CABD /* HEFeatures in Frameworks */ = {isa = PBXBuildFile; productRef = 339DA5FD5ED1D39AF98AA585 /* HEFeatures */; };
 		E01266402692B9558B473A7D /* HeartelfieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		3BC08935662D38572C2F40DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		5540C1FBC6BA2BEBC6509DC8 /* Heartelfie.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Heartelfie.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5540C1FBC6BA2BEBC6509DC8 /* Heartelfie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heartelfie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartelfieApp.swift; sourceTree = "<group>"; };
 		7CB9F99B2263DF0F53E2F9AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		84606288F395FDAAE56551B4 /* HeartelfieiOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HeartelfieiOS; path = .; sourceTree = SOURCE_ROOT; };
+		87519A622213334EFE168DBB /* Heartelfie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Heartelfie.entitlements; sourceTree = "<group>"; };
+		EF4240B880297B4E0175ED7F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,8 +56,10 @@
 			isa = PBXGroup;
 			children = (
 				3BC08935662D38572C2F40DB /* Assets.xcassets */,
+				87519A622213334EFE168DBB /* Heartelfie.entitlements */,
 				6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */,
 				7CB9F99B2263DF0F53E2F9AE /* Info.plist */,
+				EF4240B880297B4E0175ED7F /* PrivacyInfo.xcprivacy */,
 			);
 			path = Heartelfie;
 			sourceTree = "<group>";
@@ -105,10 +110,9 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					1148428C1558FCE5DEA8FAC6 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -141,6 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				44DD1160C62E7C3736F66084 /* Assets.xcassets in Resources */,
+				B83889979688491E5383B08D /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,6 +167,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -197,6 +203,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -210,6 +217,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
@@ -221,8 +229,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = J2P293N3N8;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -230,7 +240,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.app;
 				PRODUCT_NAME = Heartelfie;
 				SDKROOT = iphoneos;
@@ -243,6 +253,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -278,6 +289,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -298,6 +310,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
@@ -309,8 +322,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = J2P293N3N8;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -318,7 +333,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.app;
 				PRODUCT_NAME = Heartelfie;
 				SDKROOT = iphoneos;
