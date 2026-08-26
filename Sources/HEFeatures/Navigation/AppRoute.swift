@@ -45,5 +45,4 @@ public enum AppRoute: Hashable, Sendable {
     case dataAndPrivacy
     case exportData
     case about
-    case developer
 }

@@ -4,7 +4,7 @@ import HEDesign
 
 /// The Profile tab root: a calm, accessible `Form` that summarises the person's
 /// health profile and links out to the data, privacy, export, about, and
-/// developer screens.
+/// data controls.
 ///
 /// All copy is wellness-grade and explicitly non-diagnostic. Nothing here is a
 /// measurement; the profile only adds gentle context to screenings.
@@ -267,11 +267,6 @@ struct ProfileView: View {
             NavigationLink(value: AppRoute.about) {
                 Label("About \(HeartelfieConfig.appName)", systemImage: "info.circle")
             }
-            #if DEBUG
-            NavigationLink(value: AppRoute.developer) {
-                Label("Developer", systemImage: "hammer")
-            }
-            #endif
         }
     }
 

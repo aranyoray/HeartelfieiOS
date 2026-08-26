@@ -64,8 +64,6 @@ public struct MainTabView: View {
             ExportDataView()
         case .about:
             AboutView()
-        case .developer:
-            DeveloperView()
         }
     }
 }
