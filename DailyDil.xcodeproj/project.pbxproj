@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E03A2D5BBCF9A0135643CD8 /* DailyDilWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDD642F767D0D8EDFC8E07D1 /* DailyDilWidget.swift */; };
 		315FD524BE13B9CBCB644EEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB777D939E2709187AAA4B6F /* Assets.xcassets */; };
 		36A390B4C21D8F0963CE8719 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */; };
 		3C4A79E7E089A938DD63473E /* HeartelfieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */; };
 		9B86C2488C82C9CCD8716C56 /* NavProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E923AA02076F7A41D00D5BB /* NavProbeTests.swift */; };
 		A91D31C72F2375D17C0B6E16 /* HEFeatures in Frameworks */ = {isa = PBXBuildFile; productRef = 6A065A302DB4B96C39EC2989 /* HEFeatures */; };
+		F6C6A6B8C2C47D609712E6AB /* DailyDilWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6AC75D7AAAF683D13FB899DE /* DailyDilWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -22,7 +24,28 @@
 			remoteGlobalIDString = B60850E6868CD80055D8513F;
 			remoteInfo = DailyDil;
 		};
+		FD2C5142C9A3DE9D468BFF66 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6EB3FD8A991A14D48ABDF42 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1ADED6F2F3A4E02BA0C0A2C;
+			remoteInfo = DailyDilWidget;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CECF03ECAC20913618F60BE6 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F6C6A6B8C2C47D609712E6AB /* DailyDilWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		05746B85BCFE25F3A6F78524 /* DailyDilUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DailyDilUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -31,6 +54,10 @@
 		4E923AA02076F7A41D00D5BB /* NavProbeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavProbeTests.swift; sourceTree = "<group>"; };
 		4EFAC08ACC9D65B1496A85A5 /* Heartelfie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Heartelfie.entitlements; sourceTree = "<group>"; };
 		60A2DF766F94C46495BB9C18 /* HeartelfieiOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HeartelfieiOS; path = .; sourceTree = SOURCE_ROOT; };
+		66A645353EBC143A510DD926 /* DailyDilWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DailyDilWidget.entitlements; sourceTree = "<group>"; };
+		6AC75D7AAAF683D13FB899DE /* DailyDilWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DailyDilWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		866AC0BD6DF2E88881DCDE99 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		BDD642F767D0D8EDFC8E07D1 /* DailyDilWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyDilWidget.swift; sourceTree = "<group>"; };
 		E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartelfieApp.swift; sourceTree = "<group>"; };
 		EB777D939E2709187AAA4B6F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EFF700A72BD677EA5C8A6686 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -67,6 +94,7 @@
 		8B4DD9B53560E0775BF24A7F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				C4087BD49536509400699CB5 /* DailyDilWidget */,
 				DE8264589047012733EFCAF7 /* Heartelfie */,
 			);
 			path = App;
@@ -80,11 +108,22 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		C4087BD49536509400699CB5 /* DailyDilWidget */ = {
+			isa = PBXGroup;
+			children = (
+				66A645353EBC143A510DD926 /* DailyDilWidget.entitlements */,
+				BDD642F767D0D8EDFC8E07D1 /* DailyDilWidget.swift */,
+				866AC0BD6DF2E88881DCDE99 /* Info.plist */,
+			);
+			path = DailyDilWidget;
+			sourceTree = "<group>";
+		};
 		C4E0E47F833F5DF1B60E0000 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				0B614E795763C472C8A7E7DA /* DailyDil.app */,
 				05746B85BCFE25F3A6F78524 /* DailyDilUITests.xctest */,
+				6AC75D7AAAF683D13FB899DE /* DailyDilWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -121,10 +160,12 @@
 				B53BC8B516398DD97C852A77 /* Sources */,
 				5A74E942AD244AEAF7DA1D50 /* Resources */,
 				E2D8E169CDCC993585D88F89 /* Frameworks */,
+				CECF03ECAC20913618F60BE6 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				EADDA4FC19A9833C4ECAE79F /* PBXTargetDependency */,
 			);
 			name = DailyDil;
 			packageProductDependencies = (
@@ -152,6 +193,23 @@
 			productReference = 05746B85BCFE25F3A6F78524 /* DailyDilUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		C1ADED6F2F3A4E02BA0C0A2C /* DailyDilWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C173E293CBB9DBC61305B6F6 /* Build configuration list for PBXNativeTarget "DailyDilWidget" */;
+			buildPhases = (
+				99965E85EF6B2015F36E9567 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DailyDilWidget;
+			packageProductDependencies = (
+			);
+			productName = DailyDilWidget;
+			productReference = 6AC75D7AAAF683D13FB899DE /* DailyDilWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -169,6 +227,10 @@
 						DevelopmentTeam = J2P293N3N8;
 						ProvisioningStyle = Automatic;
 						TestTargetID = B60850E6868CD80055D8513F;
+					};
+					C1ADED6F2F3A4E02BA0C0A2C = {
+						DevelopmentTeam = J2P293N3N8;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -191,6 +253,7 @@
 			targets = (
 				B60850E6868CD80055D8513F /* DailyDil */,
 				BECB68B05FDB39F5A972924E /* DailyDilUITests */,
+				C1ADED6F2F3A4E02BA0C0A2C /* DailyDilWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -208,6 +271,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		99965E85EF6B2015F36E9567 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E03A2D5BBCF9A0135643CD8 /* DailyDilWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B53BC8B516398DD97C852A77 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -231,6 +302,11 @@
 			isa = PBXTargetDependency;
 			target = B60850E6868CD80055D8513F /* DailyDil */;
 			targetProxy = B36DFCD9D1E428F8A614F05F /* PBXContainerItemProxy */;
+		};
+		EADDA4FC19A9833C4ECAE79F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1ADED6F2F3A4E02BA0C0A2C /* DailyDilWidget */;
+			targetProxy = FD2C5142C9A3DE9D468BFF66 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -260,7 +336,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -400,6 +476,46 @@
 			};
 			name = Debug;
 		};
+		9122FA14BDAF2F00926B1510 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = App/DailyDilWidget/DailyDilWidget.entitlements;
+				INFOPLIST_FILE = App/DailyDilWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.ios.widget;
+				PRODUCT_NAME = DailyDilWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A2D68482DFFA7425811B9D3E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = App/DailyDilWidget/DailyDilWidget.entitlements;
+				INFOPLIST_FILE = App/DailyDilWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.ios.widget;
+				PRODUCT_NAME = DailyDilWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		D7BAD39B0598784B58B7A95D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -425,7 +541,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -468,6 +584,15 @@
 			buildConfigurations = (
 				777683F08B8705D10726711F /* Debug */,
 				74DD1012021AB02C7AF8884D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C173E293CBB9DBC61305B6F6 /* Build configuration list for PBXNativeTarget "DailyDilWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2D68482DFFA7425811B9D3E /* Debug */,
+				9122FA14BDAF2F00926B1510 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -25,6 +25,12 @@ public struct MainTabView: View {
                 .tag(tab)
             }
         }
+        .onOpenURL { url in
+            // Widget deep link: dailydil://check lands on the Measure tab.
+            if url.scheme == "dailydil" {
+                selectedTab = .measure
+            }
+        }
     }
 
     @ViewBuilder

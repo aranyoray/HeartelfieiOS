@@ -19,6 +19,7 @@ struct ProfileView: View {
             detailsSection
             editSection
             healthSection
+            DailyReminderSection()
             dataSection
             aboutSection
             versionSection

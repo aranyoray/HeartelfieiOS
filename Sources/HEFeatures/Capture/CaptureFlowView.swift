@@ -27,6 +27,11 @@ public struct CaptureFlowView: View {
 
     private var isFingerFlow: Bool { modality == .fingerPPG }
 
+    /// Re-arms the heartbeat-haptic task whenever the live phase flips.
+    private var heartbeatTaskKey: Bool {
+        vm?.phase == .coaching || vm?.phase == .capturing
+    }
+
     public var body: some View {
         ScrollView {
             VStack(spacing: HESpacing.lg) {
@@ -53,6 +58,21 @@ public struct CaptureFlowView: View {
             case .completed: return .success
             case .failed: return .error
             default: return nil
+            }
+        }
+        .task(id: heartbeatTaskKey) {
+            // A soft haptic tick per detected beat while live — the reading
+            // becomes something you can feel, not just watch.
+            guard let vm, vm.phase == .coaching || vm.phase == .capturing else { return }
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.prepare()
+            while !Task.isCancelled, vm.phase == .coaching || vm.phase == .capturing {
+                if let bpm = vm.liveBPM, (30...220).contains(bpm) {
+                    generator.impactOccurred(intensity: 0.55)
+                    try? await Task.sleep(for: .seconds(60.0 / bpm))
+                } else {
+                    try? await Task.sleep(for: .milliseconds(300))
+                }
             }
         }
         .task {

@@ -55,23 +55,50 @@ targets:
     dependencies:
       - package: Heartelfie
         product: HEFeatures
+      - target: DailyDilWidget
     entitlements:
       path: App/Heartelfie/Heartelfie.entitlements
       properties:
         com.apple.developer.healthkit: true
         com.apple.developer.healthkit.access: []
+        com.apple.security.application-groups:
+          - group.com.heartelfie.ios
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.ios
         PRODUCT_NAME: DailyDil
         MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "10"
+        CURRENT_PROJECT_VERSION: "11"
         INFOPLIST_FILE: App/Heartelfie/Info.plist
         TARGETED_DEVICE_FAMILY: "1,2"
         ENABLE_PREVIEWS: "YES"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_EMIT_LOC_STRINGS: "YES"
+
+  DailyDilWidget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: App/DailyDilWidget
+    entitlements:
+      path: App/DailyDilWidget/DailyDilWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.heartelfie.ios
+    info:
+      path: App/DailyDilWidget/Info.plist
+      properties:
+        CFBundleDisplayName: DailyDil
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.ios.widget
+        PRODUCT_NAME: DailyDilWidget
+        SWIFT_VERSION: "6.0"
+        SKIP_INSTALL: "YES"
 
   DailyDilUITests:
     type: bundle.ui-testing

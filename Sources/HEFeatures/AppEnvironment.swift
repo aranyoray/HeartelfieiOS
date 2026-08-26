@@ -1,5 +1,8 @@
 import Foundation
 import Observation
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
 import HECore
 import HESensors
 import HEML
@@ -103,12 +106,40 @@ public final class AppEnvironment {
     }
 
     /// Refresh the cached Home/Trends data from the repository.
+    /// Non-sensitive rollup for the home-screen widget (score + streak only).
+    private func publishWidgetSnapshot() {
+        struct Snapshot: Codable {
+            var score: Int
+            var hasData: Bool
+            var streakDays: Int
+            var checkedToday: Bool
+            var updated: Date
+        }
+        guard let shared = UserDefaults(suiteName: HeartelfieConfig.appGroupID) else { return }
+        let snapshot = Snapshot(
+            score: todayScore.value,
+            hasData: todayScore.contributingReadings > 0,
+            streakDays: streak.currentStreak,
+            checkedToday: streak.didCheckToday,
+            updated: Date()
+        )
+        if let data = try? JSONEncoder().encode(snapshot) {
+            shared.set(data, forKey: "he.widget.snapshot")
+        }
+        #if canImport(WidgetKit)
+        WidgetCenter.shared.reloadTimelines(ofKind: "DailyDilWidget")
+        #endif
+    }
+
     public func refreshDashboard() async {
         // A degraded launch (Keychain not yet unlocked / prewarm) is usually
         // transient; every dashboard refresh is a cheap chance to recover.
         await retryStorageIfDegraded()
         isLoading = true
-        defer { isLoading = false }
+        defer {
+            isLoading = false
+            publishWidgetSnapshot()
+        }
         async let scoreT = repository.todayScore()
         async let streakT = repository.streak()
         async let recentT = repository.allReadings()
