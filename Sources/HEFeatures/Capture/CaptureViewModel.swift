@@ -93,6 +93,13 @@ public final class CaptureViewModel {
         let sensor = sensors.sensor(for: modality)
         self.sensor = sensor
         let stream = await sensor.start()
+        // abort() may have run while start() was awaiting (backgrounding, the
+        // system permission alert); don't resurrect a cancelled flow — and stop
+        // the sensor we just started, since abort() couldn't reach it.
+        guard phase == .preparing else {
+            await sensor.stop()
+            return
+        }
         phase = .coaching
         streamTask = Task { [weak self] in
             for await frame in stream {
@@ -206,6 +213,9 @@ public final class CaptureViewModel {
     }
 
     private func ingest(_ frame: SignalFrame) {
+        // The finish snapshot is taken asynchronously; frames arriving after
+        // the window closed must not splice into it.
+        guard !isFinishing else { return }
         // A timestamp gap (camera stall, face lost) means the buffer is no
         // longer one continuous signal — never splice across it.
         if let last = timestamps.last, frame.timestamp - last > maxFrameGapSeconds {
@@ -221,6 +231,9 @@ public final class CaptureViewModel {
                 captureProgress = 0
                 elapsedSeconds = 0
                 captureWasInterrupted = true
+                // Re-arm the deadline for the fresh window — the old deadline
+                // would otherwise fire mid-window and fail a healthy capture.
+                startWatchdog()
             case .coaching:
                 // Restart the coaching buffer so the stitched signal never
                 // feeds the live BPM estimate.
@@ -234,6 +247,20 @@ public final class CaptureViewModel {
             channelBuffers[sample.channel, default: []].append(sample.value)
         }
         timestamps.append(frame.timestamp)
+
+        // Coaching is user-paced and can run for minutes; cap the buffers to a
+        // rolling window so live SQI/BPM cost stays constant and early noise
+        // doesn't dominate the quality verdict. Capture windows stay untrimmed.
+        if phase == .coaching {
+            let cap = 1024
+            if timestamps.count > cap {
+                timestamps.removeFirst(timestamps.count - cap)
+                for key in channelBuffers.keys {
+                    let count = channelBuffers[key]?.count ?? 0
+                    if count > cap { channelBuffers[key]?.removeFirst(count - cap) }
+                }
+            }
+        }
 
         let primaryChannel = SignalProcessor.primaryChannel(for: modality)
         let primary = channelBuffers[primaryChannel] ?? channelBuffers.values.first ?? []

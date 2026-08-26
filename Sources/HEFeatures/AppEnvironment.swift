@@ -17,7 +17,7 @@ public final class AppEnvironment {
 
     // MARK: Services
     public let sensors: SensorProviding
-    public let repository: any ReadingRepository
+    public private(set) var repository: any ReadingRepository
     public let inference: any InferenceProviding
     public let healthKit: HealthKitBridge
     public let exporter: ReadingExporter
@@ -37,6 +37,9 @@ public final class AppEnvironment {
     /// to in-memory storage — new readings will be lost when the app closes.
     /// Home surfaces this so the degradation is never silent.
     public private(set) var storageDegraded = false
+    /// True when the last delete-all could not remove every app-written Apple
+    /// Health sample (revoked share grant or per-type failure).
+    public private(set) var healthCleanupIncomplete = false
 
     // MARK: Private
     @ObservationIgnored private let defaults: UserDefaults
@@ -101,6 +104,9 @@ public final class AppEnvironment {
 
     /// Refresh the cached Home/Trends data from the repository.
     public func refreshDashboard() async {
+        // A degraded launch (Keychain not yet unlocked / prewarm) is usually
+        // transient; every dashboard refresh is a cheap chance to recover.
+        await retryStorageIfDegraded()
         isLoading = true
         defer { isLoading = false }
         async let scoreT = repository.todayScore()
@@ -147,9 +153,15 @@ public final class AppEnvironment {
     /// cleanups never run first, so a failure is never masked by partial success.
     public func deleteAllData() async throws {
         try await repository.deleteAll()
+        // In degraded (in-memory fallback) mode the encrypted blob is still on
+        // disk even though the active repository is empty — the user's deletion
+        // must remove it too, or it all comes back next launch.
+        if storageDegraded {
+            try EncryptedReadingStore.destroyOnDiskStore()
+        }
         profile = .empty
         Self.deleteExportedFiles()
-        await healthKit.deleteAllWrittenSamples()
+        healthCleanupIncomplete = !(await healthKit.deleteAllWrittenSamples())
         await refreshDashboard()
     }
 
@@ -162,6 +174,20 @@ public final class AppEnvironment {
         for name in names where name.hasPrefix("DailyDil-") || name.hasPrefix("Heartelfie-") {
             try? fm.removeItem(at: tmp.appendingPathComponent(name))
         }
+    }
+
+    /// Retry the encrypted store after a degraded launch (Keychain unavailable
+    /// before first unlock / prewarm). On success, migrates anything recorded
+    /// into the in-memory fallback so the session's readings survive.
+    public func retryStorageIfDegraded() async {
+        guard storageDegraded else { return }
+        guard let encrypted = try? EncryptedReadingStore() else { return }
+        let pending = (try? await repository.allReadings()) ?? []
+        for reading in pending {
+            try? await encrypted.save(reading)
+        }
+        repository = encrypted
+        storageDegraded = false
     }
 
     public func enableHealthKit() async {
@@ -179,7 +205,8 @@ public final class AppEnvironment {
             profile: profile,
             skinTone: profile.monkSkinTone
         ) { [weak self] reading in
-            try await self?.record(reading)
+            guard let self else { throw CancellationError() }
+            try await self.record(reading)
         }
     }
 }

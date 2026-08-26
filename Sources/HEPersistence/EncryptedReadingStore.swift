@@ -223,8 +223,25 @@ public actor EncryptedReadingStore: ReadingRepository {
             let plaintext = try crypto.open(sealed)
             return try decoder.decode(Snapshot.self, from: plaintext)
         } catch {
-            try? quarantineUnreadableStore()
+            // If the blob can't even be moved aside, fail the read rather than
+            // return .empty — a later save would overwrite the only ciphertext
+            // copy, breaking the "nothing is silently destroyed" promise.
+            try quarantineUnreadableStore()
             return .empty
+        }
+    }
+
+    /// Removes the on-disk blob (and any quarantined copy) without needing a
+    /// working Keychain/crypto stack. Used by delete-all when the app is running
+    /// on the in-memory fallback: the user's deletion must still reach the disk.
+    public static func destroyOnDiskStore(fileName: String = "heartelfie.store") throws {
+        let dir = try defaultDirectory()
+        let fm = FileManager.default
+        for name in [fileName, fileName + ".corrupt"] {
+            let url = dir.appendingPathComponent(name, isDirectory: false)
+            if fm.fileExists(atPath: url.path) {
+                try fm.removeItem(at: url)
+            }
         }
     }
 

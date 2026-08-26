@@ -96,17 +96,26 @@ public final class HealthKitBridge {
     /// touched. Only types with an active share grant are attempted (deleting
     /// app-written objects requires share authorization), and per-type failures
     /// are swallowed so one denied type can't block the rest.
-    public func deleteAllWrittenSamples() async {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
+    /// Returns `false` when some app-written samples may remain (a type's share
+    /// grant was revoked, or a per-type delete failed) so the UI can say so.
+    @discardableResult
+    public func deleteAllWrittenSamples() async -> Bool {
+        guard HKHealthStore.isHealthDataAvailable() else { return true }
         let predicate = HKQuery.predicateForObjects(from: HKSource.default())
+        var complete = true
         for type in Self.writeTypes {
-            guard store.authorizationStatus(for: type) == .sharingAuthorized else { continue }
-            await withCheckedContinuation { continuation in
-                store.deleteObjects(of: type, predicate: predicate) { _, _, _ in
-                    continuation.resume()
+            guard store.authorizationStatus(for: type) == .sharingAuthorized else {
+                complete = false
+                continue
+            }
+            let ok = await withCheckedContinuation { continuation in
+                store.deleteObjects(of: type, predicate: predicate) { success, _, _ in
+                    continuation.resume(returning: success)
                 }
             }
+            complete = complete && ok
         }
+        return complete
     }
 
     // MARK: - Reads
@@ -325,7 +334,8 @@ public final class HealthKitBridge {
         throw HealthKitError.unavailable
     }
 
-    public func deleteAllWrittenSamples() async {}
+    @discardableResult
+    public func deleteAllWrittenSamples() async -> Bool { true }
 }
 
 #endif

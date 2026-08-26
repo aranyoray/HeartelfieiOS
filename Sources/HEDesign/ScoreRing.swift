@@ -72,7 +72,11 @@ public struct ScoreRing: View {
         .onAppear { applyProgress(animated: !reduceMotion) }
         .onChange(of: score.progress) { _, _ in applyProgress(animated: !reduceMotion) }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Cardio score \(score.value) out of 100, \(score.risk.displayName)")
+        .accessibilityLabel(
+            score.contributingReadings == 0
+                ? "No checks yet today"
+                : "Cardio score \(score.value) out of 100, \(score.risk.displayName)"
+        )
         .accessibilityValue(score.headline)
     }
 

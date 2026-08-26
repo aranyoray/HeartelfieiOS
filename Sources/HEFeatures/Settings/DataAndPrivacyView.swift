@@ -184,6 +184,11 @@ struct DataAndPrivacyView: View {
                         Label("All local DailyDil data has been deleted from this device.", systemImage: "checkmark.circle.fill")
                             .font(.heCallout)
                             .foregroundStyle(Color.heTextSecondary)
+                        if env.healthCleanupIncomplete {
+                            Text("Some samples DailyDil wrote to Apple Health may remain — you can remove them in the Health app under Browse → Data Sources.")
+                                .font(.heCaption)
+                                .foregroundStyle(Color.heTextSecondary)
+                        }
                     } else {
                         if deleteFailed {
                             Label("Deletion didn't finish — your data may still be on this device. Please try again.", systemImage: "exclamationmark.triangle.fill")

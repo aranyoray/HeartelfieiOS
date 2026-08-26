@@ -78,15 +78,28 @@ public struct CaptureFlowView: View {
             }
         }
         .onChange(of: scenePhase) { _, newPhase in
-            // Leaving the foreground mid-flow must tear the camera down (torch
-            // off, no half-captures); a finished or failed reading is left alone.
-            guard newPhase != .active else { return }
-            switch vm?.phase {
-            case .preparing, .coaching, .capturing, .processing:
-                countdownTask?.cancel()
-                countdownTask = nil
-                countdown = nil
-                Task { await vm?.abort() }
+            switch newPhase {
+            case .background:
+                // Backgrounding mid-flow must tear the camera down (torch off,
+                // no half-captures); a finished or failed reading is left alone.
+                // `.inactive` is deliberately NOT handled: the camera-permission
+                // alert, Control Center, and call banners all pass through it.
+                switch vm?.phase {
+                case .preparing, .coaching, .capturing, .processing:
+                    countdownTask?.cancel()
+                    countdownTask = nil
+                    countdown = nil
+                    Task { await vm?.abort() }
+                default:
+                    break
+                }
+            case .active:
+                // The legacy (face) flow auto-begins from .task only once; after
+                // a background abort it would otherwise dead-end on "Starting
+                // camera…" with no way to restart.
+                if let vm, vm.phase == .idle, !isFingerFlow {
+                    Task { await vm.begin() }
+                }
             default:
                 break
             }
@@ -561,6 +574,9 @@ struct CaptureResultSummary: View {
                     .padding(.horizontal, HESpacing.xs)
                     .padding(.vertical, HESpacing.xxs)
                     .background(RoundedRectangle(cornerRadius: HERadius.md, style: .continuous).fill(.white.opacity(0.92)))
+                    // The strip is a fixed white surface; dynamic dark-mode text
+                    // colors would render near-white-on-white.
+                    .environment(\.colorScheme, .light)
                 }
             }
 

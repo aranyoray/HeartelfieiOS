@@ -80,8 +80,8 @@ struct HomeView: View {
                 }
             }
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isHeader)
+        // No .combine here: flattening the hero would hide the "Take today's
+        // check" NavigationLink from VoiceOver.
     }
 
     /// Time-of-day greeting. No name is stored in the lean health profile, so this

@@ -175,11 +175,15 @@ struct ExportDataView: View {
 
                 let url = FileManager.default.temporaryDirectory
                     .appendingPathComponent("DailyDil-readings-\(Self.fileStamp()).\(kind.fileExtension)")
+                // Rendering a full-history PDF/CSV is CPU-bound; keep it off the
+                // main actor so the spinner can actually animate.
+                let exporter = env.exporter
                 switch kind {
                 case .csv:
-                    try env.exporter.writeCSV(readings, to: url)
+                    try await Task.detached { try exporter.writeCSV(readings, to: url) }.value
                 case .pdf:
-                    try env.exporter.writePDF(readings, profile: env.profile, to: url)
+                    let profile = env.profile
+                    try await Task.detached { try exporter.writePDF(readings, profile: profile, to: url) }.value
                 }
 
                 generatedURLs.append(url)
