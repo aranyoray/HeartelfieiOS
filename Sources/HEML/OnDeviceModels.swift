@@ -6,12 +6,9 @@ import CoreML
 #endif
 
 /// On-device inference helpers that run entirely locally (no network, no
-/// attribution obligations). Two jobs today:
-///
-/// 1. `screenRhythm` — an optional CoreML rhythm screen for phone `.fingerPPG`
-///    that falls back to a transparent heuristic when no model ships.
-/// 2. `estimateHydration` — a placeholder BioZ → hydration estimate for the
-///    device `.deviceBioZ` modality.
+/// attribution obligations). `screenRhythm` is an optional CoreML rhythm screen
+/// for phone `.fingerPPG` that falls back to a transparent heuristic when no
+/// model ships.
 ///
 /// Everything here is `Sendable` and free of mutable shared state, so it is safe
 /// to call from any actor / task.
@@ -86,34 +83,6 @@ public final class OnDeviceModels: Sendable {
             i += 1
         }
         return peaks
-    }
-
-    // MARK: - Hydration (BioZ, placeholder)
-
-    /// Placeholder BioZ → hydration estimate (% total body water).
-    ///
-    /// Real bio-impedance hydration uses calibrated impedance + height/weight; this
-    /// maps the BioZ signal's stability onto the configured hydration reference
-    /// band (`ClinicalConfig.referenceRange(for: .hydration)`) around its midpoint.
-    /// Clearly a placeholder — replace with a validated BIA model.
-    public func estimateHydration(bioZ: [Double]) -> Double {
-        let range = ClinicalConfig.referenceRange(for: .hydration)
-        let low = range?.low ?? 50
-        let high = range?.high ?? 65
-        let midpoint = (low + high) / 2.0
-        guard bioZ.count > 2 else { return midpoint }
-
-        // Use a normalised, bounded deviation from the mean as a stand-in feature:
-        // steadier impedance → nudge toward the upper (better-hydrated) half.
-        let mean = bioZ.reduce(0, +) / Double(bioZ.count)
-        guard abs(mean) > 1e-9 else { return midpoint }
-        let variance = bioZ.reduce(0) { $0 + ($1 - mean) * ($1 - mean) } / Double(bioZ.count)
-        let cv = variance.squareRoot() / abs(mean)              // ~0 (steady) … large
-        let steadiness = 1.0 / (1.0 + cv)                       // 0…1, 1 = very steady
-        // Center on midpoint, swing ±40% of the half-band by steadiness.
-        let halfBand = (high - low) / 2.0
-        let estimate = midpoint + (steadiness - 0.5) * 0.8 * halfBand
-        return min(max(estimate.rounded(), low - halfBand), high + halfBand)
     }
 
     // MARK: - Drop real weights here

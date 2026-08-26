@@ -2,9 +2,7 @@ import Foundation
 import HECore
 
 /// The DSP-computable result of one capture: metrics the on-device signal pipeline
-/// can derive itself (HR, HRV, rhythm, screening SpO₂, respiration). Clinical
-/// device metrics (Hb, clinical SpO₂, anemia, perfusion, hydration) are added by
-/// the ML layer and merged on top of this.
+/// can derive itself (HR, HRV, rhythm, screening SpO₂, respiration).
 public struct ProcessedSignal: Sendable {
     public let metrics: [CardioMetric]
     public let signalQuality: SignalQuality
@@ -142,9 +140,6 @@ public struct SignalProcessor: Sendable {
     public static func primaryChannel(for modality: Modality) -> SignalChannel {
         switch modality {
         case .fingerPPG, .facialRPPG: return .green
-        case .deviceMultiWavelengthPPG: return .infrared
-        case .deviceECG: return .ecg
-        case .deviceBioZ: return .bioImpedance
         }
     }
 

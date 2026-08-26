@@ -48,7 +48,7 @@ platforms: [
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
 
-        // MARK: ML — on-device CoreML wrappers + cloud model client (mockable).
+        // MARK: ML — on-device CoreML wrappers (mockable).
         .target(
             name: "HEML",
             dependencies: ["HECore", "HESignal"],

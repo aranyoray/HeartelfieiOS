@@ -2,8 +2,8 @@ import Foundation
 import HECore
 
 /// Supplies a `CardioSensor` for any `Modality`. The capture pipeline depends only
-/// on this protocol, so swapping real ⇄ mock sensors (Simulator, tests, the
-/// developer "simulate device" toggle) is transparent.
+/// on this protocol, so swapping real ⇄ mock sensors (Simulator, tests) is
+/// transparent.
 public protocol SensorProviding: Sendable {
     /// The appropriate sensor for `modality` — real on capable hardware, otherwise
     /// the synthetic `Mock…` variant.
@@ -12,40 +12,19 @@ public protocol SensorProviding: Sendable {
 
 /// Default `SensorProviding`.
 ///
-/// Resolution rules:
-/// * **Phone modalities** (`.fingerPPG`, `.facialRPPG`) → the real
-///   sensor on a physical device, the `Mock…` sensor in the Simulator or when
-///   `forceSimulation` is set. (Each real sensor also self-falls-back to its mock if
-///   its framework is unavailable at runtime, so this is belt-and-braces.)
-/// * **Device modalities** (`.deviceMultiWavelengthPPG`, `.deviceECG`,
-///   `.deviceBioZ`) → `HeartelfieDeviceSensor` reading from the supplied
-///   `HeartelfieBLEManager`. With no manager, or when simulating, the
-///   `MockHeartelfieDeviceSensor` is used. (When the BLE manager itself is in
-///   simulated mode, the device sensor still reads synthetic frames through it.)
-///
-/// The real GATT profile the device path binds to is centralized in
-/// `HeartelfieConfig.BLE`.
+/// Phone modalities (`.fingerPPG`, `.facialRPPG`) resolve to the real sensor on a
+/// physical device, or the `Mock…` sensor in the Simulator or when
+/// `forceSimulation` is set. Each real sensor also falls back to its mock if its
+/// framework is unavailable at runtime.
 public final class SensorFactory: SensorProviding, @unchecked Sendable {
 
-    /// Developer "simulate device / simulate sensors" toggle. When `true`, every
-    /// modality resolves to its `Mock…` variant regardless of hardware. Thread-safe.
-    public var forceSimulation: Bool {
-        get { lock.withLock { _forceSimulation } }
-        set { lock.withLock { _forceSimulation = newValue } }
-    }
+    /// When `true`, every modality resolves to its `Mock…` variant regardless of
+    /// hardware.
+    private let forceSimulation: Bool
 
-    private var _forceSimulation: Bool
-    private let lock = NSLock()
-    private let deviceBLE: HeartelfieBLEManager?
-
-    /// - Parameters:
-    ///   - forceSimulation: force every sensor to its mock variant. Defaults to
-    ///     `false`. Callers typically pass `isSimulatorBuild` or a debug flag.
-    ///   - deviceBLE: the shared BLE manager backing device modalities. If `nil`,
-    ///     device modalities always resolve to the mock device sensor.
-    public init(forceSimulation: Bool = false, deviceBLE: HeartelfieBLEManager? = nil) {
-        self._forceSimulation = forceSimulation
-        self.deviceBLE = deviceBLE
+    /// - Parameter forceSimulation: force every sensor to its mock variant.
+    public init(forceSimulation: Bool = false) {
+        self.forceSimulation = forceSimulation
     }
 
     public func sensor(for modality: Modality) -> any CardioSensor {
@@ -56,13 +35,6 @@ public final class SensorFactory: SensorProviding, @unchecked Sendable {
             return simulate ? MockCameraPPGSensor() : makeCameraPPG()
         case .facialRPPG:
             return simulate ? MockFaceRPPGSensor() : makeFaceRPPG()
-        case .deviceMultiWavelengthPPG, .deviceECG, .deviceBioZ:
-            // Use the real device sensor only when we have a BLE manager and aren't
-            // force-simulating; otherwise emit synthetic device frames.
-            if !simulate, let ble = deviceBLE {
-                return HeartelfieDeviceSensor(modality: modality, ble: ble)
-            }
-            return MockHeartelfieDeviceSensor(modality: modality)
         }
     }
 
@@ -86,8 +58,8 @@ public final class SensorFactory: SensorProviding, @unchecked Sendable {
         return MockFaceRPPGSensor()
     }
 
-    /// Whether this build is running in the iOS Simulator (no real camera/IMU/BLE).
-public static var isSimulator: Bool {
+    /// Whether this build is running in the iOS Simulator (no real camera).
+    public static var isSimulator: Bool {
         #if targetEnvironment(simulator)
         return true
         #else

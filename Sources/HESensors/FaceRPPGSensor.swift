@@ -77,15 +77,20 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
     #if canImport(AVFoundation) && canImport(Vision)
     /// Configure the front-camera capture graph. Returns `false` when no front
     /// camera is usable, signalling a fallback to synthetic frames.
+    /// Idempotent: existing inputs/outputs are removed so `start()` can be called
+    /// again on the same instance without silently falling back to the mock.
     private func configureSession() -> Bool {
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
-              let input = try? AVCaptureDeviceInput(device: device),
-              session.canAddInput(input),
-              session.canAddOutput(output)
+              let input = try? AVCaptureDeviceInput(device: device)
         else { return false }
 
         session.beginConfiguration()
+        session.inputs.forEach { session.removeInput($0) }
+        session.outputs.forEach { session.removeOutput($0) }
         session.sessionPreset = .vga640x480 // enough for a stable face ROI mean.
+        defer { session.commitConfiguration() }
+
+        guard session.canAddInput(input), session.canAddOutput(output) else { return false }
         session.addInput(input)
         output.videoSettings = [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
@@ -93,7 +98,6 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
         output.alwaysDiscardsLateVideoFrames = true
         output.setSampleBufferDelegate(self, queue: sampleQueue)
         session.addOutput(output)
-        session.commitConfiguration()
         return true
     }
 

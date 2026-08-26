@@ -9,10 +9,6 @@ public enum CaptureError: Error, Sendable, Hashable {
     case poorSignalQuality(SignalQuality)
     /// The user aborted the capture.
     case aborted
-    /// A device modality was requested but the Heartelfie device isn't connected.
-    case deviceNotConnected
-    /// Electrode/finger contact on the device was lost mid-capture.
-    case contactLost
     /// A required permission was denied. Associated value names the permission.
     case permissionDenied(String)
     /// The capture ran past its time budget without enough clean signal.
@@ -26,10 +22,6 @@ public enum CaptureError: Error, Sendable, Hashable {
             return "We couldn't get a clean enough signal. Follow the on-screen tips and try again."
         case .aborted:
             return "Capture cancelled."
-        case .deviceNotConnected:
-            return "Connect your Heartelfie device to use this measurement."
-        case .contactLost:
-            return "Contact with the Heartelfie device was lost. Reposition and try again."
         case .permissionDenied(let name):
             return "Heartelfie needs \(name) access for this check. You can enable it in Settings."
         case .timeout:

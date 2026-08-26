@@ -34,8 +34,9 @@ public enum HealthKitError: Error, Sendable, CustomStringConvertible {
 ///
 /// **Write** scope: heart rate, HRV (SDNN), blood oxygen, respiratory rate only.
 ///
-/// - Important: Heartelfie's custom waveforms and device-only metrics (hemoglobin,
-///   anemia risk, perfusion index, hydration, rhythm-irregularity %) are
+/// - Important: Heartelfie's custom waveforms and screening-only metrics that
+///   have no HealthKit equivalent (rhythm-irregularity %, approximate oxygen
+///   wellness, and historical device-only rows such as hemoglobin) are
 ///   **not** representable as standard HealthKit sample types and
 ///   are therefore never written to HealthKit — they live only in the encrypted
 ///   on-device store. ``write(reading:)`` silently skips them.

@@ -36,8 +36,6 @@ public enum AppRoute: Hashable, Sendable {
     case readingDetail(CardioReading)
     /// "What this does / doesn't mean" info for a modality.
     case modalityInfo(Modality)
-    /// Device pairing & management.
-    case devicePairing
     /// Insights (daily summary, trend callouts, when-to-seek-care).
     case insights
     /// Per-metric trend detail.

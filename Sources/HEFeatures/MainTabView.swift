@@ -46,8 +46,6 @@ public struct MainTabView: View {
             ResultDetailView(reading: reading)
         case .modalityInfo(let modality):
             ModalityInfoView(modality: modality)
-        case .devicePairing:
-            DevicePairingView()
         case .insights:
             InsightsView()
         case .metricTrend(let metric):

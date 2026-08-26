@@ -76,7 +76,7 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "person.crop.circle.badge.minus",
                         title: "Minimal personal data",
-                        detail: "Heartelfie keeps no account, email address, contact list, photos, or advertising profile."
+                        detail: "DailyDil keeps no account, email address, contact list, photos, or advertising profile."
                     )
                 }
             }
@@ -96,7 +96,7 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "camera.viewfinder",
                         title: "What is collected",
-                        detail: "During a facial rPPG check, the front camera video stream is processed on device to find a face region and read color-change signals used to estimate pulse. Heartelfie does not create Face ID templates or identify you."
+                        detail: "During a facial rPPG check, the front camera video stream is processed on device to find a face region and read color-change signals used to estimate pulse. DailyDil does not create Face ID templates or identify you."
                     )
                     privacyPoint(
                         icon: "iphone",
@@ -106,7 +106,7 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "person.2.slash",
                         title: "No sharing",
-                        detail: "Face data is not sold, used for advertising, or shared with third parties. It is not uploaded to Heartelfie servers."
+                        detail: "Face data is not sold, used for advertising, or shared with third parties. It is not uploaded to DailyDil servers."
                     )
                     privacyPoint(
                         icon: "trash",
@@ -130,7 +130,7 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "iphone.gen3",
                         title: "Sensitive signals stay local",
-                        detail: "Camera frames, face regions, custom waveforms, and device wellness signals are processed on device and are not uploaded by default."
+                        detail: "Camera frames, face regions, and custom waveforms are processed on device and are not uploaded by default."
                     )
                     privacyPoint(
                         icon: "lock.icloud.fill",
@@ -154,13 +154,13 @@ struct DataAndPrivacyView: View {
                 VStack(alignment: .leading, spacing: HESpacing.md) {
                     privacyPoint(
                         icon: "arrow.down.heart.fill",
-                        title: "What Heartelfie reads",
-                        detail: "With your permission, Heartelfie reads supported Apple Health values such as heart rate, heart-rate variability, resting heart rate, oxygen wellness, breathing rate, and available Apple Watch rhythm data."
+                        title: "What DailyDil reads",
+                        detail: "With your permission, DailyDil reads supported Apple Health values such as heart rate, heart-rate variability, resting heart rate, oxygen wellness, breathing rate, and available Apple Watch rhythm data."
                     )
                     privacyPoint(
                         icon: "arrow.up.heart.fill",
-                        title: "What Heartelfie writes",
-                        detail: "With your permission, Heartelfie writes only supported reading summaries back to Apple Health. Face frames, custom waveforms, and device-only wellness estimates are not written to HealthKit."
+                        title: "What DailyDil writes",
+                        detail: "With your permission, DailyDil writes only supported reading summaries back to Apple Health. Face frames, custom waveforms, and screening-only estimates that HealthKit does not represent are not written."
                     )
                     Text("You can change Apple Health permissions any time in the Health app.")
                         .font(.heCaption)
@@ -180,7 +180,7 @@ struct DataAndPrivacyView: View {
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.md) {
                     if didDelete {
-                        Label("All local Heartelfie data has been deleted from this device.", systemImage: "checkmark.circle.fill")
+                        Label("All local DailyDil data has been deleted from this device.", systemImage: "checkmark.circle.fill")
                             .font(.heCallout)
                             .foregroundStyle(Color.heTextSecondary)
                     } else {

@@ -4,10 +4,9 @@ import HEDesign
 
 /// Step 1 — Welcome / value proposition.
 ///
-/// Warm, premium first impression that explains what Heartelfie is for (gentle
-/// daily cardiovascular self-checks) and introduces the two-tier idea — phone
-/// screenings vs. higher-confidence device measurements — in plain language. Sets
-/// a calm, non-diagnostic tone from the very first screen.
+/// Warm, premium first impression that explains what DailyDil is for (gentle
+/// daily cardiovascular self-checks from the phone) in plain language. Sets a
+/// calm, non-diagnostic tone from the very first screen.
 struct OnboardingWelcomeStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: HESpacing.lg) {
@@ -19,7 +18,7 @@ struct OnboardingWelcomeStep: View {
                     .foregroundStyle(Color.heTextPrimary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("Heartelfie helps you notice how your cardiovascular wellness changes day to day, using just your phone — and your Heartelfie device when you have one.")
+                Text("DailyDil helps you notice how your cardiovascular wellness changes day to day, using just your phone.")
                     .font(.heBody)
                     .foregroundStyle(Color.heTextSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -27,7 +26,7 @@ struct OnboardingWelcomeStep: View {
             .accessibilityElement(children: .combine)
 
             VStack(alignment: .leading, spacing: HESpacing.md) {
-                Text("Two ways to check in")
+                Text("How you check in")
                     .font(.heHeadline)
                     .foregroundStyle(Color.heTextPrimary)
                     .accessibilityAddTraits(.isHeader)
@@ -35,13 +34,7 @@ struct OnboardingWelcomeStep: View {
                 tierCard(
                     tier: .screening,
                     title: "Phone screening",
-                    detail: "Quick, everyday wellness snapshots from your phone's camera and sensors. Great for spotting trends."
-                )
-
-                tierCard(
-                    tier: .measurement,
-                    title: "Device measurement",
-                    detail: "When your Heartelfie device is connected, you get a higher-confidence reading for a closer look."
+                    detail: "Quick, everyday wellness snapshots from your phone's camera. Great for spotting trends."
                 )
             }
 
@@ -66,7 +59,7 @@ struct OnboardingWelcomeStep: View {
                     .foregroundStyle(.white)
                     .accessibilityHidden(true)
 
-                Text("Welcome to Heartelfie")
+                Text("Welcome to DailyDil")
                     .font(.heTitle)
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
@@ -77,7 +70,7 @@ struct OnboardingWelcomeStep: View {
         .frame(height: 200)
         .heCardShadow()
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Welcome to Heartelfie")
+        .accessibilityLabel("Welcome to DailyDil")
     }
 
     // MARK: - Tier card

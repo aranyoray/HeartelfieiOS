@@ -3,9 +3,6 @@ import Foundation
 /// A single physiological channel of raw signal.
 public enum SignalChannel: String, Codable, Sendable, CaseIterable, Hashable {
     case red, green, blue        // camera PPG color planes
-    case infrared, infrared2     // device multi-wavelength
-    case ecg                     // device electrodes
-    case bioImpedance            // device BioZ
 }
 
 /// A single timestamped sample on one channel.
@@ -22,8 +19,7 @@ public struct SignalSample: Sendable, Hashable, Codable {
 }
 
 /// One streamed acquisition frame: the set of per-channel samples captured at a
-/// single instant. Multi-wavelength device sources populate several channels per
-/// frame; phone PPG typically populates the color planes it reads.
+/// single instant. Phone PPG typically populates the color planes it reads.
 ///
 /// `CardioSensor.start()` yields a stream of these frames.
 public struct SignalFrame: Sendable, Hashable, Codable {

@@ -1,37 +1,39 @@
 App Review Response
 
-Guideline 2.1 - Face Data
+Submission ID: ed97f05c-48a9-4e3d-8bec-15ba3e8c98e2
+Version reviewed: 1.0 (3)
+This reply applies to the new binary 1.0 (4).
 
-Heartelfie only processes face data during the optional facial rPPG wellness check. The app uses the front camera video stream to locate a face region and process subtle color changes that can be used to estimate pulse for a wellness screening. Heartelfie does not create Face ID templates, identify the user, or use face data for authentication, advertising, profiling, or tracking.
+Guideline 1.4.1 - Safety - Physical Harm
 
-Raw face images and video frames are processed in memory on the device. They are not saved to the app database, not written to Apple Health, not uploaded to Heartelfie servers, and not shared with third parties. Raw face frames are discarded immediately after the check. Saved readings may include derived wellness metrics, signal quality values, timestamps, capture modality, model provenance, and a small derived waveform preview.
+Heartelfie does not connect to external medical hardware and does not provide medical services through a hardware accessory.
 
-Face data is not sold, used for advertising, or shared with third parties. Raw face frames are not persistently stored. Derived readings are stored locally on the user's device in an encrypted database until the user deletes them, exports them, or removes the app. Users can delete local Heartelfie data from the app Data and Privacy screen.
+The previous binary included an optional Bluetooth Heartelfie device path. That path has been fully removed:
 
-The privacy policy explains face data in Section 1, Summary, Section 3, Face Data, Section 4, Storage, Retention, and Deletion, Section 6, Sharing and Third Parties, and Section 10, Security.
+- There is no Bluetooth pairing, scanning, or GATT client in the app.
+- NSBluetoothAlwaysUsageDescription and NSBluetoothPeripheralUsageDescription have been removed from Info.plist. The app does not request Bluetooth permission.
+- Measure and Home no longer offer device measurement, pairing, battery, firmware, or “simulate device” controls.
+- Capture is limited to phone camera wellness screening: fingertip PPG with the rear camera and torch, and facial rPPG with the front camera.
 
-Relevant privacy policy text:
+Because the app no longer uses designated medical hardware:
 
-Section 1 states: "Camera frames, including face frames, are processed on device and are not saved." It also states: "Face data is not sold, used for advertising, or shared with third parties."
+- We are not attaching regulatory-clearance documents for hardware, because no hardware is used.
+- We are not attaching a hardware test report or peer-reviewed hardware study, because no hardware is used.
+- We are not restricting storefronts for hardware clearance, because no hardware is used.
 
-Section 3 states: "During a facial rPPG check, Heartelfie uses the front camera video stream to locate a face region and process subtle color changes that can be used to estimate pulse for a wellness screening. This is the only face data collected by the app. Heartelfie does not create Face ID templates, does not identify you, and does not use face data for authentication, advertising, profiling, or tracking."
+Heartelfie is a wellness and screening app. It is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or condition. Readings are wellness snapshots from the iPhone or iPad camera, not clinical measurements.
 
-Section 3 also states: "Raw face images and video frames are processed in memory on the device. They are not saved to the app database, not written to Apple Health, not uploaded to Heartelfie servers, and not shared with third parties. After the check ends, raw face frames are discarded."
+Guideline 2.1 - Demo video of hardware pairing
 
-Guideline 5.1.1 - HealthKit Permission Prompt
+A pairing demo video is not applicable to this binary.
 
-The HealthKit priming button has been changed from "Connect Apple Health" to "Continue" in onboarding and profile authorization flows. The app now clearly identifies the integration as "Apple Health and HealthKit" and explains that access is optional and controlled by the Health app.
+There is no designated hardware, no pairing flow, and no accessory interaction to film. The current version of the app runs only on the Apple device using the built-in camera.
 
-Guideline 2.5.1 - HealthKit and CareKit Identification
+If App Review still wants a walkthrough of the current product, we can provide a video of onboarding, a fingertip camera screening, a facial rPPG screening, and viewing a saved wellness reading on a physical iPhone or iPad. Please let us know if that would help.
 
-The app does not use CareKit. The app uses HealthKit only through the optional Apple Health integration. The interface identifies this in onboarding, Profile, and Data and Privacy.
+Notes for testing this binary
 
-Guideline 1.4.1 - Safety and Medical Claims
-
-In response to the July 23 review, we have removed the two device-sensor heart-measurement features the review identified. The app no longer rests the phone on the chest to sense heartbeat vibrations from the accelerometer and motion sensors (seismocardiography), and no longer holds the microphone to the chest to listen to heart sounds (phonocardiography). Both acquisition modalities, their sensor code, their associated metrics, their onboarding permission priming, and the NSMotionUsageDescription and NSMicrophoneUsageDescription entries have been removed from the app. The build no longer requests motion or microphone access and makes no health-measurement claim from those sensors.
-
-Phone-based screening is now limited to camera-based photoplethysmography only: fingertip PPG using the rear camera and torch, and facial rPPG using the front camera. Any higher-confidence readings come only from the optional external Heartelfie hardware device.
-
-The app has also been revised to reinforce wellness only positioning and remove reading driven medical action calls to action. Threshold notices now tell users to retake readings and compare trends, not to seek care based on app readings. Former hospital, emergency, and partner clinic action language has been removed from result cards.
-
-Heartelfie is not represented as a medical device and is not intended to diagnose, treat, cure, or prevent any disease or condition. If Heartelfie hardware is marketed as regulated medical hardware in any jurisdiction, we will attach the applicable regulatory clearance and validation documentation in App Store Connect before submitting in that jurisdiction.
+- No demo account is required. The app has no login.
+- On first launch, complete onboarding (camera is explained; Apple Health is optional and can be skipped).
+- Use Measure → Finger PPG or Facial rPPG. These are camera wellness screenings only.
+- Bluetooth is not used. The app should not prompt for Bluetooth.

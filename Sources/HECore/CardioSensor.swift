@@ -1,10 +1,9 @@
 import Foundation
 
 /// Protocol-oriented abstraction over every signal source. Concrete
-/// implementations live in `HESensors` (`CameraPPGSensor`, `FaceRPPGSensor`,
-/// `HeartelfieDeviceSensor`) — each paired with
-/// a `Mock…` variant emitting synthetic frames so every flow runs in the
-/// Simulator with no hardware.
+/// implementations live in `HESensors` (`CameraPPGSensor`, `FaceRPPGSensor`) —
+/// each paired with a `Mock…` variant emitting synthetic frames so every flow
+/// runs in the Simulator with no hardware.
 public protocol CardioSensor: Sendable {
     /// What this sensor measures.
     var modality: Modality { get }

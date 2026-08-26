@@ -5,8 +5,8 @@ import HEDesign
 /// Step 2 - staged permission priming.
 ///
 /// Explains why Heartelfie asks for each capability before iOS shows a system
-/// prompt. Camera and Bluetooth are requested in context at first use. HealthKit
-/// has an explicit opt-in action here.
+/// prompt. Camera is requested in context at first use. HealthKit has an explicit
+/// opt-in action here.
 struct OnboardingPermissionsStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: HESpacing.lg) {
@@ -46,12 +46,6 @@ private struct PermissionPrimer: Identifiable {
             title: "Camera",
             systemImage: "camera.fill",
             rationale: "Reads subtle color changes in your fingertip or face to estimate pulse for a wellness screening."
-        ),
-        PermissionPrimer(
-            id: "bluetooth",
-            title: "Bluetooth",
-            systemImage: "sensor.tag.radiowaves.forward.fill",
-            rationale: "Connects the optional Heartelfie wellness device for higher-confidence check-ins."
         )
     ]
 }

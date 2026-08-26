@@ -3,19 +3,14 @@ import HECore
 import HEDesign
 
 /// A rich picker row for a single `Modality` on the Measure screen: icon,
-/// display name, honest one-line summary, tier badge, experimental qualifier,
-/// supported-metric chips, and an explicit primary action.
+/// display name, honest one-line summary, tier badge, supported-metric chips,
+/// and an explicit primary action.
 ///
-/// Phone (screening) modalities start the capture flow directly. Device
-/// (measurement) modalities that can't currently measure offer "Connect device"
-/// instead, and every row links to a "What this does / doesn't mean" explainer so
-/// the user is never left guessing what a reading means.
+/// Phone (screening) modalities start the capture flow directly, and every row
+/// links to a "What this does / doesn't mean" explainer so the user is never
+/// left guessing what a reading means.
 struct ModalityRow: View {
     let modality: Modality
-    /// Whether this modality can be captured right now.
-    let isAvailable: Bool
-
-    private var isGatedDevice: Bool { modality.requiresDevice && !isAvailable }
 
     var body: some View {
         HECard {
@@ -46,9 +41,6 @@ struct ModalityRow: View {
 
                 HStack(spacing: HESpacing.xs) {
                     TierBadge(modality.tier, compact: true)
-                    if modality.isExperimental {
-                        ExperimentalChip()
-                    }
                 }
             }
 
@@ -69,7 +61,7 @@ struct ModalityRow: View {
     @ViewBuilder
     private var metricsChips: some View {
         if !modality.supportedMetrics.isEmpty {
-            let heading = modality.tier == .measurement ? "Measures" : "Screens for"
+            let heading = "Screens for"
             VStack(alignment: .leading, spacing: HESpacing.xs) {
                 Text(heading)
                     .font(.heCaption.weight(.semibold))
@@ -88,25 +80,14 @@ struct ModalityRow: View {
 
     private var actionRow: some View {
         HStack(spacing: HESpacing.sm) {
-            if isGatedDevice {
-                NavigationLink(value: AppRoute.devicePairing) {
-                    Label("Connect device", systemImage: "sensor.tag.radiowaves.forward.fill")
-                        .font(.heCallout.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, HESpacing.sm)
-                }
-                .buttonStyle(SecondaryButtonStyle())
-                .accessibilityHint("Opens device pairing. This measurement needs the Heartelfie device.")
-            } else {
-                NavigationLink(value: AppRoute.capture(modality)) {
-                    Label(startTitle, systemImage: "record.circle")
-                        .font(.heCallout.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, HESpacing.sm)
-                }
-                .buttonStyle(PrimaryButtonStyle())
-                .accessibilityHint("Starts a \(modality.tier.shortLabel.lowercased()) with \(modality.displayName).")
+            NavigationLink(value: AppRoute.capture(modality)) {
+                Label("Start screening", systemImage: "record.circle")
+                    .font(.heCallout.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, HESpacing.sm)
             }
+            .buttonStyle(PrimaryButtonStyle())
+            .accessibilityHint("Starts a \(modality.tier.shortLabel.lowercased()) with \(modality.displayName).")
 
             NavigationLink(value: AppRoute.modalityInfo(modality)) {
                 Image(systemName: "info.circle")
@@ -121,10 +102,6 @@ struct ModalityRow: View {
             .accessibilityLabel("What this does and doesn't mean")
             .accessibilityHint("Explains \(modality.displayName).")
         }
-    }
-
-    private var startTitle: String {
-        modality.tier == .measurement ? "Start measurement" : "Start screening"
     }
 }
 
@@ -232,10 +209,8 @@ struct FlowLayout: Layout {
     NavigationStack {
         ScrollView {
             VStack(spacing: HESpacing.md) {
-                ModalityRow(modality: .fingerPPG, isAvailable: true)
-                ModalityRow(modality: .facialRPPG, isAvailable: true)
-                ModalityRow(modality: .deviceECG, isAvailable: false)
-                ModalityRow(modality: .deviceMultiWavelengthPPG, isAvailable: true)
+                ModalityRow(modality: .fingerPPG)
+                ModalityRow(modality: .facialRPPG)
             }
             .padding()
         }

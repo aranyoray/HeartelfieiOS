@@ -2,17 +2,14 @@ import Foundation
 
 /// The two explicit trust tiers that flow through every reading in Heartelfie.
 ///
-/// This distinction is a *Critical Constraint*: the UI and data model must always
-/// make clear where a signal came from and how trustworthy it is. Phone-only
-/// sensors are wellness-grade `.screening`; the Heartelfie hardware device path is
-/// clinical-grade `.measurement`.
+/// Phone camera checks are wellness-grade `.screening`. `.measurement` remains so
+/// older saved hardware readings can still decode and display honestly.
 public enum MeasurementTier: String, Codable, Sendable, CaseIterable, Hashable, Identifiable {
     /// Wellness-grade screening from the phone's own sensors. Lower confidence.
     /// Never to be presented as a medical measurement or diagnosis.
     case screening
 
-    /// Higher-accuracy, clinical-grade path that is only available through the
-    /// connected Heartelfie hardware device.
+    /// Legacy higher-confidence hardware path. No longer offered in the product.
     case measurement
 
     public var id: String { rawValue }
@@ -29,7 +26,7 @@ public enum MeasurementTier: String, Codable, Sendable, CaseIterable, Hashable, 
     public var displayName: String {
         switch self {
         case .screening: return "Screening (phone)"
-        case .measurement: return "Measurement (device)"
+        case .measurement: return "Measurement"
         }
     }
 
@@ -39,13 +36,7 @@ public enum MeasurementTier: String, Codable, Sendable, CaseIterable, Hashable, 
         case .screening:
             return "Screening — not a medical measurement."
         case .measurement:
-            return "Device measurement — for wellness, not diagnosis."
+            return "Measurement — for wellness, not diagnosis."
         }
     }
-
-    /// Whether this tier represents the clinical-grade hardware path.
-    public var isClinicalGrade: Bool { self == .measurement }
-
-    /// Whether readings of this tier require the Heartelfie device to be connected.
-    public var requiresDevice: Bool { self == .measurement }
 }

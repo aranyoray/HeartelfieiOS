@@ -2,9 +2,13 @@ import SwiftUI
 import HECore
 import HEDesign
 
-/// The per-modality capture flow: live preview + real-time SQI coaching →
-/// countdown → capture with progress → processing → result (or actionable
-/// poor-signal coaching). Abortable throughout.
+/// The per-modality capture flow.
+///
+/// Finger PPG uses an explicit, user-paced flow: the camera only turns on after
+/// the user asks, live coaching + waveform + settling heart-rate estimate are
+/// shown as a card stack, and saving a reading is a deliberate start/finish
+/// action. Other modalities keep the countdown-driven window flow.
+/// Abortable throughout.
 public struct CaptureFlowView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
@@ -12,10 +16,13 @@ public struct CaptureFlowView: View {
     public let modality: Modality
     @State private var vm: CaptureViewModel?
     @State private var countdown: Int?
+    @State private var countdownTask: Task<Void, Never>?
 
     public init(modality: Modality) {
         self.modality = modality
     }
+
+    private var isFingerFlow: Bool { modality == .fingerPPG }
 
     public var body: some View {
         ScrollView {
@@ -35,6 +42,7 @@ public struct CaptureFlowView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(trigger: vm?.phase) { _, newPhase in
             switch newPhase {
+            case .preparing: return .impact(weight: .light)
             case .capturing: return .impact(weight: .medium)
             case .completed: return .success
             case .failed: return .error
@@ -45,10 +53,24 @@ public struct CaptureFlowView: View {
             if vm == nil {
                 let model = env.makeCaptureViewModel(for: modality)
                 vm = model
-                await model.begin()
+                // The finger flow waits for an explicit "Start camera" tap; the
+                // camera never runs before the user asks for it.
+                if !isFingerFlow {
+                    await model.begin()
+                }
             }
         }
-        .onDisappear { Task { await vm?.abort() } }
+        .onDisappear {
+            countdownTask?.cancel()
+            countdownTask = nil
+            countdown = nil
+            Task {
+                // Pushing the result detail covers this view; don't tear down a
+                // finished reading or the user comes back to an empty capture.
+                if case .completed = vm?.phase { return }
+                await vm?.abort()
+            }
+        }
     }
 
     // MARK: - Header
@@ -57,14 +79,10 @@ public struct CaptureFlowView: View {
         VStack(spacing: HESpacing.sm) {
             HStack {
                 TierBadge(modality.tier)
-                if modality.isExperimental {
-                    Text("Experimental")
-                        .font(.heCaption)
-                        .padding(.horizontal, HESpacing.sm)
-                        .padding(.vertical, 4)
-                        .background(Color.heTextTertiary.opacity(0.15), in: Capsule())
-                }
                 Spacer()
+                if let vm, vm.phase == .coaching || vm.phase == .capturing {
+                    livePill
+                }
             }
             Text(modality.summary)
                 .font(.heCallout)
@@ -73,12 +91,258 @@ public struct CaptureFlowView: View {
         }
     }
 
+    private var livePill: some View {
+        HStack(spacing: HESpacing.xs) {
+            Circle()
+                .fill(Color.heAccent)
+                .frame(width: 7, height: 7)
+            Text("Live")
+                .font(.heCaption)
+                .foregroundStyle(Color.heTextSecondary)
+        }
+        .padding(.horizontal, HESpacing.sm)
+        .padding(.vertical, HESpacing.xs)
+        .background(Color.heSurface, in: Capsule())
+    }
+
     // MARK: - Phase content
 
     @ViewBuilder
     private func content(for vm: CaptureViewModel) -> some View {
+        if isFingerFlow {
+            fingerContent(for: vm)
+        } else {
+            legacyContent(for: vm)
+        }
+    }
+
+    // MARK: - Finger PPG flow
+
+    @ViewBuilder
+    private func fingerContent(for vm: CaptureViewModel) -> some View {
         switch vm.phase {
-        case .idle, .preparing, .coaching, .countdown, .capturing:
+        case .idle:
+            readyCard(for: vm)
+        case .preparing:
+            startingCard
+        case .coaching, .capturing:
+            measuringStack(for: vm)
+        case .processing:
+            processingSection
+        case .completed(let reading):
+            CaptureResultSummary(reading: reading) { Task { await vm.abort(); dismiss() } }
+        case .failed(let error):
+            failureSection(for: vm, error: error)
+        }
+    }
+
+    /// Camera off; nothing runs until the user asks.
+    private func readyCard(for vm: CaptureViewModel) -> some View {
+        HECard {
+            VStack(spacing: HESpacing.md) {
+                iconBadge("camera.metering.center.weighted", size: 92)
+                Text("Ready to take a reading")
+                    .font(.heHeadline)
+                    .foregroundStyle(Color.heTextPrimary)
+                Text("\(HeartelfieConfig.appName) turns on the camera only after you start. Rest a fingertip over the rear camera and hold still while the estimate settles.")
+                    .font(.heCallout)
+                    .foregroundStyle(Color.heTextSecondary)
+                    .multilineTextAlignment(.center)
+                HEPrimaryButton("Start camera", systemImage: "camera.fill") {
+                    Task { await vm.begin() }
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, HESpacing.xl)
+        }
+    }
+
+    private var startingCard: some View {
+        HECard {
+            VStack(spacing: HESpacing.md) {
+                ProgressView()
+                    .controlSize(.large)
+                    .tint(Color.hePrimary)
+                Text("Getting the camera ready…")
+                    .font(.heCallout)
+                    .foregroundStyle(Color.heTextSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, HESpacing.xl)
+        }
+    }
+
+    /// Live measuring card stack: guidance → live pulse → estimate → save.
+    private func measuringStack(for vm: CaptureViewModel) -> some View {
+        VStack(spacing: HESpacing.lg) {
+            guidanceCard(for: vm)
+            livePulseCard(for: vm)
+            estimateCard(for: vm)
+            saveCard(for: vm)
+        }
+    }
+
+    private var hasSignal: Bool {
+        guard let vm else { return false }
+        return vm.liveWaveform.count > 30
+    }
+
+    private func guidanceCard(for vm: CaptureViewModel) -> some View {
+        let hasContact = vm.liveWaveform.count > 30
+        let hasEstimate = vm.liveBPM != nil
+        let headline: String
+        let support: String
+        let glyph: String
+        if !hasContact {
+            headline = "Rest a fingertip over the rear camera"
+            support = "Cover the camera and torch gently, then hold still."
+            glyph = "hand.point.up.left.fill"
+        } else if !hasEstimate {
+            headline = "Hold still, settling…"
+            support = "Stay relaxed for a few seconds while the estimate steadies."
+            glyph = "hand.point.up.left.fill"
+        } else {
+            headline = "Looking good — keep holding"
+            support = "Stay relaxed for a few seconds while the estimate steadies."
+            glyph = "hand.thumbsup.fill"
+        }
+        return HECard {
+            VStack(alignment: .leading, spacing: HESpacing.md) {
+                HStack(spacing: HESpacing.md) {
+                    iconBadge(glyph, size: 40)
+                    VStack(alignment: .leading, spacing: HESpacing.xxs) {
+                        Text(headline)
+                            .font(.heHeadline)
+                            .foregroundStyle(Color.heTextPrimary)
+                        Text(support)
+                            .font(.heCaption)
+                            .foregroundStyle(Color.heTextSecondary)
+                    }
+                    Spacer(minLength: 0)
+                }
+                if let quality = vm.liveQuality {
+                    SQICoachBanner(quality: quality)
+                }
+            }
+        }
+    }
+
+    private func livePulseCard(for vm: CaptureViewModel) -> some View {
+        HECard {
+            VStack(alignment: .leading, spacing: HESpacing.sm) {
+                HESectionHeader(title: "Live pulse")
+                LiveWaveformView(samples: vm.liveWaveform, tint: .hePrimary, isLive: true)
+                    .frame(height: 150)
+            }
+        }
+    }
+
+    private func estimateCard(for vm: CaptureViewModel) -> some View {
+        HECard {
+            VStack(alignment: .leading, spacing: HESpacing.sm) {
+                HESectionHeader(title: "Heart-rate estimate")
+                HStack(spacing: HESpacing.md) {
+                    PulseHeartView(bpm: vm.liveBPM)
+                        .frame(width: 44, height: 44)
+                    if let bpm = vm.liveBPM {
+                        HStack(alignment: .firstTextBaseline, spacing: HESpacing.xs) {
+                            Text("\(Int(bpm))")
+                                .font(.heMetricNumeralCompact)
+                                .foregroundStyle(Color.heTextPrimary)
+                                .contentTransition(.numericText())
+                                .animation(.default, value: Int(bpm))
+                            Text("bpm")
+                                .font(.heUnit)
+                                .foregroundStyle(Color.heTextSecondary)
+                        }
+                    } else if hasSignal {
+                        HStack(spacing: HESpacing.sm) {
+                            ProgressView()
+                                .tint(Color.hePrimary)
+                            Text("Settling…")
+                                .font(.heCallout)
+                                .foregroundStyle(Color.heTextSecondary)
+                        }
+                    } else {
+                        Text("Waiting for signal…")
+                            .font(.heCallout)
+                            .foregroundStyle(Color.heTextSecondary)
+                    }
+                    Spacer(minLength: 0)
+                }
+                Text("Estimated from the camera • wellness screening only — not a medical measurement.")
+                    .font(.heCaption)
+                    .foregroundStyle(Color.heTextTertiary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func saveCard(for vm: CaptureViewModel) -> some View {
+        HECard {
+            VStack(alignment: .leading, spacing: HESpacing.md) {
+                HESectionHeader(title: "Save this reading")
+                if vm.phase == .capturing {
+                    HStack {
+                        Label("Saving · \(clock(vm.elapsedSeconds))", systemImage: "record.circle")
+                            .font(.heHeadline)
+                            .foregroundStyle(Color.hePrimary)
+                            .contentTransition(.numericText())
+                        Spacer()
+                    }
+                    if vm.secondsUntilFinishAllowed > 0 {
+                        Text("Keep holding — about \(Int(vm.secondsUntilFinishAllowed.rounded(.up)))s more for a valid reading.")
+                            .font(.heCaption)
+                            .foregroundStyle(Color.heTextTertiary)
+                    }
+                    HEPrimaryButton("Finish", systemImage: "stop.circle.fill") {
+                        Task { await vm.finishEarly() }
+                    }
+                    .disabled(vm.secondsUntilFinishAllowed > 0)
+                    HESecondaryButton("Cancel", systemImage: "xmark") {
+                        Task { await vm.abort(); dismiss() }
+                    }
+                } else {
+                    HEPrimaryButton("Start saving", systemImage: "record.circle") {
+                        vm.startCapture()
+                    }
+                    .disabled(vm.liveBPM == nil)
+                    if vm.liveBPM == nil {
+                        Text("Wait for a heart-rate estimate first.")
+                            .font(.heCaption)
+                            .foregroundStyle(Color.heTextTertiary)
+                    } else {
+                        Text("Saves about \(Int(captureWindow)) seconds of signal, then checks its quality on-device.")
+                            .font(.heCaption)
+                            .foregroundStyle(Color.heTextTertiary)
+                    }
+                }
+            }
+        }
+    }
+
+    private func iconBadge(_ systemImage: String, size: CGFloat) -> some View {
+        ZStack {
+            Circle()
+                .fill(Color.hePrimary.opacity(0.12))
+            Image(systemName: systemImage)
+                .font(.system(size: size * 0.42, weight: .medium))
+                .foregroundStyle(Color.hePrimary)
+        }
+        .frame(width: size, height: size)
+    }
+
+    private func clock(_ seconds: Double) -> String {
+        let total = max(0, Int(seconds))
+        return String(format: "%02d:%02d", total / 60, total % 60)
+    }
+
+    // MARK: - Legacy flow (non-finger modalities)
+
+    @ViewBuilder
+    private func legacyContent(for vm: CaptureViewModel) -> some View {
+        switch vm.phase {
+        case .idle, .preparing, .coaching, .capturing:
             liveCaptureSection(for: vm)
         case .processing:
             processingSection
@@ -147,7 +411,7 @@ public struct CaptureFlowView: View {
             }
         } else if countdown == nil {
             VStack(spacing: HESpacing.sm) {
-                HEPrimaryButton("Start \(modality.tier == .measurement ? "Measurement" : "Screening")", systemImage: "record.circle") {
+                HEPrimaryButton("Start Screening", systemImage: "record.circle") {
                     startCountdown(for: vm)
                 }
                 Text("Get a steady signal above, then hold still for about \(Int(captureWindow)) seconds.")
@@ -157,6 +421,8 @@ public struct CaptureFlowView: View {
             }
         }
     }
+
+    // MARK: - Shared sections
 
     private var processingSection: some View {
         VStack(spacing: HESpacing.md) {
@@ -194,12 +460,16 @@ public struct CaptureFlowView: View {
     private var captureWindow: Double { ClinicalConfig.minimumCaptureSeconds(for: modality) + 2 }
 
     private func startCountdown(for vm: CaptureViewModel) {
-        Task {
+        countdownTask?.cancel()
+        countdownTask = Task {
             for value in stride(from: 3, through: 1, by: -1) {
+                guard !Task.isCancelled else { return }
                 withAnimation { countdown = value }
                 try? await Task.sleep(for: .seconds(1))
             }
+            guard !Task.isCancelled else { return }
             withAnimation { countdown = nil }
+            guard vm.phase == .coaching else { return }
             vm.startCapture()
         }
     }

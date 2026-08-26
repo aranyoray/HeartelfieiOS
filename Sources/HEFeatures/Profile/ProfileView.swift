@@ -3,8 +3,8 @@ import HECore
 import HEDesign
 
 /// The Profile tab root: a calm, accessible `Form` that summarises the person's
-/// health profile, surfaces the Heartelfie device status, and links out to the
-/// data, privacy, export, about, and developer screens.
+/// health profile and links out to the data, privacy, export, about, and
+/// developer screens.
 ///
 /// All copy is wellness-grade and explicitly non-diagnostic. Nothing here is a
 /// measurement; the profile only adds gentle context to screenings.
@@ -18,7 +18,6 @@ struct ProfileView: View {
             headerSection
             detailsSection
             editSection
-            deviceSection
             healthSection
             dataSection
             aboutSection
@@ -233,22 +232,6 @@ struct ProfileView: View {
         )
     }
 
-    // MARK: - Device
-
-    private var deviceSection: some View {
-        Section {
-            NavigationLink(value: AppRoute.devicePairing) {
-                DeviceStatusChip(state: env.deviceState)
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint(env.deviceState.isConnected
-                ? "Opens device management."
-                : "Opens device pairing to connect your Heartelfie device.")
-        } header: {
-            Text("Connected device")
-        }
-    }
-
     // MARK: - Apple Health
 
     private var healthSection: some View {
@@ -283,9 +266,11 @@ struct ProfileView: View {
             NavigationLink(value: AppRoute.about) {
                 Label("About \(HeartelfieConfig.appName)", systemImage: "info.circle")
             }
+            #if DEBUG
             NavigationLink(value: AppRoute.developer) {
                 Label("Developer", systemImage: "hammer")
             }
+            #endif
         }
     }
 

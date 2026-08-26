@@ -11,7 +11,7 @@
 # (You can also just open Package.swift directly in Xcode to build/test the
 # library modules and run the DSP unit tests, without generating the app project.)
 
-name: Heartelfie
+name: DailyDil
 options:
   bundleIdPrefix: com.heartelfie
   deploymentTarget:
@@ -26,14 +26,14 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    DEVELOPMENT_TEAM: "" # set your team for device builds
+    DEVELOPMENT_TEAM: J2P293N3N8
     CODE_SIGN_STYLE: Automatic
 
 schemes:
-  Heartelfie:
+  DailyDil:
     build:
       targets:
-        Heartelfie: all
+        DailyDil: all
     run:
       config: Debug
     test:
@@ -45,7 +45,7 @@ schemes:
       config: Release
 
 targets:
-  Heartelfie:
+  DailyDil:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
@@ -61,10 +61,10 @@ targets:
         com.apple.developer.healthkit.access: []
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.app
-        PRODUCT_NAME: Heartelfie
-        MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "3"
+        PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.ios
+        PRODUCT_NAME: DailyDil
+        MARKETING_VERSION: "1.1.0"
+        CURRENT_PROJECT_VERSION: "5"
         INFOPLIST_FILE: App/Heartelfie/Info.plist
         TARGETED_DEVICE_FAMILY: "1,2"
         ENABLE_PREVIEWS: "YES"

@@ -90,25 +90,8 @@ struct ResultDetailView: View {
             HStack(spacing: HESpacing.sm) {
                 TierBadge(reading.tier)
                 RiskBadge(reading.overallRisk)
-                if reading.modality.isExperimental {
-                    experimentalBadge
-                }
             }
         }
-    }
-
-    private var experimentalBadge: some View {
-        HStack(spacing: HESpacing.xs) {
-            Image(systemName: "flask.fill")
-                .imageScale(.small)
-            Text("Experimental")
-                .font(.heCaption.weight(.semibold))
-        }
-        .foregroundStyle(Color.heAccent)
-        .padding(.vertical, HESpacing.xs)
-        .padding(.horizontal, HESpacing.sm)
-        .background(Capsule().fill(Color.heAccent.opacity(0.14)))
-        .accessibilityLabel("Experimental check")
     }
 
     // MARK: - Low-confidence recheck
@@ -435,13 +418,6 @@ struct ResultDetailView: View {
 #Preview("Result — finger PPG") {
     NavigationStack {
         ResultDetailView(reading: SampleData.fingerPPGReading())
-            .environment(AppEnvironment.preview())
-    }
-}
-
-#Preview("Result — device") {
-    NavigationStack {
-        ResultDetailView(reading: SampleData.deviceReading())
             .environment(AppEnvironment.preview())
     }
 }

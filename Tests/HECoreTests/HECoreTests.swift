@@ -6,24 +6,15 @@ final class HECoreTests: XCTestCase {
     // MARK: Tier / modality honesty
 
     func testPhoneModalitiesAreScreeningTier() {
-        for modality in Modality.phoneModalities {
+        for modality in Modality.allCases {
             XCTAssertEqual(modality.tier, .screening, "\(modality) must be screening tier")
-            XCTAssertFalse(modality.requiresDevice)
-        }
-    }
-
-    func testDeviceModalitiesAreMeasurementTier() {
-        for modality in Modality.deviceModalities {
-            XCTAssertEqual(modality.tier, .measurement)
-            XCTAssertTrue(modality.requiresDevice)
-            XCTAssertEqual(modality.source, .device)
         }
     }
 
     /// The core constraint: phone modalities must never surface device-only metrics
     /// (ECG, clinical SpO₂, hemoglobin, etc.).
     func testPhoneModalitiesNeverExposeDeviceOnlyMetrics() {
-        for modality in Modality.phoneModalities {
+        for modality in Modality.allCases {
             for metric in modality.supportedMetrics {
                 XCTAssertFalse(
                     metric.isDeviceOnly,
@@ -33,11 +24,16 @@ final class HECoreTests: XCTestCase {
         }
     }
 
+    func testFingerPPGSupportsScreeningOxygenEstimate() {
+        XCTAssertTrue(Modality.fingerPPG.supportedMetrics.contains(.spo2Estimate))
+        XCTAssertFalse(Modality.facialRPPG.supportedMetrics.contains(.spo2Estimate))
+    }
+
     func testModalityTierMatchesSensorTierContract() {
+        XCTAssertEqual(Modality.fingerPPG.source, .rearCamera)
+        XCTAssertEqual(Modality.facialRPPG.source, .frontCamera)
         for modality in Modality.allCases {
-            // tier is derived from source; ensure they agree
-            let expected: MeasurementTier = modality.source == .device ? .measurement : .screening
-            XCTAssertEqual(modality.tier, expected)
+            XCTAssertEqual(modality.tier, .screening)
         }
     }
 
@@ -101,14 +97,14 @@ final class HECoreTests: XCTestCase {
 
     func testReadingTierDefaultsToModalityTier() {
         let reading = CardioReading(
-            modality: .deviceECG,
+            modality: .fingerPPG,
             metrics: [],
             confidence: Confidence(0.8),
             signalQuality: .pristine,
             provenance: .onDeviceDSP,
             interpretation: ""
         )
-        XCTAssertEqual(reading.tier, .measurement)
+        XCTAssertEqual(reading.tier, .screening)
     }
 
     // MARK: SeekCare signals
@@ -122,6 +118,12 @@ final class HECoreTests: XCTestCase {
 
     // MARK: Codable round-trips
 
+    func testLegacyDeviceModalityDecodesAsFingerPPG() throws {
+        let json = "\"deviceECG\"".data(using: .utf8)!
+        let decoded = try JSONDecoder().decode(Modality.self, from: json)
+        XCTAssertEqual(decoded, .fingerPPG)
+    }
+
     func testReadingCodableRoundTrip() throws {
         let original = SampleData.fingerPPGReading()
         let data = try JSONEncoder().encode(original)
@@ -129,6 +131,29 @@ final class HECoreTests: XCTestCase {
         XCTAssertEqual(decoded.id, original.id)
         XCTAssertEqual(decoded.metrics.count, original.metrics.count)
         XCTAssertEqual(decoded.tier, original.tier)
+    }
+
+    func testMergingInferredMetricsReplacesSameKind() {
+        let dsp = [
+            CardioMetric(kind: .heartRate, value: 72),
+            CardioMetric(kind: .rhythmIrregularity, value: 4)
+        ]
+        let inferred = [
+            CardioMetric(kind: .rhythmIrregularity, value: 18, note: "On-device rhythm screen")
+        ]
+        let merged = CardioMetric.merging(dsp, withInferred: inferred)
+        XCTAssertEqual(merged.count, 2)
+        XCTAssertEqual(merged.first { $0.kind == .heartRate }?.value, 72)
+        let rhythm = merged.first { $0.kind == .rhythmIrregularity }
+        XCTAssertEqual(rhythm?.value, 18)
+        XCTAssertEqual(rhythm?.note, "On-device rhythm screen")
+    }
+
+    func testMergingInferredMetricsAppendsNewKinds() {
+        let dsp = [CardioMetric(kind: .heartRate, value: 70)]
+        let inferred = [CardioMetric(kind: .rhythmIrregularity, value: 3)]
+        let merged = CardioMetric.merging(dsp, withInferred: inferred)
+        XCTAssertEqual(Set(merged.map(\.kind)), [.heartRate, .rhythmIrregularity])
     }
 
     // MARK: HealthProfile (name / BMI / conditions)

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2660"
-   version = "1.3">
+   LastUpgradeVersion = "1430"
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      runPostActionsOnFailure = "NO">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1148428C1558FCE5DEA8FAC6"
-               BuildableName = "Heartelfie.app"
-               BlueprintName = "Heartelfie"
-               ReferencedContainer = "container:Heartelfie.xcodeproj">
+               BlueprintIdentifier = "B60850E6868CD80055D8513F"
+               BuildableName = "DailyDil.app"
+               BlueprintName = "DailyDil"
+               ReferencedContainer = "container:DailyDil.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -26,14 +27,15 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "NO">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1148428C1558FCE5DEA8FAC6"
-            BuildableName = "Heartelfie.app"
-            BlueprintName = "Heartelfie"
-            ReferencedContainer = "container:Heartelfie.xcodeproj">
+            BlueprintIdentifier = "B60850E6868CD80055D8513F"
+            BuildableName = "DailyDil.app"
+            BlueprintName = "DailyDil"
+            ReferencedContainer = "container:DailyDil.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -45,7 +47,7 @@
                BlueprintIdentifier = "HECoreTests"
                BuildableName = "HECoreTests"
                BlueprintName = "HECoreTests"
-               ReferencedContainer = "container:">
+               ReferencedContainer = "container:.">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -56,10 +58,12 @@
                BlueprintIdentifier = "HESignalTests"
                BuildableName = "HESignalTests"
                BlueprintName = "HESignalTests"
-               ReferencedContainer = "container:">
+               ReferencedContainer = "container:.">
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -75,12 +79,14 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1148428C1558FCE5DEA8FAC6"
-            BuildableName = "Heartelfie.app"
-            BlueprintName = "Heartelfie"
-            ReferencedContainer = "container:Heartelfie.xcodeproj">
+            BlueprintIdentifier = "B60850E6868CD80055D8513F"
+            BuildableName = "DailyDil.app"
+            BlueprintName = "DailyDil"
+            ReferencedContainer = "container:DailyDil.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -92,10 +98,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1148428C1558FCE5DEA8FAC6"
-            BuildableName = "Heartelfie.app"
-            BlueprintName = "Heartelfie"
-            ReferencedContainer = "container:Heartelfie.xcodeproj">
+            BlueprintIdentifier = "B60850E6868CD80055D8513F"
+            BuildableName = "DailyDil.app"
+            BlueprintName = "DailyDil"
+            ReferencedContainer = "container:DailyDil.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

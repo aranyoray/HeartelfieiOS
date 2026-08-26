@@ -1,6 +1,5 @@
 import Foundation
 import Observation
-import Combine
 import HECore
 import HESensors
 import HEML
@@ -9,7 +8,7 @@ import HEPersistence
 /// The app's composition root and shared, observable state container.
 ///
 /// Owns the service layer (sensors, inference, encrypted persistence, HealthKit,
-/// BLE, export) and the cached dashboard state the screens read. Injected into the
+/// export) and the cached dashboard state the screens read. Injected into the
 /// SwiftUI environment by `RootView` and read with
 /// `@Environment(AppEnvironment.self)`.
 @MainActor
@@ -21,21 +20,11 @@ public final class AppEnvironment {
     public let repository: any ReadingRepository
     public let inference: any InferenceProviding
     public let healthKit: HealthKitBridge
-    public let ble: HeartelfieBLEManager
     public let exporter: ReadingExporter
 
     // MARK: App state
     public var profile: HealthProfile
     public var hasCompletedOnboarding: Bool
-    public var deviceState: DeviceState
-    public var forceSimulateDevice: Bool {
-        didSet {
-            guard oldValue != forceSimulateDevice else { return }
-            factory.forceSimulation = forceSimulateDevice
-            ble.isSimulated = forceSimulateDevice || SensorFactory.isSimulator
-            defaults.set(forceSimulateDevice, forKey: Self.simulateKey)
-        }
-    }
 
     // MARK: Dashboard cache
     public var todayScore: CardioScore = .empty
@@ -45,12 +34,9 @@ public final class AppEnvironment {
     public var isLoading: Bool = false
 
     // MARK: Private
-    @ObservationIgnored private let factory: SensorFactory
     @ObservationIgnored private let defaults: UserDefaults
-    @ObservationIgnored private var cancellables = Set<AnyCancellable>()
 
     private static let onboardedKey = "he.onboarding.completed"
-    private static let simulateKey = "he.developer.simulateDevice"
 
     // MARK: Init
 
@@ -58,18 +44,14 @@ public final class AppEnvironment {
     ///   - repository: inject for previews/tests; defaults to the encrypted store
     ///     (falling back to an in-memory store if it can't be opened).
     ///   - defaults: inject for tests.
-    ///   - forceSimulate: force mock sensors + simulated device.
+    ///   - forceSimulate: force mock sensors (defaults on in the Simulator).
     public init(
         repository: (any ReadingRepository)? = nil,
         defaults: UserDefaults = .standard,
         forceSimulate: Bool = SensorFactory.isSimulator
     ) {
-        let simulate = forceSimulate
-        let bleManager = HeartelfieBLEManager(simulated: simulate || SensorFactory.isSimulator)
-        let sensorFactory = SensorFactory(forceSimulation: simulate, deviceBLE: bleManager)
+        let sensorFactory = SensorFactory(forceSimulation: forceSimulate)
 
-        self.ble = bleManager
-        self.factory = sensorFactory
         self.sensors = sensorFactory
         self.inference = InferenceCoordinator()
         self.healthKit = HealthKitBridge()
@@ -86,10 +68,6 @@ public final class AppEnvironment {
 
         self.profile = .empty
         self.hasCompletedOnboarding = defaults.bool(forKey: Self.onboardedKey)
-        self.forceSimulateDevice = simulate
-        self.deviceState = bleManager.state
-
-        observeBLE()
     }
 
     /// A fully in-memory, seeded environment for SwiftUI previews and demos.
@@ -103,18 +81,6 @@ public final class AppEnvironment {
         env.profile = SampleData.profile
         Task { await env.refreshDashboard() }
         return env
-    }
-
-    private func observeBLE() {
-        ble.$state
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] state in
-                // `.receive(on: .main)` guarantees this runs on the main actor's
-                // executor, so assuming isolation here is safe and lets us touch
-                // the @MainActor-isolated `deviceState` synchronously.
-                MainActor.assumeIsolated { self?.deviceState = state }
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: Lifecycle
@@ -165,6 +131,7 @@ public final class AppEnvironment {
 
     public func deleteAllData() async {
         try? await repository.deleteAll()
+        profile = .empty
         await refreshDashboard()
     }
 
@@ -185,12 +152,5 @@ public final class AppEnvironment {
         ) { [weak self] reading in
             await self?.record(reading)
         }
-    }
-
-    /// All modalities, with device modalities flagged as available only when the
-    /// device can currently measure.
-    public func isAvailable(_ modality: Modality) -> Bool {
-        guard modality.requiresDevice else { return true }
-        return deviceState.canMeasure || deviceState.isSimulated || forceSimulateDevice
     }
 }

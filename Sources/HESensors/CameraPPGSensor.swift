@@ -85,15 +85,20 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
 
     /// Build the rear-camera capture graph. Returns `false` if no usable device is
     /// present (Simulator, permission revoked), signalling a fallback to the mock.
+    /// Idempotent: existing inputs/outputs are removed so `start()` can be called
+    /// again on the same instance without silently falling back to the mock.
     private func configureSession() -> Bool {
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let input = try? AVCaptureDeviceInput(device: device),
-              session.canAddInput(input),
-              session.canAddOutput(output)
+              let input = try? AVCaptureDeviceInput(device: device)
         else { return false }
 
         session.beginConfiguration()
+        session.inputs.forEach { session.removeInput($0) }
+        session.outputs.forEach { session.removeOutput($0) }
         session.sessionPreset = .low // PPG needs only a low-res mean, not detail.
+        defer { session.commitConfiguration() }
+
+        guard session.canAddInput(input), session.canAddOutput(output) else { return false }
         session.addInput(input)
         output.videoSettings = [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
@@ -101,7 +106,6 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
         output.alwaysDiscardsLateVideoFrames = true
         output.setSampleBufferDelegate(self, queue: sampleQueue)
         session.addOutput(output)
-        session.commitConfiguration()
         captureDevice = device
         return true
     }

@@ -86,7 +86,6 @@ struct RecentReadingRow: View {
         ScrollView {
             VStack(spacing: HESpacing.md) {
                 RecentReadingRow(reading: SampleData.fingerPPGReading())
-                RecentReadingRow(reading: SampleData.deviceReading(at: Date().addingTimeInterval(-3600)))
                 RecentReadingRow(reading: SampleData.lowConfidenceReading(at: Date().addingTimeInterval(-7200)))
             }
             .padding()

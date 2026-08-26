@@ -2,12 +2,10 @@ import SwiftUI
 import HECore
 import HEDesign
 
-/// What Heartelfie is and isn't: a wellness and screening companion with two
-/// confidence tiers, honest about phone-vs-device signals, anchored by the
-/// persistent emergency notice and a clear non-diagnostic statement.
+/// What Heartelfie is and isn't: a wellness and screening companion for phone
+/// camera checks, anchored by the persistent emergency notice and a clear
+/// non-diagnostic statement.
 struct AboutView: View {
-    @Environment(AppEnvironment.self) private var env
-
     init() {}
 
     var body: some View {
@@ -78,25 +76,17 @@ struct AboutView: View {
     private var tiersSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
             HESectionHeader(
-                title: "Two confidence tiers",
+                title: "How checks work",
                 subtitle: "We're honest about how much to trust each signal.",
                 systemImage: "chart.bar.fill"
             )
 
             HECard {
-                VStack(alignment: .leading, spacing: HESpacing.md) {
-                    tier(
-                        icon: "iphone",
-                        title: "Screening — phone only",
-                        detail: "Camera checks give you a quick, low-friction screening. Convenient, but lower confidence."
-                    )
-                    Divider().overlay(Color.heSeparator)
-                    tier(
-                        icon: "sensor.tag.radiowaves.forward.fill",
-                        title: "Measurement — with the device",
-                        detail: "The Heartelfie device adds higher-confidence signals like heart-rhythm insight, oxygen wellness, oxygen-carry wellness, and bio-impedance. Still wellness and screening — never a diagnosis."
-                    )
-                }
+                tier(
+                    icon: "iphone",
+                    title: "Screening — phone only",
+                    detail: "Camera checks give you a quick, low-friction screening. Convenient, but lower confidence — and never a diagnosis."
+                )
             }
         }
     }
@@ -130,7 +120,7 @@ struct AboutView: View {
 
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.sm) {
-                    Text("Some insights are produced by machine-learning models. When a cloud model contributes to a reading, its name, version, and attribution are shown with that reading.")
+                    Text("Some insights are produced by on-device models. Each reading shows the engine, model name, and version that produced it.")
                         .font(.heCallout)
                         .foregroundStyle(Color.heTextSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -150,7 +140,7 @@ struct AboutView: View {
             HESectionHeader(title: "Regulatory posture", systemImage: "checkmark.seal")
 
             HECard {
-                Text("Heartelfie is built as a wellness and screening product. Clinical features are designed to be gated behind future regulatory clearance, and are not offered as diagnostic tools today.")
+                Text("Heartelfie is a wellness and screening product. It does not connect to external medical hardware, does not provide clinical measurements, and is not a diagnostic tool.")
                     .font(.heCallout)
                     .foregroundStyle(Color.heTextSecondary)
                     .fixedSize(horizontal: false, vertical: true)

@@ -53,9 +53,7 @@ public enum ClinicalConfig {
     /// Minimum clean capture duration (seconds) before metrics may be computed.
     public static func minimumCaptureSeconds(for modality: Modality) -> Double {
         switch modality {
-        case .fingerPPG, .facialRPPG, .deviceMultiWavelengthPPG: return 20
-        case .deviceECG: return 30
-        case .deviceBioZ: return 5
+        case .fingerPPG, .facialRPPG: return 20
         }
     }
 

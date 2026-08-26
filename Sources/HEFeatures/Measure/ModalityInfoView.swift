@@ -5,9 +5,8 @@ import HEDesign
 /// The "What this does / doesn't mean" explainer for a single modality.
 ///
 /// Lays out, in plain language: the modality and its signal source, its trust
-/// tier, what it measures, an honest "what it means" / "what it does not mean"
-/// pair, a device-requirement note for hardware modalities, and the persistent
-/// non-diagnostic + emergency notices.
+/// tier, what it screens for, an honest "what it means" / "what it does not mean"
+/// pair, and the persistent non-diagnostic + emergency notices.
 struct ModalityInfoView: View {
     let modality: Modality
 
@@ -19,9 +18,6 @@ struct ModalityInfoView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.lg) {
                 headerCard
-                if modality.requiresDevice {
-                    deviceRequirementCard
-                }
                 measuresCard
                 meaningCard(
                     title: "What this means",
@@ -64,9 +60,6 @@ struct ModalityInfoView: View {
 
                         HStack(spacing: HESpacing.xs) {
                             TierBadge(modality.tier, compact: false)
-                            if modality.isExperimental {
-                                ExperimentalChip()
-                            }
                         }
                     }
                     Spacer(minLength: 0)
@@ -91,29 +84,6 @@ struct ModalityInfoView: View {
         }
     }
 
-    // MARK: - Device requirement
-
-    private var deviceRequirementCard: some View {
-        HStack(alignment: .top, spacing: HESpacing.sm) {
-            Image(systemName: "sensor.tag.radiowaves.forward.fill")
-                .foregroundStyle(Color.heTier(.measurement))
-                .accessibilityHidden(true)
-            Text("This is a device measurement. It requires the Heartelfie device, connected with good contact.")
-                .font(.heCallout)
-                .foregroundStyle(Color.heTextSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(HESpacing.md)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.heSurface, in: RoundedRectangle(cornerRadius: HERadius.md, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: HERadius.md, style: .continuous)
-                .strokeBorder(Color.heTier(.measurement).opacity(0.25), lineWidth: 1)
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Requires the Heartelfie device, connected with good contact.")
-    }
-
     // MARK: - Measures
 
     @ViewBuilder
@@ -121,13 +91,13 @@ struct ModalityInfoView: View {
         if !modality.supportedMetrics.isEmpty {
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.sm) {
-                    Text(modality.tier == .measurement ? "What it measures" : "What it screens for")
+                    Text("What it screens for")
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
 
                     MetricChipsFlow(metrics: modality.supportedMetrics)
 
-                    Text("Showing each metric this check can surface. Device-only metrics never appear under a phone check.")
+                    Text("Showing each metric this check can surface.")
                         .font(.heCaption)
                         .foregroundStyle(Color.heTextTertiary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -158,16 +128,9 @@ struct ModalityInfoView: View {
     }
 }
 
-#Preview("Modality info — phone") {
+#Preview("Modality info") {
     NavigationStack {
         ModalityInfoView(modality: .facialRPPG)
-            .environment(AppEnvironment.preview())
-    }
-}
-
-#Preview("Modality info — device") {
-    NavigationStack {
-        ModalityInfoView(modality: .deviceECG)
             .environment(AppEnvironment.preview())
     }
 }

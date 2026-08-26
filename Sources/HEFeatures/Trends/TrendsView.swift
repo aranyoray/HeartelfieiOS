@@ -33,9 +33,10 @@ struct TrendsView: View {
 
     init() {}
 
-    /// The default metric set; device-only metrics are appended when present in data.
+    /// Phone screening metrics shown by default; historical device-only metrics
+    /// are appended when they still appear in saved readings.
     private static let baseMetrics: [MetricKind] = [
-        .heartRate, .hrvSDNN, .respiratoryRate
+        .heartRate, .hrvSDNN, .hrvRMSSD, .rhythmIrregularity, .respiratoryRate, .spo2Estimate
     ]
 
     var body: some View {
@@ -295,13 +296,15 @@ struct TrendsView: View {
             }
             .accessibilityLabel("Filter by modality, currently \(modalityFilter.title)")
 
-            Picker("Tier", selection: $tierFilter) {
-                ForEach(TierFilter.allCases) { filter in
-                    Text(filter.title).tag(filter)
+            if hasHistoricalMeasurementReadings {
+                Picker("Tier", selection: $tierFilter) {
+                    ForEach(TierFilter.allCases) { filter in
+                        Text(filter.title).tag(filter)
+                    }
                 }
+                .pickerStyle(.segmented)
+                .accessibilityLabel("Filter by tier")
             }
-            .pickerStyle(.segmented)
-            .accessibilityLabel("Filter by tier")
         }
     }
 
@@ -421,6 +424,12 @@ struct TrendsView: View {
         }
     }
 
+    /// Legacy hardware-tier readings only. Hidden on a fresh install so App Review
+    /// does not see a "Measurement" path that the app no longer offers.
+    private var hasHistoricalMeasurementReadings: Bool {
+        allReadings.contains { $0.tier == .measurement }
+    }
+
     private var filtersAreActive: Bool {
         modalityFilter != .all || tierFilter != .all
     }
@@ -525,11 +534,11 @@ struct TrendsView: View {
             let dir = FileManager.default.temporaryDirectory
             switch format {
             case .csv:
-                let target = dir.appendingPathComponent("Heartelfie-Trends-\(stamp).csv")
+                let target = dir.appendingPathComponent("DailyDil-Trends-\(stamp).csv")
                 try? exporter.writeCSV(readings, to: target)
                 return FileManager.default.fileExists(atPath: target.path) ? target : nil
             case .pdf:
-                let target = dir.appendingPathComponent("Heartelfie-Trends-\(stamp).pdf")
+                let target = dir.appendingPathComponent("DailyDil-Trends-\(stamp).pdf")
                 try? exporter.writePDF(readings, profile: profile, to: target)
                 return FileManager.default.fileExists(atPath: target.path) ? target : nil
             }
@@ -628,7 +637,7 @@ struct ExportShareSheet: View {
                 Text("Your export is ready")
                     .font(.heTitle)
                     .foregroundStyle(Color.heTextPrimary)
-                Text("This file carries the non-diagnostic disclaimer. Save it for your records or share it outside Heartelfie if you choose.")
+                Text("This file carries the non-diagnostic disclaimer. Save it for your records or share it outside DailyDil if you choose.")
                     .font(.heCallout)
                     .foregroundStyle(Color.heTextSecondary)
                     .multilineTextAlignment(.center)

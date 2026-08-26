@@ -22,7 +22,7 @@ export default function PrivacyPage() {
 
       <h2>2. Information Processed by the App</h2>
       <p>
-        Heartelfie may process camera, Bluetooth, Apple Health, and optional profile
+        Heartelfie may process camera, Apple Health, and optional profile
         information only when you choose features that need those capabilities.
         The optional profile may include values such as age range, biological sex, height, weight,
         general health context, units, and self-selected Monk Skin Tone. These values are used to
@@ -61,8 +61,8 @@ export default function PrivacyPage() {
         Apple Health values such as heart rate, heart-rate variability, resting heart rate, oxygen
         wellness, breathing rate, and available Apple Watch rhythm data. With your permission,
         Heartelfie may write supported reading summaries back to Apple Health. Face frames, custom
-        waveforms, and device-only wellness estimates are not written to HealthKit. You can change
-        Apple Health permissions at any time in the Health app.
+        waveforms, and screening-only estimates that HealthKit does not represent are not written.
+        You can change Apple Health permissions at any time in the Health app.
       </p>
 
       <h2>6. Sharing and Third Parties</h2>

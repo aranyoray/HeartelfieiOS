@@ -7,167 +7,191 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		44DD1160C62E7C3736F66084 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BC08935662D38572C2F40DB /* Assets.xcassets */; };
-		B83889979688491E5383B08D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = EF4240B880297B4E0175ED7F /* PrivacyInfo.xcprivacy */; };
-		C017D1E177DF4BC0D873CABD /* HEFeatures in Frameworks */ = {isa = PBXBuildFile; productRef = 339DA5FD5ED1D39AF98AA585 /* HEFeatures */; };
-		E01266402692B9558B473A7D /* HeartelfieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */; };
+		315FD524BE13B9CBCB644EEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB777D939E2709187AAA4B6F /* Assets.xcassets */; };
+		36A390B4C21D8F0963CE8719 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */; };
+		3C4A79E7E089A938DD63473E /* HeartelfieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */; };
+		A91D31C72F2375D17C0B6E16 /* HEFeatures in Frameworks */ = {isa = PBXBuildFile; productRef = 6A065A302DB4B96C39EC2989 /* HEFeatures */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3BC08935662D38572C2F40DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		5540C1FBC6BA2BEBC6509DC8 /* Heartelfie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heartelfie.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartelfieApp.swift; sourceTree = "<group>"; };
-		7CB9F99B2263DF0F53E2F9AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		84606288F395FDAAE56551B4 /* HeartelfieiOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HeartelfieiOS; path = .; sourceTree = SOURCE_ROOT; };
-		87519A622213334EFE168DBB /* Heartelfie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Heartelfie.entitlements; sourceTree = "<group>"; };
-		EF4240B880297B4E0175ED7F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		0B614E795763C472C8A7E7DA /* DailyDil.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DailyDil.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		4EFAC08ACC9D65B1496A85A5 /* Heartelfie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Heartelfie.entitlements; sourceTree = "<group>"; };
+		60A2DF766F94C46495BB9C18 /* HeartelfieiOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HeartelfieiOS; path = .; sourceTree = SOURCE_ROOT; };
+		E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartelfieApp.swift; sourceTree = "<group>"; };
+		EB777D939E2709187AAA4B6F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		EFF700A72BD677EA5C8A6686 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3D63A8FE7E9BA34582EF24D8 /* Frameworks */ = {
+		E2D8E169CDCC993585D88F89 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C017D1E177DF4BC0D873CABD /* HEFeatures in Frameworks */,
+				A91D31C72F2375D17C0B6E16 /* HEFeatures in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1E6F58A3B73302E6C80FC74D = {
+		8B4DD9B53560E0775BF24A7F /* App */ = {
 			isa = PBXGroup;
 			children = (
-				F8C9C6512F0E1D1A9A2B6844 /* App */,
-				A313A61CA325511043874FEA /* Packages */,
-				2B3C532B5FB2DA6787C50108 /* Products */,
+				DE8264589047012733EFCAF7 /* Heartelfie */,
 			);
+			path = App;
 			sourceTree = "<group>";
 		};
-		2B3C532B5FB2DA6787C50108 /* Products */ = {
+		ACE53EFC51F470EA88136B89 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				5540C1FBC6BA2BEBC6509DC8 /* Heartelfie.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		387D9A5EAE5C72984DA08421 /* Heartelfie */ = {
-			isa = PBXGroup;
-			children = (
-				3BC08935662D38572C2F40DB /* Assets.xcassets */,
-				87519A622213334EFE168DBB /* Heartelfie.entitlements */,
-				6ED8EDE0684CC6D58E14A3FA /* HeartelfieApp.swift */,
-				7CB9F99B2263DF0F53E2F9AE /* Info.plist */,
-				EF4240B880297B4E0175ED7F /* PrivacyInfo.xcprivacy */,
-			);
-			path = Heartelfie;
-			sourceTree = "<group>";
-		};
-		A313A61CA325511043874FEA /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				84606288F395FDAAE56551B4 /* HeartelfieiOS */,
+				60A2DF766F94C46495BB9C18 /* HeartelfieiOS */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
 		};
-		F8C9C6512F0E1D1A9A2B6844 /* App */ = {
+		C4E0E47F833F5DF1B60E0000 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				387D9A5EAE5C72984DA08421 /* Heartelfie */,
+				0B614E795763C472C8A7E7DA /* DailyDil.app */,
 			);
-			path = App;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE8264589047012733EFCAF7 /* Heartelfie */ = {
+			isa = PBXGroup;
+			children = (
+				EB777D939E2709187AAA4B6F /* Assets.xcassets */,
+				4EFAC08ACC9D65B1496A85A5 /* Heartelfie.entitlements */,
+				E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */,
+				EFF700A72BD677EA5C8A6686 /* Info.plist */,
+				25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */,
+			);
+			path = Heartelfie;
+			sourceTree = "<group>";
+		};
+		EC8F205BE7C01F356BA07847 = {
+			isa = PBXGroup;
+			children = (
+				8B4DD9B53560E0775BF24A7F /* App */,
+				ACE53EFC51F470EA88136B89 /* Packages */,
+				C4E0E47F833F5DF1B60E0000 /* Products */,
+			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1148428C1558FCE5DEA8FAC6 /* Heartelfie */ = {
+		B60850E6868CD80055D8513F /* DailyDil */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9FF821543BF4BA8A9A65AA41 /* Build configuration list for PBXNativeTarget "Heartelfie" */;
+			buildConfigurationList = 0192F792FBC3C9B2238C037F /* Build configuration list for PBXNativeTarget "DailyDil" */;
 			buildPhases = (
-				9B8671DFC580767FD46E572A /* Sources */,
-				DE72CBFB3384C9CCB2225DB2 /* Resources */,
-				3D63A8FE7E9BA34582EF24D8 /* Frameworks */,
+				B53BC8B516398DD97C852A77 /* Sources */,
+				5A74E942AD244AEAF7DA1D50 /* Resources */,
+				E2D8E169CDCC993585D88F89 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Heartelfie;
+			name = DailyDil;
 			packageProductDependencies = (
-				339DA5FD5ED1D39AF98AA585 /* HEFeatures */,
+				6A065A302DB4B96C39EC2989 /* HEFeatures */,
 			);
-			productName = Heartelfie;
-			productReference = 5540C1FBC6BA2BEBC6509DC8 /* Heartelfie.app */;
+			productName = DailyDil;
+			productReference = 0B614E795763C472C8A7E7DA /* DailyDil.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		B501E805E407D0EDD6E437CA /* Project object */ = {
+		B6EB3FD8A991A14D48ABDF42 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2660;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					1148428C1558FCE5DEA8FAC6 = {
+					B60850E6868CD80055D8513F = {
+						DevelopmentTeam = J2P293N3N8;
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = D20F1A5F052DDDC7F403243D /* Build configuration list for PBXProject "Heartelfie" */;
+			buildConfigurationList = 46AB1989DEB3B023CFBE8B2E /* Build configuration list for PBXProject "DailyDil" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
 				en,
 			);
-			mainGroup = 1E6F58A3B73302E6C80FC74D;
+			mainGroup = EC8F205BE7C01F356BA07847;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				1135B0E349B9F95FCE359157 /* XCLocalSwiftPackageReference "." */,
+				E4976890274288070031B082 /* XCLocalSwiftPackageReference "." */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 2B3C532B5FB2DA6787C50108 /* Products */;
+			productRefGroup = C4E0E47F833F5DF1B60E0000 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1148428C1558FCE5DEA8FAC6 /* Heartelfie */,
+				B60850E6868CD80055D8513F /* DailyDil */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		DE72CBFB3384C9CCB2225DB2 /* Resources */ = {
+		5A74E942AD244AEAF7DA1D50 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44DD1160C62E7C3736F66084 /* Assets.xcassets in Resources */,
-				B83889979688491E5383B08D /* PrivacyInfo.xcprivacy in Resources */,
+				315FD524BE13B9CBCB644EEC /* Assets.xcassets in Resources */,
+				36A390B4C21D8F0963CE8719 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		9B8671DFC580767FD46E572A /* Sources */ = {
+		B53BC8B516398DD97C852A77 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E01266402692B9558B473A7D /* HeartelfieApp.swift in Sources */,
+				3C4A79E7E089A938DD63473E /* HeartelfieApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		5EA30CFBF16E62014CDA4845 /* Release */ = {
+		35A41B1734CB8AC837D524A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 5;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = App/Heartelfie/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.ios;
+				PRODUCT_NAME = DailyDil;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		74DD1012021AB02C7AF8884D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -200,10 +224,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = J2P293N3N8;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -217,43 +240,16 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
-		711AED73E2A0DAA24770311A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = J2P293N3N8;
-				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = App/Heartelfie/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.app;
-				PRODUCT_NAME = Heartelfie;
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		ABC0B7579085124415F3841D /* Debug */ = {
+		777683F08B8705D10726711F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -286,10 +282,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = J2P293N3N8;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -310,22 +305,20 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
-		C10189CFB4231970AE394F1D /* Debug */ = {
+		DCBB4EFA787AE907B3E2DA4C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = J2P293N3N8;
+				CURRENT_PROJECT_VERSION = 5;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -333,32 +326,32 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.app;
-				PRODUCT_NAME = Heartelfie;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.ios;
+				PRODUCT_NAME = DailyDil;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = Debug;
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9FF821543BF4BA8A9A65AA41 /* Build configuration list for PBXNativeTarget "Heartelfie" */ = {
+		0192F792FBC3C9B2238C037F /* Build configuration list for PBXNativeTarget "DailyDil" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C10189CFB4231970AE394F1D /* Debug */,
-				711AED73E2A0DAA24770311A /* Release */,
+				35A41B1734CB8AC837D524A9 /* Debug */,
+				DCBB4EFA787AE907B3E2DA4C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		D20F1A5F052DDDC7F403243D /* Build configuration list for PBXProject "Heartelfie" */ = {
+		46AB1989DEB3B023CFBE8B2E /* Build configuration list for PBXProject "DailyDil" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				ABC0B7579085124415F3841D /* Debug */,
-				5EA30CFBF16E62014CDA4845 /* Release */,
+				777683F08B8705D10726711F /* Debug */,
+				74DD1012021AB02C7AF8884D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -366,18 +359,18 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		1135B0E349B9F95FCE359157 /* XCLocalSwiftPackageReference "." */ = {
+		E4976890274288070031B082 /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = .;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		339DA5FD5ED1D39AF98AA585 /* HEFeatures */ = {
+		6A065A302DB4B96C39EC2989 /* HEFeatures */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HEFeatures;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = B501E805E407D0EDD6E437CA /* Project object */;
+	rootObject = B6EB3FD8A991A14D48ABDF42 /* Project object */;
 }

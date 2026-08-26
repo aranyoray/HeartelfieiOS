@@ -139,10 +139,8 @@ public struct SQIClassifier: Sendable {
 
     private func amplitudeReference(for modality: Modality) -> Double {
         switch modality {
-        case .fingerPPG, .deviceMultiWavelengthPPG: return 0.02 // ~2% perfusion
+        case .fingerPPG: return 0.02 // ~2% perfusion
         case .facialRPPG: return 0.005
-        case .deviceECG: return 0.1
-        case .deviceBioZ: return 0.01
         }
     }
 

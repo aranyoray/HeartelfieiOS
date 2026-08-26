@@ -21,7 +21,6 @@ public final class CaptureViewModel {
         case idle
         case preparing
         case coaching          // streaming; waiting for good signal / user to start
-        case countdown(Int)
         case capturing
         case processing
         case completed(CardioReading)
@@ -82,6 +81,7 @@ public final class CaptureViewModel {
     /// Start the sensor stream and enter live coaching.
     public func begin() async {
         guard phase == .idle || isFailed else { return }
+        await stopSensor()
         resetBuffers()
         phase = .preparing
         let sensor = sensors.sensor(for: modality)
@@ -92,9 +92,7 @@ public final class CaptureViewModel {
             for await frame in stream {
                 self?.ingest(frame)
             }
-            // Stream ended. If it ended while we were still waiting/capturing, the
-            // source dropped (camera stalled, device disconnected) — surface it
-            // instead of leaving the UI stuck.
+            guard !Task.isCancelled else { return }
             await self?.streamEnded()
         }
     }
@@ -140,18 +138,34 @@ public final class CaptureViewModel {
     }
 
     /// The sensor stream finished. If it ended while we were still waiting for signal
-    /// or mid-capture, the source dropped (camera stalled, device disconnected) —
-    /// surface it instead of leaving the UI stuck. Ignored during intentional teardown.
+    /// or mid-capture, the source dropped (camera stalled) — surface it instead of
+    /// leaving the UI stuck. Ignored during intentional teardown.
     private func streamEnded() async {
         guard !isTearingDown else { return }
         switch phase {
-        case .preparing, .coaching, .countdown:
-            phase = .failed(modality.requiresDevice ? .contactLost : .sensorUnavailable)
+        case .preparing, .coaching:
+            await stopSensor()
+            phase = .failed(.sensorUnavailable)
         case .capturing:
             await captureDeadlineReached()
         default:
             break
         }
+    }
+
+    /// Finish the capture window early at the user's request. Only honored once
+    /// the modality's minimum signal length has been collected, so the SQI gate
+    /// still sees enough data to judge the reading honestly.
+    public func finishEarly() async {
+        guard phase == .capturing, !isFinishing else { return }
+        guard elapsedSeconds >= ClinicalConfig.minimumCaptureSeconds(for: modality) else { return }
+        isFinishing = true
+        await finishCapture()
+    }
+
+    /// Seconds still required before an early finish produces a valid reading.
+    public var secondsUntilFinishAllowed: Double {
+        max(0, ClinicalConfig.minimumCaptureSeconds(for: modality) - elapsedSeconds)
     }
 
     /// Abort the capture and tear down the sensor.
@@ -250,8 +264,8 @@ public final class CaptureViewModel {
             phase = .failed(error)
 
         case .success(let processed):
-            // Inference adds device-only clinical metrics (cloud) or an on-device
-            // rhythm screen; phone DSP metrics already came from the processor.
+            // On-device inference can refine DSP metrics of the same kind
+            // (finger-PPG rhythm screen). Inferred rows replace DSP rows.
             let inferred = await inference.infer(
                 modality: modality,
                 channels: channels,
@@ -260,12 +274,11 @@ public final class CaptureViewModel {
                 skinTone: skinTone
             )
 
-            var metrics = processed.metrics
-            for metric in inferred.metrics where !metrics.contains(where: { $0.kind == metric.kind }) {
-                metrics.append(metric)
+            let metrics = CardioMetric.merging(processed.metrics, withInferred: inferred.metrics)
+            let didApplyInference = metrics.contains { merged in
+                inferred.metrics.contains { $0.kind == merged.kind && $0.id == merged.id }
             }
-
-            let provenance = inferred.metrics.isEmpty ? Provenance.onDeviceDSP : inferred.provenance
+            let provenance = didApplyInference ? inferred.provenance : Provenance.onDeviceDSP
             let confidence = inferred.confidence ?? processed.confidence
             let interpretation = inferred.interpretation
                 ?? Self.interpretation(metrics: metrics, confidence: confidence, tier: modality.tier)

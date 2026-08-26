@@ -3,12 +3,11 @@ import HECore
 import HEDesign
 
 /// The Home dashboard: a glanceable, scrollable overview of the day's cardio
-/// wellness. Shows today's score ring, the daily-check streak, the Heartelfie
-/// device status, quick-start tiles for every modality, recent readings, and the
-/// always-present emergency notice.
+/// wellness. Shows today's score ring, the daily-check streak, quick-start tiles
+/// for phone screenings, recent readings, and the always-present emergency notice.
 ///
-/// All copy is wellness-grade and explicitly non-diagnostic: phone modalities are
-/// "screenings", the device path is "measurement".
+/// All copy is wellness-grade and explicitly non-diagnostic. Phone modalities are
+/// screenings, not medical measurements.
 struct HomeView: View {
     @Environment(AppEnvironment.self) private var env
 
@@ -26,7 +25,6 @@ struct HomeView: View {
                 snapshotSection
                 HomeTrendsCard()
                 StreakCard(streak: env.streak, recentReadings: env.recentReadings)
-                deviceSection
                 quickStartSection
                 recentReadingsSection
                 insightsLink
@@ -35,7 +33,7 @@ struct HomeView: View {
             .padding(HESpacing.md)
         }
         .background(Color.heBackground)
-        .navigationTitle("Heartelfie")
+        .navigationTitle("DailyDil")
         .navigationBarTitleDisplayMode(.inline)
         .task { await env.refreshDashboard() }
         .refreshable { await env.refreshDashboard() }
@@ -102,38 +100,19 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Device status
-
-    private var deviceSection: some View {
-        VStack(alignment: .leading, spacing: HESpacing.sm) {
-            HESectionHeader(
-                title: "Heartelfie device",
-                systemImage: "sensor.tag.radiowaves.forward.fill"
-            )
-
-            NavigationLink(value: AppRoute.devicePairing) {
-                DeviceStatusChip(state: env.deviceState)
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint(env.deviceState.isConnected
-                ? "Opens device management."
-                : "Opens device pairing to connect your Heartelfie device.")
-        }
-    }
-
     // MARK: - Quick start
 
     private var quickStartSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
             HESectionHeader(
                 title: "Quick start",
-                subtitle: "Phone checks are screenings. The device path is a measurement.",
+                subtitle: "Phone checks are wellness screenings — not medical measurements.",
                 systemImage: "bolt.heart.fill"
             )
 
             LazyVGrid(columns: gridColumns, spacing: HESpacing.md) {
                 ForEach(Modality.allCases) { modality in
-                    QuickStartTile(modality: modality, isAvailable: env.isAvailable(modality))
+                    QuickStartTile(modality: modality)
                 }
             }
         }

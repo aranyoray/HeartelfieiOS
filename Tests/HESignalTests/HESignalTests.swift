@@ -182,17 +182,50 @@ final class HESignalTests: XCTestCase {
     }
 
     func testSignalProcessorScopesMetricsToModality() {
-        let fs = 250.0
-        let signal = SyntheticSignal.ecg(durationSeconds: 32, sampleRate: fs, heartRateBPM: 68, noise: 0.02)
+        let fs = 100.0
+        let signal = SyntheticSignal.ppg(durationSeconds: 25, sampleRate: fs, heartRateBPM: 68, noise: 0.02)
         let result = SignalProcessor().process(
-            channels: [.ecg: signal], sampleRate: fs, modality: .deviceECG, profile: SampleData.profile
+            channels: [.green: signal], sampleRate: fs, modality: .facialRPPG, profile: SampleData.profile
         )
         guard case .success(let processed) = result else {
             return XCTFail("Expected success")
         }
         let kinds = Set(processed.metrics.map(\.kind))
-        // deviceECG supports only heart rate + rhythm irregularity.
-        XCTAssertTrue(kinds.isSubset(of: Set(Modality.deviceECG.supportedMetrics)))
+        XCTAssertTrue(kinds.isSubset(of: Set(Modality.facialRPPG.supportedMetrics)))
         XCTAssertTrue(kinds.contains(.heartRate))
+    }
+
+    func testSignalProcessorEmitsScreeningSpO2WhenRedAndGreenPresent() {
+        let fs = 100.0
+        let green = SyntheticSignal.ppg(durationSeconds: 25, sampleRate: fs, heartRateBPM: 72, hrvMS: 12, noise: 0.02)
+        // Same pulsatile shape, different DC/AC so the ratio-of-ratios is defined.
+        let red = green.map { $0 * 0.7 + 40 }
+        let result = SignalProcessor().process(
+            channels: [.green: green, .red: red],
+            sampleRate: fs,
+            modality: .fingerPPG,
+            profile: SampleData.profile
+        )
+        guard case .success(let processed) = result else {
+            return XCTFail("Expected success")
+        }
+        XCTAssertNotNil(processed.metrics.first { $0.kind == .spo2Estimate })
+        XCTAssertFalse(processed.metrics.contains { $0.kind.isDeviceOnly })
+    }
+
+    func testSignalProcessorOmitsSpO2WhenNotSupported() {
+        let fs = 100.0
+        let green = SyntheticSignal.ppg(durationSeconds: 25, sampleRate: fs, heartRateBPM: 68, noise: 0.02)
+        let red = green.map { $0 * 0.7 + 40 }
+        let result = SignalProcessor().process(
+            channels: [.green: green, .red: red],
+            sampleRate: fs,
+            modality: .facialRPPG,
+            profile: SampleData.profile
+        )
+        guard case .success(let processed) = result else {
+            return XCTFail("Expected success")
+        }
+        XCTAssertNil(processed.metrics.first { $0.kind == .spo2Estimate })
     }
 }

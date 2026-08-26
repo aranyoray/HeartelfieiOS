@@ -41,4 +41,20 @@ public struct CardioMetric: Identifiable, Codable, Sendable, Hashable {
     public var formattedValueWithUnit: String {
         unit.isEmpty ? formattedValue : "\(formattedValue) \(unit)"
     }
+
+    /// Overlay inferred metrics onto DSP metrics. Same-kind inferred values
+    /// replace the DSP row so on-device models can refine a metric the processor
+    /// already emitted (e.g. the finger-PPG rhythm screen).
+    public static func merging(_ dsp: [CardioMetric], withInferred inferred: [CardioMetric]) -> [CardioMetric] {
+        guard !inferred.isEmpty else { return dsp }
+        var merged = dsp
+        for metric in inferred {
+            if let index = merged.firstIndex(where: { $0.kind == metric.kind }) {
+                merged[index] = metric
+            } else {
+                merged.append(metric)
+            }
+        }
+        return merged
+    }
 }

@@ -78,12 +78,8 @@ public enum FilterBand {
     /// Cardiac band for PPG/ECG (~30–210 bpm).
     public static func passband(for modality: Modality) -> (low: Double, high: Double) {
         switch modality {
-        case .fingerPPG, .facialRPPG, .deviceMultiWavelengthPPG:
+        case .fingerPPG, .facialRPPG:
             return (0.7, 3.5)
-        case .deviceECG:
-            return (0.5, 40.0)
-        case .deviceBioZ:
-            return (0.05, 1.0)
         }
     }
 }

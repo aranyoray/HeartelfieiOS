@@ -38,32 +38,6 @@ public enum SampleData {
         )
     }
 
-    /// A device multi-wavelength measurement reading.
-    public static func deviceReading(at date: Date = Date()) -> CardioReading {
-        CardioReading(
-            timestamp: date,
-            modality: .deviceMultiWavelengthPPG,
-            metrics: [
-                CardioMetric(kind: .hemoglobin, value: 13.6, profile: profile),
-                CardioMetric(kind: .anemiaRisk, value: 8, profile: profile),
-                CardioMetric(kind: .spo2Clinical, value: 98, profile: profile),
-                CardioMetric(kind: .perfusionIndex, value: 2.4, profile: profile),
-                CardioMetric(kind: .heartRate, value: 70, profile: profile)
-            ],
-            confidence: Confidence(0.91),
-            signalQuality: SignalQuality(sqi: 0.94, isAcceptable: true, issues: []),
-            provenance: Provenance(
-                engine: .cloud,
-                modelName: "PaPaGei-PPG",
-                modelVersion: "0.3-mock",
-                attribution: "PPG foundation model — mock response. Attribution required in production."
-            ),
-            interpretation: "Your multi-wavelength wellness reading looks typical. Oxygen-carry and oxygen wellness estimates are within the configured range.",
-            monkSkinTone: profile.monkSkinTone,
-            waveformPreview: syntheticWave(count: 120)
-        )
-    }
-
     /// A low-confidence reading that should trigger the recheck pathway.
     public static func lowConfidenceReading(at date: Date = Date()) -> CardioReading {
         CardioReading(
@@ -94,7 +68,7 @@ public enum SampleData {
             readings.append(
                 CardioReading(
                     timestamp: date,
-                    modality: dayOffset % 4 == 0 ? .deviceMultiWavelengthPPG : .fingerPPG,
+                    modality: .fingerPPG,
                     metrics: [
                         CardioMetric(kind: .heartRate, value: 70 + jitter, profile: profile),
                         CardioMetric(kind: .hrvSDNN, value: 55 + jitter, profile: profile)
