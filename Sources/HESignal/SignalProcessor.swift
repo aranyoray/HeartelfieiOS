@@ -97,10 +97,12 @@ public struct SignalProcessor: Sendable {
         if allowed.contains(.heartRate) {
             metrics.append(CardioMetric(kind: .heartRate, value: features.heartRateBPM.rounded(), profile: profile))
         }
-        if allowed.contains(.hrvSDNN) {
+        // A literal 0 ms HRV is a degenerate signal (or synthetic input), not a
+        // physiological finding; showing it would flag a false "worth a check".
+        if allowed.contains(.hrvSDNN), features.sdnnMS > 0 {
             metrics.append(CardioMetric(kind: .hrvSDNN, value: features.sdnnMS.rounded(), profile: profile))
         }
-        if allowed.contains(.hrvRMSSD) {
+        if allowed.contains(.hrvRMSSD), features.rmssdMS > 0 {
             metrics.append(CardioMetric(kind: .hrvRMSSD, value: features.rmssdMS.rounded(), profile: profile))
         }
         if allowed.contains(.rhythmIrregularity) {

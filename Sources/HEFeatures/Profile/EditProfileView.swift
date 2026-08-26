@@ -73,7 +73,7 @@ struct EditProfileView: View {
             .accessibilityLabel("Age")
             .accessibilityValue("\(draft.age) years")
 
-            Picker("Gender", selection: $draft.biologicalSex) {
+            Picker("Biological sex", selection: $draft.biologicalSex) {
                 Text("Not set").tag(Optional<BiologicalSex>.none)
                 ForEach(BiologicalSex.allCases) { sex in
                     Text(sex.displayName).tag(Optional(sex))

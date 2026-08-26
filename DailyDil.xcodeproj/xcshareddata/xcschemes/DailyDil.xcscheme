@@ -61,6 +61,17 @@
                ReferencedContainer = "container:.">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BECB68B05FDB39F5A972924E"
+               BuildableName = "DailyDilUITests.xctest"
+               BlueprintName = "DailyDilUITests"
+               ReferencedContainer = "container:DailyDil.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

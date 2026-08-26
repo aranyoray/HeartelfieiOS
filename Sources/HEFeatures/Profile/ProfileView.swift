@@ -37,7 +37,7 @@ struct ProfileView: View {
                 avatar
 
                 VStack(alignment: .leading, spacing: HESpacing.xxs) {
-                    Text(env.profile.name)
+                    Text(env.profile.name == "PID001" ? "Your profile" : env.profile.name)
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
                     Text(profileSummary)
@@ -92,7 +92,7 @@ struct ProfileView: View {
     private var detailsSection: some View {
         Section {
             detailRow("Age", env.profile.age.map(String.init))
-            detailRow("Gender", env.profile.biologicalSex?.displayName)
+            detailRow("Biological sex", env.profile.biologicalSex?.displayName)
             detailRow("Height", heightText)
             detailRow("Weight", weightText)
             bmiRow

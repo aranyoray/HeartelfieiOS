@@ -43,21 +43,26 @@ public struct ScoreRing: View {
 
             // Center readout.
             VStack(spacing: HESpacing.xxs) {
-                Text(verbatim: "\(score.value)")
+                // A big "0" before any check reads as a zero score; show a
+                // neutral placeholder until a reading contributes.
+                Text(verbatim: score.contributingReadings == 0 ? "\u{2013}" : "\(score.value)")
                     .font(.heMetricNumeral)
                     .foregroundStyle(Color.heTextPrimary)
                     .monospacedDigit()
                     .contentTransition(.numericText())
 
-                Text("out of 100")
-                    .font(.heCaption)
-                    .foregroundStyle(Color.heTextTertiary)
+                if score.contributingReadings > 0 {
+                    Text("out of 100")
+                        .font(.heCaption)
+                        .foregroundStyle(Color.heTextTertiary)
+                }
 
                 Text(score.headline)
                     .font(.heCallout.weight(.medium))
                     .foregroundStyle(Color.heTextSecondary)
                     .multilineTextAlignment(.center)
-                    .lineLimit(2)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.85)
                     .padding(.horizontal, HESpacing.sm)
                     .padding(.top, HESpacing.xxs)
             }

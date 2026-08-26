@@ -10,12 +10,25 @@
 		315FD524BE13B9CBCB644EEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB777D939E2709187AAA4B6F /* Assets.xcassets */; };
 		36A390B4C21D8F0963CE8719 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */; };
 		3C4A79E7E089A938DD63473E /* HeartelfieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */; };
+		9B86C2488C82C9CCD8716C56 /* NavProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E923AA02076F7A41D00D5BB /* NavProbeTests.swift */; };
 		A91D31C72F2375D17C0B6E16 /* HEFeatures in Frameworks */ = {isa = PBXBuildFile; productRef = 6A065A302DB4B96C39EC2989 /* HEFeatures */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B36DFCD9D1E428F8A614F05F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6EB3FD8A991A14D48ABDF42 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B60850E6868CD80055D8513F;
+			remoteInfo = DailyDil;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		05746B85BCFE25F3A6F78524 /* DailyDilUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DailyDilUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B614E795763C472C8A7E7DA /* DailyDil.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DailyDil.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		4E923AA02076F7A41D00D5BB /* NavProbeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavProbeTests.swift; sourceTree = "<group>"; };
 		4EFAC08ACC9D65B1496A85A5 /* Heartelfie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Heartelfie.entitlements; sourceTree = "<group>"; };
 		60A2DF766F94C46495BB9C18 /* HeartelfieiOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HeartelfieiOS; path = .; sourceTree = SOURCE_ROOT; };
 		E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartelfieApp.swift; sourceTree = "<group>"; };
@@ -35,6 +48,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		01CCEA82F68D229745CA9414 /* DailyDilUITests */ = {
+			isa = PBXGroup;
+			children = (
+				4E923AA02076F7A41D00D5BB /* NavProbeTests.swift */,
+			);
+			path = DailyDilUITests;
+			sourceTree = "<group>";
+		};
+		0E22D5FC28021A8F2DC3E356 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				01CCEA82F68D229745CA9414 /* DailyDilUITests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 		8B4DD9B53560E0775BF24A7F /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -55,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				0B614E795763C472C8A7E7DA /* DailyDil.app */,
+				05746B85BCFE25F3A6F78524 /* DailyDilUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,6 +106,7 @@
 			children = (
 				8B4DD9B53560E0775BF24A7F /* App */,
 				ACE53EFC51F470EA88136B89 /* Packages */,
+				0E22D5FC28021A8F2DC3E356 /* Tests */,
 				C4E0E47F833F5DF1B60E0000 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -103,6 +134,24 @@
 			productReference = 0B614E795763C472C8A7E7DA /* DailyDil.app */;
 			productType = "com.apple.product-type.application";
 		};
+		BECB68B05FDB39F5A972924E /* DailyDilUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2CD1E16ECF3A12E4CA2AB41F /* Build configuration list for PBXNativeTarget "DailyDilUITests" */;
+			buildPhases = (
+				B5F3A25D79664C8AF21AA305 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B0E7ED303CF63ED186FCE4F4 /* PBXTargetDependency */,
+			);
+			name = DailyDilUITests;
+			packageProductDependencies = (
+			);
+			productName = DailyDilUITests;
+			productReference = 05746B85BCFE25F3A6F78524 /* DailyDilUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -115,6 +164,11 @@
 					B60850E6868CD80055D8513F = {
 						DevelopmentTeam = J2P293N3N8;
 						ProvisioningStyle = Automatic;
+					};
+					BECB68B05FDB39F5A972924E = {
+						DevelopmentTeam = J2P293N3N8;
+						ProvisioningStyle = Automatic;
+						TestTargetID = B60850E6868CD80055D8513F;
 					};
 				};
 			};
@@ -136,6 +190,7 @@
 			projectRoot = "";
 			targets = (
 				B60850E6868CD80055D8513F /* DailyDil */,
+				BECB68B05FDB39F5A972924E /* DailyDilUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -161,9 +216,43 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B5F3A25D79664C8AF21AA305 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B86C2488C82C9CCD8716C56 /* NavProbeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		B0E7ED303CF63ED186FCE4F4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B60850E6868CD80055D8513F /* DailyDil */;
+			targetProxy = B36DFCD9D1E428F8A614F05F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		3058DC5964EE39227D68EEE9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.ios.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DailyDil;
+			};
+			name = Debug;
+		};
 		35A41B1734CB8AC837D524A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -171,7 +260,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -311,6 +400,24 @@
 			};
 			name = Debug;
 		};
+		D7BAD39B0598784B58B7A95D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.ios.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DailyDil;
+			};
+			name = Release;
+		};
 		DCBB4EFA787AE907B3E2DA4C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -318,7 +425,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -343,6 +450,15 @@
 			buildConfigurations = (
 				35A41B1734CB8AC837D524A9 /* Debug */,
 				DCBB4EFA787AE907B3E2DA4C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		2CD1E16ECF3A12E4CA2AB41F /* Build configuration list for PBXNativeTarget "DailyDilUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3058DC5964EE39227D68EEE9 /* Debug */,
+				D7BAD39B0598784B58B7A95D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

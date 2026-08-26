@@ -116,7 +116,7 @@ private struct HealthKitPrimingCard: View {
                         .accessibilityElement(children: .combine)
                 } else {
                     HESecondaryButton(
-                        "Continue",
+                        "Enable Apple Health",
                         systemImage: "heart.fill",
                         isLoading: isConnecting
                     ) {

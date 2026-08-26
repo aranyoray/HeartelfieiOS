@@ -45,7 +45,7 @@ public struct MonkSkinTone: Codable, Sendable, Hashable, Identifiable, Comparabl
     /// User-facing disclosure of why Heartelfie asks for this and how it's used.
     public static let usageDisclosure = """
     Optical heart readings can behave differently across skin tones. Sharing your \
-    skin tone (optional) helps Heartelfie calibrate signal processing so screenings \
+    skin tone (optional) helps DailyDil calibrate signal processing so screenings \
     work more equitably for everyone. It stays on your device and is only used to \
     tune measurement quality — never to identify you.
     """

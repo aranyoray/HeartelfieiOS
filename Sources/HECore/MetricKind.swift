@@ -26,8 +26,8 @@ public enum MetricKind: String, Codable, Sendable, CaseIterable, Hashable, Ident
     public var displayName: String {
         switch self {
         case .heartRate: return "Heart Rate"
-        case .hrvSDNN: return "Heart-Rate Variability (SDNN)"
-        case .hrvRMSSD: return "Heart-Rate Variability (RMSSD)"
+        case .hrvSDNN: return "HRV (SDNN)"
+        case .hrvRMSSD: return "HRV (RMSSD)"
         case .rhythmIrregularity: return "Rhythm Variation"
         case .spo2Estimate: return "Oxygen Wellness (approx.)"
         case .spo2Clinical: return "Oxygen Wellness"

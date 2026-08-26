@@ -123,6 +123,13 @@ struct OnboardingView: View {
                     ? "Saves your preferences and opens DailyDil"
                     : "Accept the summary above to continue"
             )
+            if !draft.hasAcceptedConsent {
+                Text("Turn on \u{201C}I understand\u{2026}\u{201D} above to continue.")
+                    .font(.heCaption)
+                    .foregroundStyle(Color.heTextTertiary)
+                    .frame(maxWidth: .infinity)
+                    .multilineTextAlignment(.center)
+            }
         } else {
             HEPrimaryButton(step.primaryTitle, systemImage: "arrow.right") {
                 goNext()

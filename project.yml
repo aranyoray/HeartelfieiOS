@@ -41,6 +41,7 @@ schemes:
       targets:
         - package: Heartelfie/HECoreTests
         - package: Heartelfie/HESignalTests
+        - DailyDilUITests
     archive:
       config: Release
 
@@ -64,10 +65,24 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.ios
         PRODUCT_NAME: DailyDil
         MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "7"
+        CURRENT_PROJECT_VERSION: "8"
         INFOPLIST_FILE: App/Heartelfie/Info.plist
         TARGETED_DEVICE_FAMILY: "1,2"
         ENABLE_PREVIEWS: "YES"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_EMIT_LOC_STRINGS: "YES"
+
+  DailyDilUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Tests/DailyDilUITests
+    dependencies:
+      - target: DailyDil
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.ios.uitests
+        GENERATE_INFOPLIST_FILE: "YES"
+        TEST_TARGET_NAME: DailyDil

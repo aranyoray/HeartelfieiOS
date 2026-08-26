@@ -43,6 +43,9 @@ public struct CaptureFlowView: View {
         .background(Color.heBackground)
         .navigationTitle(modality.shortName)
         .navigationBarTitleDisplayMode(.inline)
+        // A capture is a focused task; the tab bar only invites mid-capture
+        // tab switches and covers the bottom card.
+        .toolbar(.hidden, for: .tabBar)
         .sensoryFeedback(trigger: vm?.phase) { _, newPhase in
             switch newPhase {
             case .preparing: return .impact(weight: .light)
@@ -206,7 +209,9 @@ public struct CaptureFlowView: View {
 
     private func guidanceCard(for vm: CaptureViewModel) -> some View {
         let hasContact = vm.liveWaveform.count > 30
-        let hasEstimate = vm.liveBPM != nil
+        // Don't say "looking good" while the SQI banner below is still coaching
+        // the user to improve the signal — the two must never contradict.
+        let hasEstimate = vm.liveBPM != nil && (vm.liveQuality?.isAcceptable ?? false)
         let headline: String
         let support: String
         let glyph: String
