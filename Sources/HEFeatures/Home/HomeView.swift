@@ -48,7 +48,7 @@ struct HomeView: View {
         HEHeroCard {
             VStack(alignment: .leading, spacing: HESpacing.sm) {
                 Text(greeting)
-                    .font(.heLargeTitle)
+                    .font(.heTitle)
                     .foregroundStyle(.white)
                 Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day())
                     .font(.heCallout)
@@ -133,8 +133,14 @@ struct HomeView: View {
             HECard {
                 VStack(spacing: HESpacing.md) {
                     ScoreRing(score: env.todayScore)
-                        .frame(maxWidth: 260)
-                        .frame(height: 260)
+                        .frame(maxWidth: 220)
+                        .frame(height: 220)
+                        .frame(maxWidth: .infinity)
+
+                    Text(env.todayScore.headline)
+                        .font(.heCallout)
+                        .foregroundStyle(Color.heTextSecondary)
+                        .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
 
                     if env.todayScore.contributingReadings == 0 {

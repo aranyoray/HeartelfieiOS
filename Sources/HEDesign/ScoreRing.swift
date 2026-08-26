@@ -57,14 +57,6 @@ public struct ScoreRing: View {
                         .foregroundStyle(Color.heTextTertiary)
                 }
 
-                Text(score.headline)
-                    .font(.heCallout.weight(.medium))
-                    .foregroundStyle(Color.heTextSecondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(3)
-                    .minimumScaleFactor(0.85)
-                    .padding(.horizontal, HESpacing.sm)
-                    .padding(.top, HESpacing.xxs)
             }
             .padding(lineWidth + HESpacing.md)
         }

@@ -193,7 +193,7 @@ public struct CaptureFlowView: View {
     private func readyCard(for vm: CaptureViewModel) -> some View {
         HECard {
             VStack(spacing: HESpacing.md) {
-                iconBadge("camera.metering.center.weighted", size: 92)
+                iconBadge("camera.metering.center.weighted", size: 72)
                 Text("Ready to take a reading")
                     .font(.heHeadline)
                     .foregroundStyle(Color.heTextPrimary)
@@ -206,7 +206,7 @@ public struct CaptureFlowView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, HESpacing.xl)
+            .padding(.vertical, HESpacing.lg)
         }
     }
 
@@ -227,7 +227,7 @@ public struct CaptureFlowView: View {
 
     /// Live measuring card stack: guidance → live pulse → estimate → save.
     private func measuringStack(for vm: CaptureViewModel) -> some View {
-        VStack(spacing: HESpacing.lg) {
+        VStack(spacing: HESpacing.md) {
             guidanceCard(for: vm)
             livePulseCard(for: vm)
             estimateCard(for: vm)
@@ -287,7 +287,7 @@ public struct CaptureFlowView: View {
             VStack(alignment: .leading, spacing: HESpacing.sm) {
                 HESectionHeader(title: "Live pulse")
                 LiveWaveformView(samples: vm.liveWaveform, tint: .hePrimary, isLive: true)
-                    .frame(height: 150)
+                    .frame(height: 128)
             }
         }
     }
@@ -296,13 +296,13 @@ public struct CaptureFlowView: View {
         HECard {
             VStack(alignment: .leading, spacing: HESpacing.sm) {
                 HESectionHeader(title: "Heart-rate estimate")
-                HStack(spacing: HESpacing.lg) {
+                HStack(spacing: HESpacing.md) {
                     PulseHeartView(bpm: vm.liveBPM)
-                        .frame(width: 56, height: 56)
+                        .frame(width: 44, height: 44)
                     if let bpm = vm.liveBPM {
                         HStack(alignment: .firstTextBaseline, spacing: HESpacing.xs) {
                             Text("\(Int(bpm))")
-                                .font(.heMetricNumeral)
+                                .font(.heMetricNumeralCompact)
                                 .foregroundStyle(Color.heTextPrimary)
                                 .contentTransition(.numericText())
                                 .animation(.default, value: Int(bpm))
@@ -578,7 +578,7 @@ struct CaptureResultSummary: View {
                     if let hr = reading.metrics.first(where: { $0.kind == .heartRate }) {
                         HStack(alignment: .firstTextBaseline, spacing: HESpacing.xs) {
                             Text(verbatim: "\(Int(hr.value))")
-                                .font(.heMetricNumeral)
+                                .font(.heMetricNumeralCompact)
                                 .foregroundStyle(.white)
                                 .monospacedDigit()
                             Text(hr.kind.unit)

@@ -12,7 +12,7 @@ public struct HEHeroCard<Content: View>: View {
 
     public var body: some View {
         content
-            .padding(HESpacing.lg)
+            .padding(HESpacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: HERadius.xl, style: .continuous)
