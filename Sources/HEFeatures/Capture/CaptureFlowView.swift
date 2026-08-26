@@ -263,13 +263,13 @@ public struct CaptureFlowView: View {
         HECard {
             VStack(alignment: .leading, spacing: HESpacing.sm) {
                 HESectionHeader(title: "Heart-rate estimate")
-                HStack(spacing: HESpacing.md) {
+                HStack(spacing: HESpacing.lg) {
                     PulseHeartView(bpm: vm.liveBPM)
-                        .frame(width: 44, height: 44)
+                        .frame(width: 56, height: 56)
                     if let bpm = vm.liveBPM {
                         HStack(alignment: .firstTextBaseline, spacing: HESpacing.xs) {
                             Text("\(Int(bpm))")
-                                .font(.heMetricNumeralCompact)
+                                .font(.heMetricNumeral)
                                 .foregroundStyle(Color.heTextPrimary)
                                 .contentTransition(.numericText())
                                 .animation(.default, value: Int(bpm))
@@ -312,6 +312,9 @@ public struct CaptureFlowView: View {
                             .contentTransition(.numericText())
                         Spacer()
                     }
+                    ProgressView(value: min(max(vm.captureProgress, 0), 1))
+                        .progressViewStyle(.linear)
+                        .tint(Color.hePrimary)
                     if vm.captureWasInterrupted {
                         Text("The signal was interrupted, so this save restarted from the steady part.")
                             .font(.heCaption)
@@ -533,16 +536,35 @@ struct CaptureResultSummary: View {
 
     var body: some View {
         VStack(spacing: HESpacing.md) {
-            Label("Reading saved", systemImage: "checkmark.seal.fill")
-                .font(.heHeadline)
-                .foregroundStyle(Color.heRisk(.normal))
+            HEHeroCard {
+                VStack(alignment: .leading, spacing: HESpacing.sm) {
+                    Label("Reading saved", systemImage: "checkmark.seal.fill")
+                        .font(.heHeadline)
+                        .foregroundStyle(.white)
 
-            HStack(spacing: HESpacing.sm) {
-                TierBadge(reading.tier)
-                ConfidenceMeter(reading.confidence)
+                    if let hr = reading.metrics.first(where: { $0.kind == .heartRate }) {
+                        HStack(alignment: .firstTextBaseline, spacing: HESpacing.xs) {
+                            Text(verbatim: "\(Int(hr.value))")
+                                .font(.heMetricNumeral)
+                                .foregroundStyle(.white)
+                                .monospacedDigit()
+                            Text(hr.kind.unit)
+                                .font(.heUnit)
+                                .foregroundStyle(.white.opacity(0.85))
+                        }
+                    }
+
+                    HStack(spacing: HESpacing.sm) {
+                        TierBadge(reading.tier)
+                        ConfidenceMeter(reading.confidence)
+                    }
+                    .padding(.horizontal, HESpacing.xs)
+                    .padding(.vertical, HESpacing.xxs)
+                    .background(RoundedRectangle(cornerRadius: HERadius.md, style: .continuous).fill(.white.opacity(0.92)))
+                }
             }
 
-            ForEach(reading.metrics) { metric in
+            ForEach(reading.metrics.filter { $0.kind != .heartRate }) { metric in
                 MetricCardView(metric: metric)
             }
 

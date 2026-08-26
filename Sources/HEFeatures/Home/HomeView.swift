@@ -45,15 +45,41 @@ struct HomeView: View {
     // MARK: - Greeting
 
     private var greetingHeader: some View {
-        VStack(alignment: .leading, spacing: HESpacing.xxs) {
-            Text(greeting)
-                .font(.heLargeTitle)
-                .foregroundStyle(Color.heTextPrimary)
-            Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day())
-                .font(.heCallout)
-                .foregroundStyle(Color.heTextSecondary)
+        HEHeroCard {
+            VStack(alignment: .leading, spacing: HESpacing.sm) {
+                Text(greeting)
+                    .font(.heLargeTitle)
+                    .foregroundStyle(.white)
+                Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day())
+                    .font(.heCallout)
+                    .foregroundStyle(.white.opacity(0.85))
+
+                if env.streak.currentStreak > 0 || env.streak.didCheckToday {
+                    HStack(spacing: HESpacing.sm) {
+                        if env.streak.currentStreak > 0 {
+                            HEHeroChip("\(env.streak.currentStreak)-day streak", systemImage: "flame.fill")
+                        }
+                        if env.streak.didCheckToday {
+                            HEHeroChip("Checked today", systemImage: "checkmark.seal.fill")
+                        }
+                    }
+                }
+
+                if !env.streak.didCheckToday {
+                    NavigationLink(value: AppRoute.capture(.fingerPPG)) {
+                        Label("Take today's check", systemImage: "heart.fill")
+                            .font(.heHeadline.weight(.semibold))
+                            .foregroundStyle(Color.hePrimaryDeep)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, HESpacing.sm + HESpacing.xxs)
+                            .background(Capsule().fill(.white))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, HESpacing.xs)
+                    .accessibilityHint("Starts a finger screening with the rear camera.")
+                }
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
     }
