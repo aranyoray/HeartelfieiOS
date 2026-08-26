@@ -307,6 +307,11 @@ public struct CaptureFlowView: View {
                             .contentTransition(.numericText())
                         Spacer()
                     }
+                    if vm.captureWasInterrupted {
+                        Text("The signal was interrupted, so this save restarted from the steady part.")
+                            .font(.heCaption)
+                            .foregroundStyle(Color.heTextSecondary)
+                    }
                     if vm.secondsUntilFinishAllowed > 0 {
                         Text("Keep holding — about \(Int(vm.secondsUntilFinishAllowed.rounded(.up)))s more for a valid reading.")
                             .font(.heCaption)
@@ -414,6 +419,13 @@ public struct CaptureFlowView: View {
 
             if let quality = vm.liveQuality {
                 SQICoachBanner(quality: quality)
+            }
+
+            if vm.phase == .capturing, vm.captureWasInterrupted {
+                Text("The signal was interrupted, so this capture restarted from the steady part.")
+                    .font(.heCaption)
+                    .foregroundStyle(Color.heTextSecondary)
+                    .multilineTextAlignment(.center)
             }
 
             controls(for: vm)

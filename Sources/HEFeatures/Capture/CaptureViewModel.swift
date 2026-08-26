@@ -39,6 +39,9 @@ public final class CaptureViewModel {
     /// 0...1 progress through the capture window.
     public private(set) var captureProgress: Double = 0
     public private(set) var elapsedSeconds: Double = 0
+    /// True when a frame gap forced the current capture window to restart
+    /// (face lost, camera stall) — lets the UI explain the reset progress.
+    public private(set) var captureWasInterrupted = false
 
     // Dependencies
     private let sensors: SensorProviding
@@ -111,6 +114,7 @@ public final class CaptureViewModel {
         captureStartTimestamp = nil
         captureProgress = 0
         elapsedSeconds = 0
+        captureWasInterrupted = false
         isFinishing = false
         phase = .capturing
         startWatchdog()
@@ -192,22 +196,37 @@ public final class CaptureViewModel {
 
     // MARK: - Streaming
 
+    /// Largest tolerable inter-frame gap before the buffer is no longer one
+    /// continuous signal. Face capture drops frames whenever Vision loses the
+    /// face, so even sub-second look-aways splice beats together; the finger
+    /// stays planted on the lens, so only a real stall (backgrounding, camera
+    /// interruption) produces a gap there.
+    private var maxFrameGapSeconds: Double {
+        modality == .facialRPPG ? 0.75 : 2.0
+    }
+
     private func ingest(_ frame: SignalFrame) {
-        // A long timestamp gap (backgrounding, camera stall, face lost) means the
-        // buffer is no longer one continuous signal — never splice across it.
-        if let last = timestamps.last, frame.timestamp - last > 2.0 {
-            if phase == .capturing, !isFinishing {
-                isFinishing = true
-                Task {
-                    await stopSensor()
-                    phase = .failed(.timeout)
-                }
-                return
-            }
-            if phase == .coaching {
+        // A timestamp gap (camera stall, face lost) means the buffer is no
+        // longer one continuous signal — never splice across it.
+        if let last = timestamps.last, frame.timestamp - last > maxFrameGapSeconds {
+            switch phase {
+            case .capturing where !isFinishing:
+                // Restart the capture window from this frame rather than
+                // failing: a brief look-away shouldn't cost the whole reading.
+                // The watchdog still bounds the total attempt, so repeated
+                // interruptions surface as a timeout.
+                channelBuffers.removeAll()
+                timestamps.removeAll()
+                captureStartTimestamp = nil
+                captureProgress = 0
+                elapsedSeconds = 0
+                captureWasInterrupted = true
+            case .coaching:
                 // Restart the coaching buffer so the stitched signal never
                 // feeds the live BPM estimate.
                 resetBuffers()
+            default:
+                break
             }
         }
 
@@ -394,6 +413,7 @@ public final class CaptureViewModel {
         liveWaveform = []
         liveQuality = nil
         liveBPM = nil
+        captureWasInterrupted = false
         isFinishing = false
         isTearingDown = false
     }
