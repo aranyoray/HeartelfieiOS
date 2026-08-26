@@ -17,7 +17,7 @@ public struct TierBadge: View {
     private var systemImage: String {
         switch tier {
         case .screening:   return "iphone"
-        case .measurement: return "sensor.tag.radiowaves.forward.fill"
+        case .measurement: return "checkmark.seal.fill" // legacy tier: readings from the retired hardware path
         }
     }
 

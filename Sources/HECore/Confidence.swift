@@ -26,7 +26,9 @@ public struct Confidence: Codable, Sendable, Hashable, Comparable {
 
     public var band: ConfidenceBand {
         switch value {
-        case ..<ClinicalConfig.lowConfidenceThreshold: return .low
+        // Inclusive: a value exactly AT the threshold is treated as low, matching
+        // the documented "at/below" recheck contract.
+        case ...ClinicalConfig.lowConfidenceThreshold: return .low
         case ..<0.75: return .moderate
         default: return .high
         }

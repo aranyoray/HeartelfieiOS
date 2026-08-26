@@ -68,7 +68,12 @@ public final class InferenceCoordinator: InferenceProviding {
         guard let samples = channels[primary] ?? channels.values.first, samples.count > 8 else {
             return .dspOnly
         }
-        let screen = onDevice.screenRhythm(samples: samples, sampleRate: sampleRate)
+        // No bundled model → keep the DSP metrics, provenance, and confidence.
+        // Replacing them with the heuristic fabricated results (including a
+        // hard 0% irregularity on <3 detected peaks) and mislabeled provenance.
+        guard let screen = onDevice.screenRhythm(samples: samples, sampleRate: sampleRate) else {
+            return .dspOnly
+        }
         let metric = CardioMetric(
             kind: .rhythmIrregularity,
             value: screen.irregularityPercent.rounded(),

@@ -39,7 +39,10 @@ public enum HealthKitError: Error, Sendable, CustomStringConvertible {
 ///   wellness, and historical device-only rows such as hemoglobin) are
 ///   **not** representable as standard HealthKit sample types and
 ///   are therefore never written to HealthKit — they live only in the encrypted
-///   on-device store. ``write(reading:)`` silently skips them.
+///   on-device store. ``write(reading:)`` silently skips them. Camera-based
+///   screening estimates of heart rate, HRV, and respiratory rate **are**
+///   written when the user grants share access — see the committed tier policy
+///   on ``write(reading:)``.
 ///
 /// `@MainActor` because `HKHealthStore` callbacks and authorization UI are
 /// main-actor friendly and we keep all access serialised there.
@@ -83,6 +86,27 @@ public final class HealthKitBridge {
     public func requestAuthorization() async throws {
         guard HKHealthStore.isHealthDataAvailable() else { throw HealthKitError.unavailable }
         try await store.requestAuthorization(toShare: Self.writeTypes, read: Self.readTypes)
+    }
+
+    // MARK: - Deletion
+
+    /// Best-effort deletion of every sample this app wrote to HealthKit, used by
+    /// "Delete all data". Scoped to this app via
+    /// `HKQuery.predicateForObjects(from:)` so other sources' samples are never
+    /// touched. Only types with an active share grant are attempted (deleting
+    /// app-written objects requires share authorization), and per-type failures
+    /// are swallowed so one denied type can't block the rest.
+    public func deleteAllWrittenSamples() async {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        let predicate = HKQuery.predicateForObjects(from: HKSource.default())
+        for type in Self.writeTypes {
+            guard store.authorizationStatus(for: type) == .sharingAuthorized else { continue }
+            await withCheckedContinuation { continuation in
+                store.deleteObjects(of: type, predicate: predicate) { _, _, _ in
+                    continuation.resume()
+                }
+            }
+        }
     }
 
     // MARK: - Reads
@@ -140,6 +164,14 @@ public final class HealthKitBridge {
     /// (heart rate, HRV SDNN, blood oxygen, respiratory rate). Device-only and
     /// custom metrics (hemoglobin, waveforms, etc.) are silently skipped because
     /// HealthKit has no standard type for them.
+    ///
+    /// **Tier policy (committed):** screening-tier camera estimates of heart
+    /// rate, HRV (SDNN), and respiratory rate *are* written. HealthKit labels
+    /// every sample with this app as its source and the user opts in per-type
+    /// via the share grant, so wellness-grade estimates are acceptable there.
+    /// The one screening metric excluded is the camera's `.spo2Estimate`: an
+    /// oxygenSaturation sample implies pulse-oximeter data, so only
+    /// device-grade `.spo2Clinical` maps to it (see ``makeSample``).
     public func write(reading: CardioReading) async throws {
         guard HKHealthStore.isHealthDataAvailable() else { throw HealthKitError.unavailable }
 
@@ -292,6 +324,8 @@ public final class HealthKitBridge {
     public func write(reading: CardioReading) async throws {
         throw HealthKitError.unavailable
     }
+
+    public func deleteAllWrittenSamples() async {}
 }
 
 #endif

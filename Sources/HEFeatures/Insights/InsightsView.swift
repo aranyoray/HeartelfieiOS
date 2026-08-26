@@ -266,7 +266,7 @@ struct InsightsView: View {
                 Label("How to read your insights", systemImage: "lightbulb.fill")
                     .font(.heHeadline)
                     .foregroundStyle(Color.heTextPrimary)
-                Text("Heartelfie surfaces wellness patterns from your phone camera checks. A single reading rarely means much — trends over days and weeks are what's useful. These insights are not a diagnosis and can't confirm or rule out any condition. If something feels wrong, do not rely on this app.")
+                Text("DailyDil surfaces wellness patterns from your phone camera checks. A single reading rarely means much — trends over days and weeks are what's useful. These insights are not a diagnosis and can't confirm or rule out any condition. If something feels wrong, do not rely on this app.")
                     .font(.heCallout)
                     .foregroundStyle(Color.heTextSecondary)
                     .fixedSize(horizontal: false, vertical: true)

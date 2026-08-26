@@ -228,4 +228,58 @@ final class HESignalTests: XCTestCase {
         }
         XCTAssertNil(processed.metrics.first { $0.kind == .spo2Estimate })
     }
+
+    // MARK: - Audit regression tests
+
+    /// Raw camera channels ride a large DC offset; the filter must not leave
+    /// start/end transients big enough to swamp the pulse AC (peak-detector
+    /// threshold + SQI amplitude both read the filtered signal's spread).
+    func testFiltfiltHasNoEdgeTransientOnCameraLikeDC() {
+        let sr = 30.0
+        let n = 600
+        let x = (0..<n).map { 150.0 + 20.0 * sin(2 * .pi * 1.2 * Double($0) / sr) }
+        let filtered = BandpassFilter(lowHz: 0.7, highHz: 3.5, sampleRate: sr).filtfilt(x)
+        XCTAssertEqual(filtered.count, n)
+        let edge = Array(filtered.prefix(10)) + Array(filtered.suffix(10))
+        for v in edge {
+            XCTAssertLessThan(abs(v), 60, "edge transient should stay within pulse-AC order of magnitude")
+        }
+    }
+
+    /// SDNN uses the sample (n−1) convention; population std biases small
+    /// windows low enough to cross reference-range boundaries.
+    func testRRMetricsSDNNUsesSampleStd() {
+        let rr = [800.0, 850.0, 780.0, 830.0]
+        let metrics = try! XCTUnwrap(RRMetrics(rrIntervalsMS: rr))
+        let mean = rr.reduce(0, +) / 4
+        let expected = (rr.reduce(0) { $0 + ($1 - mean) * ($1 - mean) } / 3).squareRoot()
+        XCTAssertEqual(metrics.sdnnMS, expected, accuracy: 1e-9)
+    }
+
+    /// A rejected artifact must not stitch its neighbors into a fake
+    /// "successive" pair for RMSSD.
+    func testRRMetricsRMSSDSkipsPairsAcrossRejectedArtifacts() {
+        let clean = [800.0, 810.0, 800.0, 810.0, 800.0]
+        let base = try! XCTUnwrap(RRMetrics(rrIntervalsMS: clean))
+        // Same beats with an implausible 100 ms artifact spliced into the middle.
+        let spliced = [800.0, 810.0, 100.0, 800.0, 810.0, 800.0]
+        let metrics = try! XCTUnwrap(RRMetrics(rrIntervalsMS: spliced))
+        // The pair spanning the removed artifact (810 → 800) must be excluded,
+        // so RMSSD is computed from strictly adjacent pairs only.
+        XCTAssertEqual(metrics.beatCount, 5)
+        XCTAssertLessThanOrEqual(metrics.rmssdMS, base.rmssdMS + 1e-9)
+    }
+
+    /// Non-positive sample rates must fail closed instead of producing NaN SQI.
+    func testSignalProcessorRejectsNonPositiveSampleRate() {
+        let samples = (0..<700).map { 150.0 + 20.0 * sin(Double($0) * 0.25) }
+        let result = SignalProcessor().process(
+            channels: [.green: samples], sampleRate: 0, modality: .fingerPPG
+        )
+        if case .failure(let error) = result {
+            XCTAssertEqual(error, .sensorUnavailable)
+        } else {
+            XCTFail("expected failure for sampleRate == 0")
+        }
+    }
 }

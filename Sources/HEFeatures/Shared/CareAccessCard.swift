@@ -31,7 +31,7 @@ public struct CareAccessCard: View {
                 tipsList
             }
 
-            Text("Heartelfie is a wellness screening tool. It does not diagnose, treat, or recommend care based on a reading.")
+            Text("DailyDil is a wellness screening tool. It does not diagnose, treat, or recommend care based on a reading.")
                 .font(.heCaption)
                 .foregroundStyle(Color.heTextTertiary)
                 .fixedSize(horizontal: false, vertical: true)

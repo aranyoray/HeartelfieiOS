@@ -200,4 +200,15 @@ final class HECoreTests: XCTestCase {
         XCTAssertNil(decoded.race)
         XCTAssertEqual(decoded.unitSystem, .metric)
     }
+
+    // MARK: Audit regression tests
+
+    /// The documented contract is "at/below the threshold is low"; the band
+    /// switch must be inclusive at the boundary so the recheck pathway fires.
+    func testConfidenceBandLowBoundaryIsInclusive() {
+        let atThreshold = Confidence(ClinicalConfig.lowConfidenceThreshold)
+        XCTAssertEqual(atThreshold.band, ConfidenceBand.low)
+        let justAbove = Confidence(ClinicalConfig.lowConfidenceThreshold + 0.01)
+        XCTAssertEqual(justAbove.band, ConfidenceBand.moderate)
+    }
 }

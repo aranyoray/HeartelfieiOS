@@ -1,30 +1,46 @@
 import SwiftUI
+import UIKit
 import HECore
 import HEDesign
 
-/// Full data portability: builds a CSV and a PDF of every reading and offers them
-/// through the system share sheet. The PDF carries the non-diagnostic disclaimer
-/// (added by the exporter). Building happens off the main actor; the UI shows a
-/// calm loading state and the resulting counts.
+/// Full data portability: builds a CSV or a PDF of every reading on demand and
+/// offers it through the system share sheet. The PDF carries the non-diagnostic
+/// disclaimer (added by the exporter). Nothing is written to disk until the user
+/// actually taps a share button, and the generated file is deleted again as soon
+/// as the share sheet is dismissed.
 struct ExportDataView: View {
     @Environment(AppEnvironment.self) private var env
 
     @State private var phase: Phase = .loading
+    @State private var isBuilding = false
+    @State private var shareItem: ShareItem?
+    /// Files this screen has written, cleaned up after sharing / on leaving.
+    @State private var generatedURLs: [URL] = []
 
     init() {}
 
     private enum Phase {
         case loading
-        case ready(Export)
+        case ready(count: Int)
         case empty
         case failed
     }
 
-    /// The built artifacts, ready to share.
-    private struct Export {
-        let count: Int
-        let csvURL: URL
-        let pdfURL: URL
+    private enum ExportKind {
+        case csv, pdf
+
+        var fileExtension: String {
+            switch self {
+            case .csv: return "csv"
+            case .pdf: return "pdf"
+            }
+        }
+    }
+
+    /// A built artifact, ready to hand to the share sheet.
+    private struct ShareItem: Identifiable {
+        let id = UUID()
+        let url: URL
     }
 
     var body: some View {
@@ -45,7 +61,14 @@ struct ExportDataView: View {
         .background(Color.heBackground)
         .navigationTitle("Export data")
         .navigationBarTitleDisplayMode(.inline)
-        .task { await build() }
+        .task { await load() }
+        .sheet(item: $shareItem, onDismiss: { cleanupGeneratedFiles() }) { item in
+            ActivityShareSheet(url: item.url) {
+                shareItem = nil
+            }
+            .ignoresSafeArea()
+        }
+        .onDisappear { cleanupGeneratedFiles() }
     }
 
     // MARK: - Content
@@ -55,7 +78,7 @@ struct ExportDataView: View {
         switch phase {
         case .loading:
             HECard {
-                LoadingStateView(message: "Preparing your export…")
+                LoadingStateView(message: "Checking your readings…")
             }
 
         case .empty:
@@ -75,19 +98,19 @@ struct ExportDataView: View {
                 )
             }
 
-        case .ready(let export):
-            readyCard(export)
+        case .ready(let count):
+            readyCard(count: count)
         }
     }
 
-    private func readyCard(_ export: Export) -> some View {
+    private func readyCard(count: Int) -> some View {
         VStack(spacing: HESpacing.md) {
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.sm) {
-                    Label("\(export.count) \(export.count == 1 ? "reading" : "readings") ready", systemImage: "checkmark.circle.fill")
+                    Label("\(count) \(count == 1 ? "reading" : "readings") ready", systemImage: "checkmark.circle.fill")
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
-                    Text("Share a spreadsheet-friendly CSV or a formatted PDF. The PDF includes the wellness and screening disclaimer.")
+                    Text("Share a spreadsheet-friendly CSV or a formatted PDF. The PDF includes the wellness and screening disclaimer. Files are built when you tap share and removed afterwards.")
                         .font(.heCallout)
                         .foregroundStyle(Color.heTextSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -95,14 +118,16 @@ struct ExportDataView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            ShareLink(item: export.csvURL) {
+            Button { share(.csv) } label: {
                 shareLabel(title: "Share CSV", systemImage: "tablecells")
             }
+            .disabled(isBuilding)
             .accessibilityLabel("Share readings as C S V")
 
-            ShareLink(item: export.pdfURL) {
+            Button { share(.pdf) } label: {
                 shareLabel(title: "Share PDF", systemImage: "doc.richtext")
             }
+            .disabled(isBuilding)
             .accessibilityLabel("Share readings as P D F")
         }
     }
@@ -113,39 +138,66 @@ struct ExportDataView: View {
             .frame(maxWidth: .infinity, minHeight: 50)
             .foregroundStyle(.white)
             .background(Color.hePrimary, in: RoundedRectangle(cornerRadius: HERadius.md))
+            .opacity(isBuilding ? 0.6 : 1)
     }
 
-    // MARK: - Build
+    // MARK: - Load / build
 
     private func retry() {
         phase = .loading
-        Task { await build() }
+        Task { await load() }
     }
 
-    private func build() async {
-        let readings = (try? await env.repository.allReadings()) ?? []
-        guard !readings.isEmpty else {
-            phase = .empty
-            return
-        }
-
-        let profile = env.profile
-        let exporter = env.exporter
-        let stamp = Self.fileStamp()
-
+    /// Only counts the readings up front — files aren't written until the user
+    /// actually asks to share one.
+    private func load() async {
         do {
-            let csvURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent("Heartelfie-readings-\(stamp).csv")
-            let pdfURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent("Heartelfie-readings-\(stamp).pdf")
-
-            try exporter.writeCSV(readings, to: csvURL)
-            try exporter.writePDF(readings, profile: profile, to: pdfURL)
-
-            phase = .ready(Export(count: readings.count, csvURL: csvURL, pdfURL: pdfURL))
+            let readings = try await env.repository.allReadings()
+            phase = readings.isEmpty ? .empty : .ready(count: readings.count)
         } catch {
             phase = .failed
         }
+    }
+
+    /// Builds the requested artifact into the temporary directory and hands it
+    /// to the share sheet.
+    private func share(_ kind: ExportKind) {
+        guard !isBuilding else { return }
+        isBuilding = true
+        Task {
+            defer { isBuilding = false }
+            do {
+                let readings = try await env.repository.allReadings()
+                guard !readings.isEmpty else {
+                    phase = .empty
+                    return
+                }
+
+                let url = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("DailyDil-readings-\(Self.fileStamp()).\(kind.fileExtension)")
+                switch kind {
+                case .csv:
+                    try env.exporter.writeCSV(readings, to: url)
+                case .pdf:
+                    try env.exporter.writePDF(readings, profile: env.profile, to: url)
+                }
+
+                generatedURLs.append(url)
+                phase = .ready(count: readings.count)
+                shareItem = ShareItem(url: url)
+            } catch {
+                phase = .failed
+            }
+        }
+    }
+
+    /// Removes every file this screen generated. Called once the share sheet is
+    /// dismissed and again on leaving the screen, so exports never linger in tmp.
+    private func cleanupGeneratedFiles() {
+        for url in generatedURLs {
+            try? FileManager.default.removeItem(at: url)
+        }
+        generatedURLs = []
     }
 
     private static func fileStamp() -> String {
@@ -154,6 +206,24 @@ struct ExportDataView: View {
         formatter.dateFormat = "yyyy-MM-dd-HHmmss"
         return formatter.string(from: Date())
     }
+}
+
+/// Wraps `UIActivityViewController` so the generated file can be cleaned up via
+/// its completion handler as soon as the user finishes (or cancels) sharing.
+private struct ActivityShareSheet: UIViewControllerRepresentable {
+    let url: URL
+    let onComplete: () -> Void
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        let onComplete = onComplete
+        controller.completionWithItemsHandler = { _, _, _, _ in
+            onComplete()
+        }
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview("Export data") {

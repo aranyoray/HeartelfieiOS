@@ -13,6 +13,8 @@ public enum CareGuidance {
 
     /// Whether to surface extra wellness context for this reading.
     public static func shouldSurfaceCare(tier: MeasurementTier, risk: RiskLevel) -> Bool {
+        // `.measurement` is only reachable from legacy readings recorded before
+        // the hardware tier was retired; keep surfacing care context for those.
         risk == .elevated || risk == .watch || tier == .measurement
     }
 

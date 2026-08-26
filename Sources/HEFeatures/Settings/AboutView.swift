@@ -2,7 +2,7 @@ import SwiftUI
 import HECore
 import HEDesign
 
-/// What Heartelfie is and isn't: a wellness and screening companion for phone
+/// What DailyDil is and isn't: a wellness and screening companion for phone
 /// camera checks, anchored by the persistent emergency notice and a clear
 /// non-diagnostic statement.
 struct AboutView: View {
@@ -53,11 +53,11 @@ struct AboutView: View {
 
     private var whatItIsSection: some View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
-            HESectionHeader(title: "What Heartelfie is", systemImage: "heart.text.square.fill")
+            HESectionHeader(title: "What DailyDil is", systemImage: "heart.text.square.fill")
 
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.sm) {
-                    Text("Heartelfie offers wellness and screening insights — gentle, everyday check-ins, not medical measurements.")
+                    Text("DailyDil offers wellness and screening insights — gentle, everyday check-ins, not medical measurements.")
                         .font(.heBody)
                         .foregroundStyle(Color.heTextPrimary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -140,7 +140,7 @@ struct AboutView: View {
             HESectionHeader(title: "Regulatory posture", systemImage: "checkmark.seal")
 
             HECard {
-                Text("Heartelfie is a wellness and screening product. It does not connect to external medical hardware, does not provide clinical measurements, and is not a diagnostic tool.")
+                Text("DailyDil is a wellness and screening product. It does not connect to external medical hardware, does not provide clinical measurements, and is not a diagnostic tool.")
                     .font(.heCallout)
                     .foregroundStyle(Color.heTextSecondary)
                     .fixedSize(horizontal: false, vertical: true)

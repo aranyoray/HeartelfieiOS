@@ -33,6 +33,11 @@ public final class AppEnvironment {
     public var dailyChecks: [DailyCheck] = []
     public var isLoading: Bool = false
 
+    /// True when the encrypted store could not be opened and the app fell back
+    /// to in-memory storage — new readings will be lost when the app closes.
+    /// Home surfaces this so the degradation is never silent.
+    public private(set) var storageDegraded = false
+
     // MARK: Private
     @ObservationIgnored private let defaults: UserDefaults
 
@@ -64,6 +69,7 @@ public final class AppEnvironment {
             self.repository = encrypted
         } else {
             self.repository = InMemoryReadingRepository()
+            self.storageDegraded = true
         }
 
         self.profile = .empty
@@ -123,16 +129,39 @@ public final class AppEnvironment {
     }
 
     /// Persist a finished reading, mirror supported types to HealthKit, refresh.
-    public func record(_ reading: CardioReading) async {
-        try? await repository.save(reading)
+    ///
+    /// Throws when the on-device save fails so callers can tell the user the
+    /// reading wasn't kept. The HealthKit mirror only runs after a successful
+    /// save and stays best-effort — Health never holds a reading the app lost.
+    public func record(_ reading: CardioReading) async throws {
+        try await repository.save(reading)
         try? await healthKit.write(reading: reading)
         await refreshDashboard()
     }
 
-    public func deleteAllData() async {
-        try? await repository.deleteAll()
+    /// Permanently removes user data: every reading and profile value in the
+    /// on-device store, exported report files left in the temporary directory,
+    /// and (best-effort) the samples DailyDil wrote to Apple Health.
+    ///
+    /// Throws if the on-device store could not be wiped — the best-effort
+    /// cleanups never run first, so a failure is never masked by partial success.
+    public func deleteAllData() async throws {
+        try await repository.deleteAll()
         profile = .empty
+        Self.deleteExportedFiles()
+        await healthKit.deleteAllWrittenSamples()
         await refreshDashboard()
+    }
+
+    /// Removes exported report files (CSV/PDF) that the share flows wrote to the
+    /// temporary directory. Matches both brand prefixes ever shipped.
+    private static func deleteExportedFiles() {
+        let fm = FileManager.default
+        let tmp = fm.temporaryDirectory
+        guard let names = try? fm.contentsOfDirectory(atPath: tmp.path) else { return }
+        for name in names where name.hasPrefix("DailyDil-") || name.hasPrefix("Heartelfie-") {
+            try? fm.removeItem(at: tmp.appendingPathComponent(name))
+        }
     }
 
     public func enableHealthKit() async {
@@ -150,7 +179,7 @@ public final class AppEnvironment {
             profile: profile,
             skinTone: profile.monkSkinTone
         ) { [weak self] reading in
-            await self?.record(reading)
+            try await self?.record(reading)
         }
     }
 }

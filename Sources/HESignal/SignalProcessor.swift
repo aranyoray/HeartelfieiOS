@@ -55,6 +55,11 @@ public struct SignalProcessor: Sendable {
         guard let raw = channels[primaryChannel] ?? channels.values.first, raw.count > 8 else {
             return .failure(.sensorUnavailable)
         }
+        // A non-positive rate would produce NaN filter coefficients and a NaN SQI
+        // that leaks into the failure payload's UI formatting.
+        guard sampleRate > 0, sampleRate.isFinite else {
+            return .failure(.sensorUnavailable)
+        }
 
         let band = FilterBand.passband(for: modality)
         let filter = BandpassFilter(lowHz: band.low, highHz: band.high, sampleRate: sampleRate)

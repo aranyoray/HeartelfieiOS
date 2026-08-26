@@ -6,10 +6,13 @@ public enum HeartelfieConfig {
 
     // MARK: - Branding
 
-    public static let appName = "Heartelfie"
+    public static let appName = "DailyDil"
 
     // MARK: - Persistence
 
+    /// On-disk data directory name. Frozen at the original brand so existing
+    /// installs keep finding their encrypted readings after the DailyDil rename.
+    public static let storageDirectoryName = "Heartelfie"
     /// Keychain account name under which the local DB encryption key is stored.
     public static let encryptionKeyAccount = "com.heartelfie.dbkey"
     /// Keychain service identifier.

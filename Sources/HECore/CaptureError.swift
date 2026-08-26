@@ -15,6 +15,8 @@ public enum CaptureError: Error, Sendable, Hashable {
     case timeout
     /// The sensor/source is unavailable on this hardware.
     case sensorUnavailable
+    /// The reading was measured but could not be saved to the on-device store.
+    case persistenceFailure
 
     public var userMessage: String {
         switch self {
@@ -23,11 +25,13 @@ public enum CaptureError: Error, Sendable, Hashable {
         case .aborted:
             return "Capture cancelled."
         case .permissionDenied(let name):
-            return "Heartelfie needs \(name) access for this check. You can enable it in Settings."
+            return "DailyDil needs \(name) access for this check. You can enable it in Settings."
         case .timeout:
             return "That took longer than expected without a clean signal. Let's try again."
         case .sensorUnavailable:
             return "This sensor isn't available on your device."
+        case .persistenceFailure:
+            return "Your reading was measured but couldn't be saved on this device. Free up storage and try again."
         }
     }
 }

@@ -10,6 +10,7 @@ struct DataAndPrivacyView: View {
     @State private var showDeleteConfirm = false
     @State private var isDeleting = false
     @State private var didDelete = false
+    @State private var deleteFailed = false
 
     init() {}
 
@@ -33,7 +34,7 @@ struct DataAndPrivacyView: View {
             Button("Delete everything", role: .destructive) { deleteAll() }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This permanently removes every reading and profile value stored on this device. This cannot be undone.")
+            Text("This permanently removes every reading, profile value, and exported report file stored on this device, and asks Apple Health to delete the samples DailyDil wrote. This cannot be undone.")
         }
     }
 
@@ -160,7 +161,7 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "arrow.up.heart.fill",
                         title: "What DailyDil writes",
-                        detail: "With your permission, DailyDil writes only supported reading summaries back to Apple Health. Face frames, custom waveforms, and screening-only estimates that HealthKit does not represent are not written."
+                        detail: "With your permission, DailyDil saves your camera-based wellness estimates — heart rate, heart-rate variability, and breathing rate — to Apple Health, labelled as coming from DailyDil. Face frames, custom waveforms, and camera oxygen estimates that HealthKit does not represent are not written."
                     )
                     Text("You can change Apple Health permissions any time in the Health app.")
                         .font(.heCaption)
@@ -184,7 +185,14 @@ struct DataAndPrivacyView: View {
                             .font(.heCallout)
                             .foregroundStyle(Color.heTextSecondary)
                     } else {
-                        Text("Permanently remove every reading and profile value stored on this device.")
+                        if deleteFailed {
+                            Label("Deletion didn't finish — your data may still be on this device. Please try again.", systemImage: "exclamationmark.triangle.fill")
+                                .font(.heCallout)
+                                .foregroundStyle(Color.heRisk(.watch))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Text("Permanently remove every reading and profile value stored on this device, along with exported report files. DailyDil also asks Apple Health to delete the samples it wrote.")
                             .font(.heCallout)
                             .foregroundStyle(Color.heTextSecondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -230,10 +238,17 @@ struct DataAndPrivacyView: View {
     private func deleteAll() {
         guard !isDeleting else { return }
         isDeleting = true
+        deleteFailed = false
         Task {
-            await env.deleteAllData()
+            do {
+                try await env.deleteAllData()
+                didDelete = true
+            } catch {
+                // The store wipe failed — be honest that data may still exist
+                // rather than showing the success banner.
+                deleteFailed = true
+            }
             isDeleting = false
-            didDelete = true
         }
     }
 }

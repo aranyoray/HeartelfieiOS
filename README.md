@@ -1,260 +1,90 @@
-# Heartelfie
+# DailyDil
 
-A premium, production-grade iOS app for **daily cardiovascular wellness
-self-checks**, plus a companion **web wellness atlas** (see [`Web/`](Web/)).
+A production-grade iOS app for **daily cardiovascular wellness self-checks**
+using only the phone's cameras, plus a companion **web wellness atlas** (see
+[`Web/`](Web/)). Formerly named *Heartelfie*; the bundle identifier
+(`com.heartelfie.ios`) and on-disk/Keychain identifiers intentionally keep the
+old name so existing installs keep their data.
 
-Heartelfie is the companion app for the **Heartelfie hardware device** (a
-multi-wavelength finger-clip biosensor with heart-rhythm and bio-impedance
-sensing) *and* offers phone-only wellness screening when the device isn't
-connected.
-
-> **Heartelfie offers wellness and screening insights. It is not a medical
-> device and does not diagnose, treat, cure, or prevent any medical condition.**
-> If you think you're having a cardiac event, call your local emergency services
-> right away — do not rely on this app.
+> **DailyDil offers wellness and screening insights. It is not a medical
+> device and does not diagnose, treat, cure, or prevent any medical
+> condition.** If you think you're having a cardiac event, call your local
+> emergency services right away — do not rely on this app.
 
 > **App Store framing.** Every user-facing metric is intentionally
-> **wellness-framed** and non-diagnostic. Clinical/measurement terms
-> (blood pressure, hemoglobin, SpO₂, ECG…) are never shown as claims — see
-> [App Store compliance & wellness framing](#app-store-compliance--wellness-framing).
+> **wellness-framed** and non-diagnostic. The app contains no hardware/BLE
+> path: capture is limited to phone-camera screening (fingertip PPG with the
+> rear camera + torch, facial rPPG with the front camera).
 
 ---
 
 ## The one idea behind the architecture: be honest about every signal
 
-Every reading in Heartelfie carries, end-to-end, **where it came from** and **how
-much to trust it**. This is enforced in the type system, not just the UI.
+Every reading carries, end-to-end, **where it came from** and **how much to
+trust it** — enforced in the type system, not just the UI.
 
-### Two explicit tiers (`MeasurementTier`)
-
-| Tier | Source | Meaning |
-|------|--------|---------|
-| **Screening** | The phone's camera (finger PPG + facial rPPG) | Wellness-grade, lower confidence — *"not a medical measurement."* |
-| **Measurement** | The connected Heartelfie hardware device (BLE) | Higher-accuracy, clinical-grade path. |
-
-**A smartphone has no rhythm-sensing electrode.** The higher-confidence
-device-only signals (surfaced under wellness labels — *Heart Rhythm*, *Oxygen
-Wellness*, *Oxygen-Carry Wellness*) come *only* from the Heartelfie hardware. The
-phone produces wellness screening signals only (camera→PPG/rPPG).
-`MetricKind.isDeviceOnly` makes it impossible for a
-phone modality to surface a device-only metric, and a unit test
-(`HECoreTests.testPhoneModalitiesNeverExposeDeviceOnlyMetrics`) guards it.
-
-### Every reading is self-describing (`CardioReading`)
-
-A reading always carries its `tier`, a `Confidence` (0–1 + band), the
-`SignalQuality` (SQI), full model `Provenance` (engine + name + version +
-attribution), a softened `RiskLevel`, and a plain-language **non-diagnostic**
-interpretation.
-
-### Signal-quality gating is mandatory
-
-Every capture passes a **Signal Quality Index** check *before* any metric is
-computed (`SQIClassifier`). Poor captures are rejected with **specific,
-actionable** coaching ("hold still," "increase lighting," "reposition finger") —
-a metric is never computed from a rejected signal.
-
-### Skin-tone equity is a first-class feature
-
-Onboarding optionally captures a **Monk Skin Tone (1–10)** self-selection, which
-is passed into the processing/ML layer (optical PPG behaves differently across
-melanin levels) and whose use is disclosed to the user. The palette is
-colorblind-safe and imagery is inclusive.
-
----
+- `MeasurementTier.screening` — phone-camera signals; wellness-grade, lower
+  confidence. This is the only tier new readings can have.
+- `MeasurementTier.measurement` — retained **only** so readings recorded by
+  the retired hardware-device path still decode and render; nothing can
+  produce it anymore. The same applies to `MetricKind.isDeviceOnly` metrics.
+- Skin-tone equity is a first-class feature: onboarding optionally captures a
+  Monk Skin Tone (1–10) self-selection that is passed into the processing
+  layer and disclosed to the user.
 
 ## Modules (Swift Package Manager)
 
-The library layer is a single local Swift package (`./Package.swift`) with seven
-modules; the thin app target lives in `App/Heartelfie`.
+The library layer is a single local package (`./Package.swift`); a thin app
+target lives in `App/Heartelfie` (folder name kept for project stability).
 
-```
-HECore        Domain & contracts: tiers, modalities, metrics, readings, SQI,
-              confidence, provenance, risk, MonkSkinTone, ClinicalConfig
-              (centralized placeholder ranges), HeartelfieConfig (branding +
-              cloud + BLE placeholders), disclaimers. No UI, no I/O.
-
-HEDesign      Design system: programmatic light/dark tokens (color, type,
-              spacing, radius, shadow) + premium SwiftUI components (score ring,
-              live waveform, metric card, tier badge, confidence meter, SQI
-              coach, device chip, state views, Monk swatch…). Depends on HECore.
-
-HESignal      DSP: vDSP-backed bandpass biquad filters, peak detection, HR/HRV
-              (SDNN/RMSSD), autocorrelation-based SQI gate, and a SignalProcessor
-              that scopes metrics to each modality. Seedable synthetic PPG/ECG
-              generators. Depends on HECore.
-
-HESensors     Protocol-oriented sensor layer: CameraPPG / FaceRPPG /
-              HeartelfieDevice sensors, each with a Mock variant + a
-              BLE manager and simulated peripheral. Depends on HECore, HESignal.
-
-HEML          On-device CoreML wrappers (with stub fallbacks) + a cloud model
-              client (ECG-FM, PaPaGei/Pulse-PPG) with offline queue, retry, TLS
-              pinning hook, and realistic mock responses. Depends on HECore,
-              HESignal.
-
-HEPersistence Encrypted local store (AES-GCM + Keychain), HealthKit read/write
-              bridge, trends/streak aggregation, and PDF/CSV export. Depends on
-              HECore.
-
-HEFeatures    Screens, view models, navigation, and the capture pipeline that
-              wires everything together. Depends on all of the above.
-```
+| Module | Purpose |
+|--------|---------|
+| `HECore` | Domain & contracts: tiers, modalities, metrics, readings, SQI, confidence, provenance, risk, MonkSkinTone, `ClinicalConfig`, branding config, disclaimers. No UI, no I/O. |
+| `HEDesign` | Design system: light/dark tokens + SwiftUI components (score ring, live waveform, metric card, tier badge, confidence meter, SQI coach…). |
+| `HESignal` | DSP: vDSP-backed bandpass filtering (zero-phase, edge-padded), peak detection, HR/HRV (SDNN/RMSSD), autocorrelation SQI gate. Seedable synthetic PPG generators. |
+| `HESensors` | Camera sensors: `CameraPPGSensor` (rear camera + torch fingertip PPG) and `FaceRPPGSensor` (front camera rPPG), with mock variants for the simulator. |
+| `HEML` | On-device CoreML wrapper with an honest fallback: when no trained model ships, inference returns nothing and the DSP result stands (no fabricated metrics). |
+| `HEPersistence` | Encrypted local store (AES-GCM + Keychain, quarantine-on-corruption), HealthKit bridge, trends/streaks, PDF/CSV export. |
+| `HEFeatures` | Screens, view models, navigation; wires everything together. |
 
 Dependency direction is strictly downward; `HECore` depends on nothing.
 
----
-
-## The capture pipeline
+## Capture pipeline
 
 ```
 acquire (CardioSensor → AsyncStream<SignalFrame>)
-   → SQI gate (SQIClassifier — rejects here, with coaching)
-   → filter (BandpassFilter)
-   → feature-extract (PeakDetector, RRMetrics)
-   → infer (HESignal on-device + HEML on-device/cloud)
-   → CardioReading (metrics, confidence, tier, provenance, SQI, interpretation)
+  → live SQI coaching (SQIClassifier — actionable issues, never fabricated metrics)
+  → capture window (finger PPG: user-paced start/finish; min 20 s)
+  → bandpass filter → peak detection → HR/HRV features
+  → optional on-device inference (only if a real model is bundled)
+  → CardioReading (metrics, confidence, tier, provenance, SQI, interpretation)
 ```
 
-When a **device** measurement's confidence is low, the result screen offers a
-recheck and a "retake when rested" pathway.
+A reading that fails the SQI gate produces coaching, not numbers. Low-
+confidence results offer a recheck pathway.
 
-On **clinical (device measurement) results and any elevated reading**, a
-`CareAccessCard` surfaces non-diagnostic tips plus **immediate care links** — a
-no reading-driven emergency-call or hospital-finder
-search (`maps.apple.com`) — escalating to "get care now" framing when a reading
-is elevated. Phone numbers and the map query are placeholders in
-`HeartelfieConfig.Care` (localize per region — emergency numbers vary by
-country).
+## Building
 
----
-
-## Running it
-
-### Library + DSP tests (no app project needed)
-Open `Package.swift` in Xcode and run the tests, or:
-```bash
-swift test            # on macOS; runs HECoreTests + HESignalTests
+```sh
+brew install xcodegen        # once
+xcodegen generate            # produces DailyDil.xcodeproj from project.yml
+open DailyDil.xcodeproj      # scheme: DailyDil
 ```
 
-### The app
-```bash
-brew install xcodegen     # once
-xcodegen generate         # reads project.yml → Heartelfie.xcodeproj
-open Heartelfie.xcodeproj
-```
-- **Simulator:** runs fully with **no hardware** — all sensors fall back to mocks
-  and the device is simulated. The camera PPG is the one path that needs a
-  **physical device** (the Simulator has no camera).
-- A developer **"Simulate device"** toggle (Profile → Developer, and on the
-  pairing screen) forces the mock Heartelfie peripheral so the measurement tier
-  is fully demoable offline.
+Unit tests (DSP + core contracts) run via the DailyDil scheme or directly on
+the package: `HECoreTests`, `HESignalTests`.
 
----
+- Deployment target: iOS 17. Swift 6.
+- Signing: automatic, team set in `project.yml`.
+- Version/build: `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in
+  `project.yml` — bump the build number before each TestFlight upload.
 
-## Where to drop in real integrations
+## Privacy
 
-Everything replaceable is a clearly-labeled placeholder.
-
-| What | Where |
-|------|-------|
-| **Clinical reference ranges / thresholds** | `Sources/HECore/ClinicalConfig.swift` — the single source of truth. Nothing else hard-codes a medical threshold. |
-| **Product naming, cloud endpoints, BLE UUIDs** | `Sources/HECore/HeartelfieConfig.swift` — one file. |
-| **Real CoreML weights** (SQI / HR / rhythm screen) | `Sources/HEML/OnDeviceModels.swift` — marked `// MARK: - Drop real weights here`. Add the `.mlpackage`, load via `MLModel`, replace the heuristic fallback. |
-| **Cloud model API** (ECG-FM, PaPaGei/Pulse-PPG) | `Sources/HEML/CloudModelClient.swift` — flip `HeartelfieConfig.CloudAPI.useMockResponses` to `false`, set the base URL + real cert pins. |
-| **Real BLE GATT profile** | `Sources/HESensors/HeartelfieBLEManager.swift`, using the UUIDs in `HeartelfieConfig.BLE`. |
-| **Sample/replay waveforms** | Synthetic generators in `Sources/HESignal/SyntheticSignal.swift`; bundle real recordings to replay later. |
-
-> **Model provenance & attribution:** cloud-derived results always display model
-> name + version + attribution. The mock responses use the real research model
-> names (ECG-FM, PaPaGei/Pulse-PPG) precisely because production deployments must
-> honor those models' data-license attribution obligations.
-
----
-
-## Privacy & security
-
-- **On-device first.** Health data is stored in an AES-GCM-encrypted local store
-  with the key held in the Keychain (`HEPersistence`). Minimal PII.
-- **HealthKit bridge** reads HR, HRV, resting HR, oxygen-saturation, respiratory
-  rate, and (optionally, as a supplementary source) Apple Watch heart-rhythm data
-  from Apple Health; writes the HealthKit-supported sample types. Custom waveforms
-  and device wellness estimates stay only in the encrypted store.
-- **Transport:** TLS with a certificate-pinning hook for the cloud API.
-- **User control:** full export (PDF/CSV) and full delete.
-
-This is built as a **wellness / screening** app; the architecture is ready to
-gate clinical features behind future SaMD clearance. No diagnostic claims are
-made anywhere.
-
----
-
-## App Store compliance & wellness framing
-
-Heartelfie is positioned as a **wellness** app, not a medical device. To keep it
-reviewable on consumer app stores, clinically-restricted or diagnostic terms are
-**never surfaced to the user as claims** — they are replaced end-to-end with
-wellness-framed labels. Internal type/`rawValue` identifiers are unchanged (so
-persistence, ML routing, and device gating still work); only the user-facing
-copy is reframed.
-
-| Restricted / measurement term | Heartelfie wellness label |
-|-------------------------------|---------------------------|
-| High blood pressure / hypertension (atlas) | **Circulatory Strain** |
-| Coronary heart disease (atlas) | **Heart Health** |
-| Stroke (atlas) | **Brain Circulation** |
-| Hemoglobin | **Oxygen-Carry Wellness** |
-| Anemia risk | **Iron-Level Wellness** |
-| SpO₂ / blood oxygen | **Oxygen Wellness** |
-| ECG / electrocardiogram | **Heart Rhythm** / **Heart-Rhythm Insight** |
-| Rhythm irregularity | **Rhythm Variation** |
-
-Additional guardrails:
-
-- **Non-diagnostic disclaimers everywhere** — `Disclaimers.notMedicalDevice` and
-  `Disclaimers.notDiagnostic` are surfaced at onboarding (consent gate), on every
-  result/detail screen (`NonDiagnosticFooter`), and in About. The user must
-  affirmatively accept before using the app.
-- **Persistent emergency notice** (`Disclaimers.emergency`) directing users to
-  emergency services for suspected cardiac events.
-- **Device-only metrics are hardware-gated** at the type level; the phone never
-  claims a device-only wellness signal.
-- Before submission, set a real **support / privacy / terms** URL (the `Web/`
-  companion hosts `/support`, `/privacy`, `/terms`) and a monitored support
-  email (placeholder: `support@heartelfie.app`).
-
----
-
-## Web companion — Heartelfie Wellness Atlas (`Web/`)
-
-The [`Web/`](Web/) folder is the Heartelfie **web companion**: an interactive 3D
-atlas of U.S. county- and state-level **heart & circulatory wellness awareness**,
-built from public CDC PLACES community-health estimates (React + TypeScript +
-Vite + deck.gl). It was rebranded and reframed to the same wellness vocabulary
-as the iOS app.
-
-Because it is a **static web app** (a different stack from this native Swift
-package), it is co-located rather than code-merged — the two ship from one repo
-and share one brand, disclaimer voice, and terminology. The web app also provides
-the **`/privacy`, `/support`, and `/terms` pages** an App Store / Play Store
-submission links to for review.
-
-```bash
-cd Web
-npm install
-npm run dev        # http://localhost:5173
-npm run build      # tsc + vite build + route prerender
-```
-
-All atlas figures describe **geographic areas, never individuals**, and the
-shipped dataset is a clearly-badged synthetic placeholder until real CDC data is
-loaded (`npm run data:scrape`). See [`Web/README.md`](Web/README.md).
-
----
-
-## Tech
-
-Swift 6 (strict concurrency), SwiftUI (iOS 17+), async/await + actors +
-`AsyncStream`, CoreBluetooth, AVFoundation + Vision,
-Accelerate/vDSP, CoreML, Swift Charts, HealthKit, CryptoKit + Keychain. MVVM with
-a lightweight coordinator.
+- Camera frames are processed on-device and never stored or uploaded.
+- Readings are AES-GCM encrypted at rest; the key lives in the Keychain
+  (`ThisDeviceOnly`).
+- HealthKit read/write is optional and permission-gated; camera-based wellness
+  estimates are written to Apple Health only after the user approves access.
+- No accounts, no ads, no tracking. See the in-app Privacy Policy for the
+  authoritative copy.

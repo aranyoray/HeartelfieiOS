@@ -200,7 +200,7 @@ struct EditProfileView: View {
         } header: {
             Text("Prior conditions")
         } footer: {
-            Text("Optional. Helps Heartelfie phrase insights more carefully. Stored only on your device.")
+            Text("Optional. Helps DailyDil phrase insights more carefully. Stored only on your device.")
         }
     }
 

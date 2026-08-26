@@ -4,14 +4,14 @@ import HEDesign
 
 /// Step 2 - staged permission priming.
 ///
-/// Explains why Heartelfie asks for each capability before iOS shows a system
+/// Explains why DailyDil asks for each capability before iOS shows a system
 /// prompt. Camera is requested in context at first use. HealthKit has an explicit
 /// opt-in action here.
 struct OnboardingPermissionsStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: HESpacing.lg) {
             HESectionHeader(
-                title: "What Heartelfie may ask for",
+                title: "What DailyDil may ask for",
                 subtitle: "We only request access when it is needed for a check, and we explain why first.",
                 systemImage: "hand.raised.fill"
             )
@@ -33,7 +33,7 @@ struct OnboardingPermissionsStep: View {
     }
 }
 
-/// A single capability and the plain-language reason Heartelfie needs it.
+/// A single capability and the plain-language reason DailyDil needs it.
 private struct PermissionPrimer: Identifiable {
     let id: String
     let title: String

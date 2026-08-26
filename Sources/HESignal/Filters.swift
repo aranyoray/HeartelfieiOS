@@ -64,12 +64,29 @@ public struct BandpassFilter: Sendable {
 
     /// Zero-phase forward-backward filtering (filtfilt-style). Removes the phase
     /// delay so detected peak indices line up with the true signal.
+    ///
+    /// The input is mean-centred and reflect-padded before filtering: raw camera
+    /// channels carry a DC offset far larger than the pulse AC, and an IIR
+    /// starting from zero state produces edge transients of that magnitude —
+    /// enough to swamp the peak-detector threshold and the SQI amplitude check
+    /// for the first/last beats. Padding absorbs the transient; the pad is
+    /// trimmed from the result.
     public func filtfilt(_ x: [Double]) -> [Double] {
-        guard !x.isEmpty else { return x }
-        let forward = biquad.apply(x)
-        let reversed = Array(forward.reversed())
-        let back = biquad.apply(reversed)
-        return Array(back.reversed())
+        guard x.count > 2 else { return x }
+        let mean = x.reduce(0, +) / Double(x.count)
+        let centered = x.map { $0 - mean }
+
+        // ≈ 3 time constants of the low cutoff, bounded by the signal length.
+        let pad = min(x.count - 1, max(8, Int((3.0 * sampleRate / max(lowHz, 0.0001)).rounded())))
+        var padded = [Double]()
+        padded.reserveCapacity(centered.count + 2 * pad)
+        padded.append(contentsOf: centered[1...pad].reversed())
+        padded.append(contentsOf: centered)
+        padded.append(contentsOf: centered[(centered.count - 1 - pad)..<(centered.count - 1)].reversed())
+
+        let forward = biquad.apply(padded)
+        let back = Array(biquad.apply(Array(forward.reversed())).reversed())
+        return Array(back[pad..<(pad + centered.count)])
     }
 }
 

@@ -49,7 +49,7 @@ public struct Provenance: Codable, Sendable, Hashable {
     /// On-device DSP pipeline (heart rate / HRV from vDSP peak detection).
     public static let onDeviceDSP = Provenance(
         engine: .onDeviceDSP,
-        modelName: "Heartelfie DSP",
+        modelName: "DailyDil DSP",
         modelVersion: "1.0",
         attribution: nil
     )
@@ -57,7 +57,7 @@ public struct Provenance: Codable, Sendable, Hashable {
     /// On-device CoreML SQI / rhythm-screen bundle (stub weights — replace).
     public static let onDeviceCoreML = Provenance(
         engine: .onDeviceCoreML,
-        modelName: "Heartelfie CoreML Suite",
+        modelName: "DailyDil CoreML Suite",
         modelVersion: "0.1-stub",
         attribution: "Placeholder weights — drop in trained models. See README."
     )

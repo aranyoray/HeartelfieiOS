@@ -2,11 +2,17 @@ App Review Response
 
 Submission ID: ed97f05c-48a9-4e3d-8bec-15ba3e8c98e2
 Version reviewed: 1.0 (3)
-This reply applies to the new binary 1.0 (4).
+This reply applies to the new binary 1.1.0 (6).
+
+Note on the app name: the product has been renamed from "Heartelfie" to
+"DailyDil" in this binary (display name, in-app branding, and all user-facing
+copy). The bundle identifier (com.heartelfie.ios) is unchanged, so this is the
+same app record. References to "Heartelfie" below describe the previously
+reviewed binary.
 
 Guideline 1.4.1 - Safety - Physical Harm
 
-Heartelfie does not connect to external medical hardware and does not provide medical services through a hardware accessory.
+DailyDil does not connect to external medical hardware and does not provide medical services through a hardware accessory.
 
 The previous binary included an optional Bluetooth Heartelfie device path. That path has been fully removed:
 
@@ -21,7 +27,7 @@ Because the app no longer uses designated medical hardware:
 - We are not attaching a hardware test report or peer-reviewed hardware study, because no hardware is used.
 - We are not restricting storefronts for hardware clearance, because no hardware is used.
 
-Heartelfie is a wellness and screening app. It is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or condition. Readings are wellness snapshots from the iPhone or iPad camera, not clinical measurements.
+DailyDil is a wellness and screening app. It is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or condition. Readings are wellness snapshots from the iPhone or iPad camera, not clinical measurements.
 
 Guideline 2.1 - Demo video of hardware pairing
 

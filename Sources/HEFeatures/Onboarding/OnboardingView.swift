@@ -111,7 +111,7 @@ struct OnboardingView: View {
     private var primaryControl: some View {
         if step == .consent {
             HEPrimaryButton(
-                "Start using Heartelfie",
+                "Start using DailyDil",
                 systemImage: "heart.fill",
                 isLoading: isFinishing
             ) {
@@ -120,7 +120,7 @@ struct OnboardingView: View {
             .disabled(!draft.hasAcceptedConsent || isFinishing)
             .accessibilityHint(
                 draft.hasAcceptedConsent
-                    ? "Saves your preferences and opens Heartelfie"
+                    ? "Saves your preferences and opens DailyDil"
                     : "Accept the summary above to continue"
             )
         } else {
@@ -177,7 +177,7 @@ enum OnboardingStep: Int, CaseIterable, Hashable, Identifiable {
         case .permissions: return "Continue"
         case .skinTone: return "Continue"
         case .profile: return "Continue"
-        case .consent: return "Start using Heartelfie"
+        case .consent: return "Start using DailyDil"
         }
     }
 }

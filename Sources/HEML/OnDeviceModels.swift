@@ -23,19 +23,26 @@ public final class OnDeviceModels: Sendable {
     /// Screen a PPG/ECG-like waveform for rhythm irregularity.
     ///
     /// Loads a bundled CoreML model if one is present (see the integration note
-    /// below); otherwise falls back to a simple, transparent peak-interval
-    /// heuristic so the module always compiles and runs offline.
+    /// below). Returns `nil` when no model ships: the DSP stage's own
+    /// `rhythmIrregularity` metric is strictly better than the peak-interval
+    /// heuristic below (which measures RR coefficient-of-variation — a different
+    /// unit than the DSP metric's reference range — and caps confidence at 0.7),
+    /// so a nil here must leave the DSP result untouched rather than replace it.
     ///
-    /// - Returns: estimated irregularity percentage (0...100) and a `Confidence`.
-    public func screenRhythm(samples: [Double], sampleRate: Double) -> (irregularityPercent: Double, confidence: Confidence) {
+    /// - Returns: estimated irregularity percentage (0...100) and a `Confidence`,
+    ///   or `nil` when no trained model is available.
+    public func screenRhythm(samples: [Double], sampleRate: Double) -> (irregularityPercent: Double, confidence: Confidence)? {
         #if canImport(CoreML)
         if let model = Self.loadedRhythmModel,
            let result = Self.runRhythmModel(model, samples: samples, sampleRate: sampleRate) {
             return result
         }
         #endif
-        return Self.heuristicRhythm(samples: samples, sampleRate: sampleRate)
+        return nil
     }
+
+    /// Kept only as a reference implementation and for unit tests; not used in
+    /// the production inference path (see `screenRhythm`).
 
     /// Transparent fallback: estimate irregularity from the coefficient of
     /// variation of inter-peak intervals. Deliberately simple and clearly a

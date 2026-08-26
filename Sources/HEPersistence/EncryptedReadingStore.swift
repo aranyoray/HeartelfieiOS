@@ -114,7 +114,7 @@ public actor EncryptedReadingStore: ReadingRepository {
             appropriateFor: nil,
             create: true
         )
-        return base.appendingPathComponent(HeartelfieConfig.appName, isDirectory: true)
+        return base.appendingPathComponent(HeartelfieConfig.storageDirectoryName, isDirectory: true)
     }
 
     private static func ensureDirectoryExists(_ url: URL) throws {
@@ -156,10 +156,16 @@ public actor EncryptedReadingStore: ReadingRepository {
     /// Full delete for data portability: clears all readings, the profile, and
     /// removes the encrypted file from disk.
     public func deleteAll() async throws {
-        cache = .empty
+        // Remove the file first: if removal fails we must NOT reset the cache,
+        // or the UI reports success while the data quietly returns next launch.
         if FileManager.default.fileExists(atPath: fileURL.path) {
             try FileManager.default.removeItem(at: fileURL)
         }
+        let quarantineURL = fileURL.appendingPathExtension("corrupt")
+        if FileManager.default.fileExists(atPath: quarantineURL.path) {
+            try FileManager.default.removeItem(at: quarantineURL)
+        }
+        cache = .empty
     }
 
     // MARK: - Aggregations
@@ -203,12 +209,34 @@ public actor EncryptedReadingStore: ReadingRepository {
     }
 
     /// Reads + decrypts + decodes the snapshot, or returns `.empty` if no file.
+    ///
+    /// An unreadable blob (key mismatch after a device restore — the Keychain key
+    /// is `ThisDeviceOnly` while the file rides along in backups — or bit-rot) is
+    /// quarantined instead of thrown: the store restarts empty and stays usable,
+    /// rather than failing every subsequent `save` forever. The ciphertext is
+    /// kept beside the store as `*.corrupt` so nothing is silently destroyed.
     private func readFromDisk() throws -> Snapshot {
         guard FileManager.default.fileExists(atPath: fileURL.path) else { return .empty }
         let sealed = try Data(contentsOf: fileURL)
         guard !sealed.isEmpty else { return .empty }
-        let plaintext = try crypto.open(sealed)
-        return try decoder.decode(Snapshot.self, from: plaintext)
+        do {
+            let plaintext = try crypto.open(sealed)
+            return try decoder.decode(Snapshot.self, from: plaintext)
+        } catch {
+            try? quarantineUnreadableStore()
+            return .empty
+        }
+    }
+
+    /// Moves an undecryptable/undecodable blob aside so the store can restart.
+    private func quarantineUnreadableStore() throws {
+        let quarantineURL = fileURL.appendingPathExtension("corrupt")
+        // Keep only the most recent quarantined copy; this is a recovery aid,
+        // not an archive.
+        if FileManager.default.fileExists(atPath: quarantineURL.path) {
+            try FileManager.default.removeItem(at: quarantineURL)
+        }
+        try FileManager.default.moveItem(at: fileURL, to: quarantineURL)
     }
 
     /// Encodes + seals + atomically writes the snapshot, updating the cache.
@@ -219,11 +247,12 @@ public actor EncryptedReadingStore: ReadingRepository {
         cache = snapshot
     }
 
-    /// Atomic write, requesting full file protection on platforms that support it
-    /// (iOS data-protection class). Other platforms fall back to atomic only.
+    /// Atomic write with a data-protection class matching the Keychain key
+    /// (`AfterFirstUnlock…`): stricter Complete protection would make saves fail
+    /// while the device is locked even though the key is still available.
     private static var writeOptions: Data.WritingOptions {
         #if os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
-        return [.atomic, .completeFileProtection]
+        return [.atomic, .completeFileProtectionUntilFirstUserAuthentication]
         #else
         return [.atomic]
         #endif

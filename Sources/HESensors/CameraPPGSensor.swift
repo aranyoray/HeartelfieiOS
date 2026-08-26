@@ -8,6 +8,9 @@ import AVFoundation
 #if canImport(CoreVideo)
 import CoreVideo
 #endif
+#if canImport(QuartzCore)
+import QuartzCore
+#endif
 
 /// Transmissive **finger PPG** via the rear camera + torch (`.fingerPPG`).
 ///
@@ -17,8 +20,10 @@ import CoreVideo
 /// torch is switched on at start and off at stop. Phone PPG is wellness-grade
 /// `.screening` — never an ECG.
 ///
-/// If AVFoundation is unavailable (or there is no usable capture device, e.g. the
-/// Simulator) this falls back to synthetic frames so the type always works.
+/// On the Simulator (no camera hardware) this falls back to synthetic frames; on
+/// a real device a camera that cannot run (permission denied, configuration
+/// failure) ends the stream immediately so the UI reports the sensor as
+/// unavailable instead of quietly measuring a mock.
 @MainActor
 public final class CameraPPGSensor: NSObject, CardioSensor {
 
@@ -39,16 +44,29 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
     public func start() async -> AsyncStream<SignalFrame> {
         await stop()
         #if canImport(AVFoundation)
+        // Camera permission comes first: prompt if undetermined; if denied or
+        // restricted, return a stream that finishes immediately — the view model
+        // maps a stream that ends during preparing/coaching to
+        // `.sensorUnavailable`. Never measure a mock in place of a denied camera.
+        var status = AVCaptureDevice.authorizationStatus(for: .video)
+        if status == .notDetermined {
+            _ = await AVCaptureDevice.requestAccess(for: .video)
+            status = AVCaptureDevice.authorizationStatus(for: .video)
+        }
+        guard status == .authorized else { return Self.finishedStream() }
         if configureSession() {
             enableTorch(true)
             await startSession()
-            // Configuration can succeed yet the session still fail to start (camera
-            // busy, resource contention). Without this guard we'd return a stream
-            // that never emits and the capture UI would hang — fall back to the mock.
+            // Configuration can succeed yet the session still fail to start
+            // (camera busy, resource contention). Without this guard we'd return
+            // a stream that never emits and the capture UI would hang.
             guard session.isRunning else {
                 enableTorch(false)
-                return await startFallback()
+                return await unavailableStream()
             }
+            // Starting the session can reset the torch, so re-assert it now that
+            // the session is confirmed running.
+            enableTorch(true)
             let (stream, continuation) = AsyncStream<SignalFrame>.makeStream()
             self.continuation = continuation
             continuation.onTermination = { [weak self] _ in
@@ -57,8 +75,24 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
             return stream
         }
         #endif
-        // No camera available — behave like the mock.
+        // No camera available.
+        return await unavailableStream()
+    }
+
+    /// What to hand back when the camera cannot run: synthetic frames keep the
+    /// flow usable on the Simulator, but a real device gets an immediately
+    /// finished stream so the UI surfaces `.sensorUnavailable` — never mock data.
+    private func unavailableStream() async -> AsyncStream<SignalFrame> {
+        #if targetEnvironment(simulator) || !canImport(AVFoundation)
         return await startFallback()
+        #else
+        return Self.finishedStream()
+        #endif
+    }
+
+    /// A stream that ends immediately, signalling "no sensor" to the view model.
+    private static func finishedStream() -> AsyncStream<SignalFrame> {
+        AsyncStream { $0.finish() }
     }
 
     public func stop() async {
@@ -84,9 +118,9 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
     // MARK: - Capture session setup
 
     /// Build the rear-camera capture graph. Returns `false` if no usable device is
-    /// present (Simulator, permission revoked), signalling a fallback to the mock.
+    /// present (Simulator, hardware fault), signalling an unavailable camera.
     /// Idempotent: existing inputs/outputs are removed so `start()` can be called
-    /// again on the same instance without silently falling back to the mock.
+    /// again on the same instance without spuriously reporting unavailability.
     private func configureSession() -> Bool {
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
               let input = try? AVCaptureDeviceInput(device: device)
@@ -163,9 +197,11 @@ extension CameraPPGSensor: AVCaptureVideoDataOutputSampleBufferDelegate {
     ) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let presentation = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+        // Fallback must share the PTS host clock — a wall-clock (epoch) fallback
+        // would put one frame ~1.7e9 s away and garble the rate estimate.
         let timestamp = presentation.isValid
             ? CMTimeGetSeconds(presentation)
-            : Date().timeIntervalSince1970
+            : CACurrentMediaTime()
 
         guard let means = Self.channelMeans(of: pixelBuffer) else { return }
         let frame = SignalFrame(timestamp: timestamp, samples: [

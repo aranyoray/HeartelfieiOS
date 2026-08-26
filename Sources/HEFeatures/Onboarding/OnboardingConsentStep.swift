@@ -16,7 +16,7 @@ struct OnboardingConsentStep: View {
         VStack(alignment: .leading, spacing: HESpacing.lg) {
             HESectionHeader(
                 title: "Before you start",
-                subtitle: "A quick summary of what Heartelfie is — and isn't.",
+                subtitle: "A quick summary of what DailyDil is — and isn't.",
                 systemImage: "checkmark.shield.fill"
             )
 
@@ -96,13 +96,13 @@ struct OnboardingConsentStep: View {
     private var consentToggle: some View {
         HECard {
             Toggle(isOn: $draft.hasAcceptedConsent) {
-                Text("I understand Heartelfie offers wellness and screening insights, not a medical diagnosis.")
+                Text("I understand DailyDil offers wellness and screening insights, not a medical diagnosis.")
                     .font(.heCallout)
                     .foregroundStyle(Color.heTextPrimary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .tint(Color.hePrimary)
-            .accessibilityHint("Required to start using Heartelfie")
+            .accessibilityHint("Required to start using DailyDil")
         }
     }
 }

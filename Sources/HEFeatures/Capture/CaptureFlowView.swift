@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import HECore
 import HEDesign
 
@@ -12,6 +13,8 @@ import HEDesign
 public struct CaptureFlowView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openURL) private var openURL
 
     public let modality: Modality
     @State private var vm: CaptureViewModel?
@@ -69,6 +72,20 @@ public struct CaptureFlowView: View {
                 // finished reading or the user comes back to an empty capture.
                 if case .completed = vm?.phase { return }
                 await vm?.abort()
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            // Leaving the foreground mid-flow must tear the camera down (torch
+            // off, no half-captures); a finished or failed reading is left alone.
+            guard newPhase != .active else { return }
+            switch vm?.phase {
+            case .preparing, .coaching, .capturing, .processing:
+                countdownTask?.cancel()
+                countdownTask = nil
+                countdown = nil
+                Task { await vm?.abort() }
+            default:
+                break
             }
         }
     }
@@ -410,14 +427,22 @@ public struct CaptureFlowView: View {
                 Task { await vm.abort(); dismiss() }
             }
         } else if countdown == nil {
-            VStack(spacing: HESpacing.sm) {
-                HEPrimaryButton("Start Screening", systemImage: "record.circle") {
-                    startCountdown(for: vm)
+            // The countdown no-ops unless the stream is live, so only offer the
+            // start button once coaching has begun; before that, say why.
+            if vm.phase == .coaching {
+                VStack(spacing: HESpacing.sm) {
+                    HEPrimaryButton("Start Screening", systemImage: "record.circle") {
+                        startCountdown(for: vm)
+                    }
+                    Text("Get a steady signal above, then hold still for about \(Int(captureWindow)) seconds.")
+                        .font(.heCaption)
+                        .foregroundStyle(Color.heTextTertiary)
+                        .multilineTextAlignment(.center)
                 }
-                Text("Get a steady signal above, then hold still for about \(Int(captureWindow)) seconds.")
+            } else {
+                Text("Starting camera…")
                     .font(.heCaption)
                     .foregroundStyle(Color.heTextTertiary)
-                    .multilineTextAlignment(.center)
             }
         }
     }
@@ -450,6 +475,14 @@ public struct CaptureFlowView: View {
             }
             HEPrimaryButton("Try Again", systemImage: "arrow.clockwise") {
                 Task { await vm.retry() }
+            }
+            if case .sensorUnavailable = error {
+                // Camera-permission denial lands here; offer the direct fix.
+                HESecondaryButton("Open Settings", systemImage: "gear") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        openURL(url)
+                    }
+                }
             }
         }
         .padding(.top, HESpacing.lg)

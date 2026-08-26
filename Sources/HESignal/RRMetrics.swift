@@ -17,17 +17,27 @@ public struct RRMetrics: Sendable, Hashable {
     /// Compute features from RR intervals (ms). Returns `nil` if there are too few
     /// beats to be meaningful.
     public init?(rrIntervalsMS rr: [Double], minBeats: Int = 4) {
-        // Reject physiologically implausible intervals (250–2000 ms ≈ 30–240 bpm).
-        let clean = rr.filter { $0 >= 250 && $0 <= 2000 }
+        // Reject physiologically implausible intervals (250–2000 ms ≈ 30–240 bpm),
+        // keeping original indices so "successive" differences never span a
+        // removed artifact (stitching non-adjacent beats biases RMSSD).
+        let keptIndices = rr.indices.filter { rr[$0] >= 250 && rr[$0] <= 2000 }
+        let clean = keptIndices.map { rr[$0] }
         guard clean.count >= minBeats else { return nil }
 
         let meanRR = Vector.mean(clean)
         guard meanRR > 0 else { return nil }
 
         self.heartRateBPM = 60_000.0 / meanRR
-        self.sdnnMS = Vector.std(clean)
 
-        let successiveDiffs = Vector.diff(clean)
+        // Sample standard deviation (n−1), the SDNN convention; population std
+        // biases small windows low enough to cross the reference-range boundary.
+        let sumSq = clean.reduce(0) { $0 + ($1 - meanRR) * ($1 - meanRR) }
+        self.sdnnMS = (sumSq / Double(clean.count - 1)).squareRoot()
+
+        var successiveDiffs: [Double] = []
+        for k in 1..<keptIndices.count where keptIndices[k] == keptIndices[k - 1] + 1 {
+            successiveDiffs.append(clean[k] - clean[k - 1])
+        }
         self.rmssdMS = successiveDiffs.isEmpty ? 0 : Vector.rootMeanSquare(successiveDiffs)
 
         let median = Vector.median(clean)

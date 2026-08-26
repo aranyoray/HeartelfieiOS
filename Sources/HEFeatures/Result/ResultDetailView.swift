@@ -342,12 +342,12 @@ struct ResultDetailView: View {
             HEPrimaryButton("Export PDF", systemImage: "doc.richtext") {
                 Task { await prepareExport(.pdf) }
             }
-            .accessibilityHint("Prepares a PDF of this reading to share outside Heartelfie if you choose.")
+            .accessibilityHint("Prepares a PDF of this reading to share outside DailyDil if you choose.")
 
             HESecondaryButton("Export CSV", systemImage: "tablecells", isLoading: isPreparingExport) {
                 Task { await prepareExport(.csv) }
             }
-            .accessibilityHint("Prepares a CSV of this reading to share outside Heartelfie if you choose.")
+            .accessibilityHint("Prepares a CSV of this reading to share outside DailyDil if you choose.")
         }
     }
 
@@ -392,11 +392,11 @@ struct ResultDetailView: View {
             let dir = FileManager.default.temporaryDirectory
             switch format {
             case .csv:
-                let target = dir.appendingPathComponent("Heartelfie-Reading-\(stamp).csv")
+                let target = dir.appendingPathComponent("DailyDil-Reading-\(stamp).csv")
                 try? exporter.writeCSV([single], to: target)
                 return FileManager.default.fileExists(atPath: target.path) ? target : nil
             case .pdf:
-                let target = dir.appendingPathComponent("Heartelfie-Reading-\(stamp).pdf")
+                let target = dir.appendingPathComponent("DailyDil-Reading-\(stamp).pdf")
                 try? exporter.writePDF([single], profile: profile, to: target)
                 return FileManager.default.fileExists(atPath: target.path) ? target : nil
             }

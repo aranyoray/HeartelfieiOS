@@ -240,7 +240,7 @@ struct ProfileView: View {
         } header: {
             Text("Apple Health / HealthKit")
         } footer: {
-            Text("HealthKit integration is optional. Heartelfie can read supported Apple Health values and write supported reading summaries only after you approve access.")
+            Text("HealthKit integration is optional. DailyDil can read supported Apple Health values and write supported reading summaries only after you approve access.")
         }
     }
 
@@ -281,7 +281,7 @@ struct ProfileView: View {
             EmptyView()
         } footer: {
             VStack(alignment: .leading, spacing: HESpacing.xxs) {
-                Text("\(HeartelfieConfig.appName) 1.0")
+                Text("\(HeartelfieConfig.appName) \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.1.0") (\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "5"))")
                     .font(.heCaption.weight(.medium))
                     .foregroundStyle(Color.heTextSecondary)
                 Text("Wellness and screening only — not a medical device. Model name and version are shown with each reading.")

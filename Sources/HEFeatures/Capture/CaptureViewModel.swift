@@ -33,6 +33,9 @@ public final class CaptureViewModel {
     public private(set) var liveWaveform: [Double] = []
     /// Live signal-quality estimate used to coach the user before/while capturing.
     public private(set) var liveQuality: SignalQuality?
+    /// Current live heart-rate estimate (for the pulse animation), if resolvable.
+    /// Recomputed on the coaching cadence in `ingest`, not on every UI read.
+    public private(set) var liveBPM: Double?
     /// 0...1 progress through the capture window.
     public private(set) var captureProgress: Double = 0
     public private(set) var elapsedSeconds: Double = 0
@@ -42,7 +45,7 @@ public final class CaptureViewModel {
     private let inference: any InferenceProviding
     private let profile: HealthProfile?
     private let skinTone: MonkSkinTone?
-    private let onComplete: (CardioReading) async -> Void
+    private let onComplete: (CardioReading) async throws -> Void
 
     // Pipeline state
     private let processor = SignalProcessor()
@@ -66,7 +69,7 @@ public final class CaptureViewModel {
         inference: any InferenceProviding,
         profile: HealthProfile?,
         skinTone: MonkSkinTone?,
-        onComplete: @escaping (CardioReading) async -> Void
+        onComplete: @escaping (CardioReading) async throws -> Void
     ) {
         self.modality = modality
         self.sensors = sensors
@@ -100,8 +103,12 @@ public final class CaptureViewModel {
     /// Begin the capture window (typically after a short countdown in the UI).
     public func startCapture() {
         guard phase == .coaching else { return }
-        // Collect a fresh window so the processed signal is just the capture.
-        resetBuffers()
+        // Collect a fresh window so the processed signal is just the capture, but
+        // keep the live waveform/quality/BPM on screen — clearing them here makes
+        // the UI regress to "waiting for signal" for a second mid-save.
+        channelBuffers.removeAll()
+        timestamps.removeAll()
+        captureStartTimestamp = nil
         captureProgress = 0
         elapsedSeconds = 0
         isFinishing = false
@@ -127,9 +134,10 @@ public final class CaptureViewModel {
     private func captureDeadlineReached() async {
         guard phase == .capturing, !isFinishing else { return }
         isFinishing = true
-        let primary = channelBuffers[SignalProcessor.primaryChannel(for: modality)]
-            ?? channelBuffers.values.first ?? []
-        if primary.count > 30 {
+        // Only hand the buffer to the SQI gate if it can plausibly pass the
+        // minimum-duration check; a short stall should surface as a timeout, not
+        // a guaranteed-to-fail quality rejection.
+        if elapsedSeconds >= ClinicalConfig.minimumCaptureSeconds(for: modality) {
             await finishCapture()
         } else {
             await stopSensor()
@@ -185,6 +193,24 @@ public final class CaptureViewModel {
     // MARK: - Streaming
 
     private func ingest(_ frame: SignalFrame) {
+        // A long timestamp gap (backgrounding, camera stall, face lost) means the
+        // buffer is no longer one continuous signal — never splice across it.
+        if let last = timestamps.last, frame.timestamp - last > 2.0 {
+            if phase == .capturing, !isFinishing {
+                isFinishing = true
+                Task {
+                    await stopSensor()
+                    phase = .failed(.timeout)
+                }
+                return
+            }
+            if phase == .coaching {
+                // Restart the coaching buffer so the stitched signal never
+                // feeds the live BPM estimate.
+                resetBuffers()
+            }
+        }
+
         for sample in frame.samples {
             channelBuffers[sample.channel, default: []].append(sample.value)
         }
@@ -197,6 +223,7 @@ public final class CaptureViewModel {
         // Live coaching ~ every 15 new samples once we have a little signal.
         if primary.count > 30, primary.count % 15 == 0 {
             updateLiveQuality(primary: primary)
+            updateLiveBPM()
         }
 
         if phase == .capturing {
@@ -213,12 +240,16 @@ public final class CaptureViewModel {
     }
 
     /// Effective sample rate from observed timestamps, falling back to nominal.
+    /// Clamped to a physically plausible band: one bad timestamp can push the
+    /// estimate past Nyquist limits and destabilize the bandpass biquad.
     private var sampleRate: Double {
         guard let first = timestamps.first, let last = timestamps.last,
               last > first, timestamps.count > 1 else {
             return modality.nominalSampleRate
         }
-        return Double(timestamps.count - 1) / (last - first)
+        let estimated = Double(timestamps.count - 1) / (last - first)
+        guard (3.0...120.0).contains(estimated) else { return modality.nominalSampleRate }
+        return estimated
     }
 
     private func updateLiveQuality(primary: [Double]) {
@@ -233,12 +264,31 @@ public final class CaptureViewModel {
             modality: modality
         )
         // During coaching the buffer is short by design — don't nag about duration.
+        // Everything else — notably the classifier's saturation veto (finger
+        // pressed too hard) — carries into acceptability, so the live coach never
+        // shows green for a signal the gate is guaranteed to reject.
         let issues = phase == .capturing ? quality.issues : quality.issues.filter { $0 != .tooShort }
         liveQuality = SignalQuality(
             sqi: quality.sqi,
-            isAcceptable: quality.sqi >= ClinicalConfig.sqiAcceptanceThreshold,
+            isAcceptable: quality.sqi >= ClinicalConfig.sqiAcceptanceThreshold
+                && !issues.contains(.saturation),
             issues: issues
         )
+    }
+
+    /// Refresh the live heart-rate estimate from the recent waveform. Runs on the
+    /// same cadence as `updateLiveQuality` so the DSP cost is bounded per frame.
+    private func updateLiveBPM() {
+        guard liveWaveform.count > 40 else {
+            liveBPM = nil
+            return
+        }
+        let band = FilterBand.passband(for: modality)
+        let sr = sampleRate
+        let filtered = BandpassFilter(lowHz: band.low, highHz: band.high, sampleRate: sr).filtfilt(liveWaveform)
+        let peaks = PeakDetector().peakIndices(in: filtered, sampleRate: sr)
+        let rr = PeakDetector().rrIntervalsMS(peakIndices: peaks, sampleRate: sr)
+        liveBPM = RRMetrics(rrIntervalsMS: rr, minBeats: 2)?.heartRateBPM
     }
 
     // MARK: - Finish + process
@@ -258,6 +308,9 @@ public final class CaptureViewModel {
         let result = await Task.detached {
             processor.process(channels: channels, sampleRate: sr, modality: modality, profile: profile)
         }.value
+        // The user may have aborted while processing ran — don't let a cancelled
+        // capture resolve to `.completed` (and fire `onComplete`) behind them.
+        guard phase == .processing else { return }
 
         switch result {
         case .failure(let error):
@@ -273,6 +326,8 @@ public final class CaptureViewModel {
                 profile: profile,
                 skinTone: skinTone
             )
+            // Same abort re-check after the inference await.
+            guard phase == .processing else { return }
 
             let metrics = CardioMetric.merging(processed.metrics, withInferred: inferred.metrics)
             let didApplyInference = metrics.contains { merged in
@@ -293,8 +348,14 @@ public final class CaptureViewModel {
                 monkSkinTone: skinTone,
                 waveformPreview: processed.cleanWaveform
             )
-            phase = .completed(reading)
-            await onComplete(reading)
+            // Only mark completed once the reading is actually persisted; a save
+            // failure is surfaced instead of silently dropping the reading.
+            do {
+                try await onComplete(reading)
+                phase = .completed(reading)
+            } catch {
+                phase = .failed(.persistenceFailure)
+            }
         }
     }
 
@@ -328,6 +389,11 @@ public final class CaptureViewModel {
         channelBuffers.removeAll()
         timestamps.removeAll()
         captureStartTimestamp = nil
+        // Clear the live UI state too, so a retry/begin never shows a stale
+        // "looking good" coach or a stale-enabled save button.
+        liveWaveform = []
+        liveQuality = nil
+        liveBPM = nil
         isFinishing = false
         isTearingDown = false
     }
@@ -338,17 +404,6 @@ public final class CaptureViewModel {
     }
 
     // MARK: - Convenience for the UI
-
-    /// Current live heart-rate estimate (for the pulse animation), if resolvable.
-    public var liveBPM: Double? {
-        guard liveWaveform.count > 40 else { return nil }
-        let band = FilterBand.passband(for: modality)
-        let sr = sampleRate
-        let filtered = BandpassFilter(lowHz: band.low, highHz: band.high, sampleRate: sr).filtfilt(liveWaveform)
-        let peaks = PeakDetector().peakIndices(in: filtered, sampleRate: sr)
-        let rr = PeakDetector().rrIntervalsMS(peakIndices: peaks, sampleRate: sr)
-        return RRMetrics(rrIntervalsMS: rr, minBeats: 2)?.heartRateBPM
-    }
 
     public var completedReading: CardioReading? {
         if case .completed(let reading) = phase { return reading }

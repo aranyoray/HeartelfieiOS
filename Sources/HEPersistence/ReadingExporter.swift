@@ -91,16 +91,17 @@ public struct ReadingExporter: Sendable {
 
     // MARK: - File convenience
 
-    /// Writes CSV to `url` (UTF-8).
+    /// Writes CSV to `url` (UTF-8). Export files carry full data-protection so
+    /// they stay encrypted at rest until they're shared or cleaned up.
     public func writeCSV(_ readings: [CardioReading], to url: URL) throws {
         let text = csv(readings: readings)
-        try text.data(using: .utf8)?.write(to: url, options: [.atomic])
+        try text.data(using: .utf8)?.write(to: url, options: [.atomic, .completeFileProtection])
     }
 
-    /// Writes a PDF summary to `url`.
+    /// Writes a PDF summary to `url` (same protection as ``writeCSV(_:to:)``).
     public func writePDF(_ readings: [CardioReading], profile: HealthProfile?, to url: URL) throws {
         let data = pdf(readings: readings, profile: profile)
-        try data.write(to: url, options: [.atomic])
+        try data.write(to: url, options: [.atomic, .completeFileProtection])
     }
 }
 

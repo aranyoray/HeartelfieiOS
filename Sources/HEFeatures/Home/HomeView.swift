@@ -22,6 +22,9 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
                 greetingHeader
+                if env.storageDegraded {
+                    storageWarningCard
+                }
                 snapshotSection
                 HomeTrendsCard()
                 StreakCard(streak: env.streak, recentReadings: env.recentReadings)
@@ -65,6 +68,30 @@ struct HomeView: View {
         case 17..<22: return "Good evening"
         default: return "Hello"
         }
+    }
+
+    // MARK: - Storage warning
+
+    /// Compact warning shown when the encrypted store couldn't be opened and the
+    /// app is running on in-memory storage — readings won't survive a relaunch.
+    private var storageWarningCard: some View {
+        HECard {
+            HStack(alignment: .top, spacing: HESpacing.sm) {
+                Image(systemName: "externaldrive.badge.exclamationmark")
+                    .font(.heHeadline)
+                    .foregroundStyle(Color.heRisk(.watch))
+                    .accessibilityHidden(true)
+                Text("On-device storage is unavailable right now, so new readings won't be kept after you close the app.")
+                    .font(.heCallout)
+                    .foregroundStyle(Color.heTextSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous)
+                .strokeBorder(Color.heRisk(.watch).opacity(0.25), lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Today's snapshot
