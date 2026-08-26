@@ -16,7 +16,12 @@ public struct HECard<Content: View>: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous)
-                    .fill(Color.heSurface)
+                    .fill(Color.heSurface.opacity(0.72))
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous)
+                    .strokeBorder(Color.heSeparator.opacity(0.8), lineWidth: 1)
             )
             .heCardShadow()
     }
@@ -39,15 +44,16 @@ public struct HESectionHeader: View {
         HStack(alignment: .firstTextBaseline, spacing: HESpacing.sm) {
             if let systemImage {
                 Image(systemName: systemImage)
-                    .font(.heHeadline)
+                    .font(.heCaption.weight(.semibold))
                     .foregroundStyle(Color.hePrimary)
                     .accessibilityHidden(true)
             }
 
             VStack(alignment: .leading, spacing: HESpacing.xxs) {
-                Text(title)
-                    .font(.heTitle)
-                    .foregroundStyle(Color.heTextPrimary)
+                Text(title.uppercased())
+                    .font(.heCaption.weight(.semibold))
+                    .kerning(1.4)
+                    .foregroundStyle(Color.heTextSecondary)
 
                 if let subtitle {
                     Text(subtitle)

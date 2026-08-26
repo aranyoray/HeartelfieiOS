@@ -6,6 +6,8 @@ import SwiftUI
 /// "clinical-calm meets premium" tone, so steps grow on an 8-pt rhythm with a
 /// couple of finer values for tight, glanceable layouts.
 public enum HESpacing {
+    /// Standard horizontal screen margin (iOS-native 20pt gutter).
+    public static let screen: CGFloat = 20
     /// 2 pt — hairline gaps between tightly coupled glyphs/labels.
     public static let xxs: CGFloat = 2
     /// 4 pt — icon-to-label spacing inside chips.

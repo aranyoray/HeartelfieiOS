@@ -33,7 +33,8 @@ struct HomeView: View {
                 insightsLink
                 EmergencyNotice()
             }
-            .padding(HESpacing.md)
+            .padding(.horizontal, HESpacing.screen)
+            .padding(.vertical, HESpacing.md)
         }
         .background(Color.heBackground)
         .navigationTitle("DailyDil")

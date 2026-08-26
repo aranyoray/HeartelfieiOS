@@ -49,10 +49,10 @@ struct SnapshotProvider: TimelineProvider {
 }
 
 // Brand colors, mirrored from HEDesign (widget stays dependency-free).
-private let heTeal = Color(red: 0x1E / 255, green: 0x6E / 255, blue: 0x78 / 255)
-private let heTealDeep = Color(red: 0x14 / 255, green: 0x4B / 255, blue: 0x52 / 255)
+private let heCyanDeep = Color(red: 0x15 / 255, green: 0x5E / 255, blue: 0x75 / 255)
+private let heIndigoDeep = Color(red: 0x31 / 255, green: 0x2E / 255, blue: 0x81 / 255)
 private let heGradient = LinearGradient(
-    colors: [heTeal, heTealDeep], startPoint: .topLeading, endPoint: .bottomTrailing
+    colors: [heCyanDeep, heIndigoDeep], startPoint: .topLeading, endPoint: .bottomTrailing
 )
 
 struct DailyDilWidgetView: View {

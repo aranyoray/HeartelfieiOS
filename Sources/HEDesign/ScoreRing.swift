@@ -40,6 +40,7 @@ public struct ScoreRing: View {
                     style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
+                .shadow(color: tint.opacity(0.45), radius: 10)
 
             // Center readout.
             VStack(spacing: HESpacing.xxs) {

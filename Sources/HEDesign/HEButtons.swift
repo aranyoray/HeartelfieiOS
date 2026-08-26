@@ -14,7 +14,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.heHeadline.weight(.semibold))
-            .foregroundStyle(.white)
+            .foregroundStyle(Color(hex: "06121F"))
             .frame(maxWidth: .infinity)
             .padding(.vertical, HESpacing.md)
             .padding(.horizontal, HESpacing.lg)

@@ -16,7 +16,7 @@ public struct HEHeroCard<Content: View>: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: HERadius.xl, style: .continuous)
-                    .fill(Color.hePrimaryGradient)
+                    .fill(Color.heHeroGradient)
             )
             .heCardShadow()
     }

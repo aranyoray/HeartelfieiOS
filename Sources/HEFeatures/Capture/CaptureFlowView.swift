@@ -43,7 +43,8 @@ public struct CaptureFlowView: View {
                         .frame(height: 280)
                 }
             }
-            .padding(HESpacing.md)
+            .padding(.horizontal, HESpacing.screen)
+            .padding(.vertical, HESpacing.md)
         }
         .background(Color.heBackground)
         .navigationTitle(modality.shortName)
@@ -193,7 +194,7 @@ public struct CaptureFlowView: View {
     private func readyCard(for vm: CaptureViewModel) -> some View {
         HECard {
             VStack(spacing: HESpacing.md) {
-                iconBadge("camera.metering.center.weighted", size: 72)
+                iconBadge("camera.aperture", size: 72)
                 Text("Ready to take a reading")
                     .font(.heHeadline)
                     .foregroundStyle(Color.heTextPrimary)
@@ -251,15 +252,15 @@ public struct CaptureFlowView: View {
         if !hasContact {
             headline = "Rest a fingertip over the rear camera"
             support = "Cover the camera and torch gently, then hold still."
-            glyph = "hand.point.up.left.fill"
+            glyph = "hand.tap.fill"
         } else if !hasEstimate {
             headline = "Hold still, settling…"
             support = "Stay relaxed for a few seconds while the estimate steadies."
-            glyph = "hand.point.up.left.fill"
+            glyph = "hand.tap.fill"
         } else {
             headline = "Looking good — keep holding"
             support = "Stay relaxed for a few seconds while the estimate steadies."
-            glyph = "hand.thumbsup.fill"
+            glyph = "checkmark.circle.fill"
         }
         return HECard {
             VStack(alignment: .leading, spacing: HESpacing.md) {

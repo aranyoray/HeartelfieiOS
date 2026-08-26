@@ -48,7 +48,7 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
 
     public var systemImage: String {
         switch self {
-        case .fingerPPG: return "hand.point.up.left.fill"
+        case .fingerPPG: return "hand.tap.fill"
         case .facialRPPG: return "face.smiling"
         }
     }

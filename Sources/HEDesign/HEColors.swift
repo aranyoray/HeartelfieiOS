@@ -74,34 +74,34 @@ public extension Color {
     // Surfaces ---------------------------------------------------------------
 
     /// App background — a soft, warm-cool off-white in light, near-black in dark.
-    static let heBackground = Color.heDynamic(light: 0xF4F6F8, dark: 0x0B0F12)
+    static let heBackground = Color.heDynamic(light: 0xF3F6FB, dark: 0x0A0E1A)
 
     /// Primary card surface.
-    static let heSurface = Color.heDynamic(light: 0xFFFFFF, dark: 0x161B20)
+    static let heSurface = Color.heDynamic(light: 0xFFFFFF, dark: 0x131A2B)
 
     /// Slightly raised surface (sheets, popovers, nested cards).
-    static let heSurfaceElevated = Color.heDynamic(light: 0xFFFFFF, dark: 0x1F262C)
+    static let heSurfaceElevated = Color.heDynamic(light: 0xFFFFFF, dark: 0x1C2540)
 
     // Brand ------------------------------------------------------------------
 
     /// Primary brand color — a calm deep teal/indigo that conveys medical trust.
-    static let hePrimary = Color.heDynamic(light: 0x1E6E78, dark: 0x4FB8C4)
+    static let hePrimary = Color.heDynamic(light: 0x0D9488, dark: 0x2DD4BF)
 
     /// A deeper variant of the primary, for gradients and pressed states.
-    static let hePrimaryDeep = Color.heDynamic(light: 0x123E54, dark: 0x2C7A88)
+    static let hePrimaryDeep = Color.heDynamic(light: 0x115E59, dark: 0x0E7490)
 
     /// Warm accent used sparingly for highlights and selection.
-    static let heAccent = Color.heDynamic(light: 0x5B6CCB, dark: 0x8C9BF0)
+    static let heAccent = Color.heDynamic(light: 0x6366F1, dark: 0x818CF8)
 
     // Text -------------------------------------------------------------------
 
-    static let heTextPrimary = Color.heDynamic(light: 0x14202A, dark: 0xF2F5F7)
-    static let heTextSecondary = Color.heDynamic(light: 0x52606B, dark: 0xAEBAC4)
-    static let heTextTertiary = Color.heDynamic(light: 0x8593A0, dark: 0x70808C)
+    static let heTextPrimary = Color.heDynamic(light: 0x14202A, dark: 0xF5F8FF)
+    static let heTextSecondary = Color.heDynamic(light: 0x52606B, dark: 0x9FB0C7)
+    static let heTextTertiary = Color.heDynamic(light: 0x8593A0, dark: 0x64748B)
 
     // Lines ------------------------------------------------------------------
 
-    static let heSeparator = Color.heDynamic(light: 0xE2E7EC, dark: 0x2A333B)
+    static let heSeparator = Color.heDynamic(light: 0xE4E9F2, dark: 0x233052)
 
     /// Diffuse shadow tint (kept very soft to read as calm depth).
     static let heShadow = Color.heDynamic(light: 0x14202A, dark: 0x000000)
@@ -109,9 +109,17 @@ public extension Color {
 
     // Gradients --------------------------------------------------------------
 
-    /// The brand gradient used on the score ring and primary buttons.
+    /// The bright action gradient — mint into cyan — for buttons and the ring.
     static let hePrimaryGradient = LinearGradient(
-        colors: [Color.hePrimary, Color.hePrimaryDeep],
+        colors: [Color(hex: "2DD4BF"), Color(hex: "0891B2")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    /// The deep hero gradient — cyan into indigo — for hero surfaces where
+    /// white text and translucent chips sit on top.
+    static let heHeroGradient = LinearGradient(
+        colors: [Color(hex: "155E75"), Color(hex: "312E81")],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
@@ -131,9 +139,9 @@ public extension Color {
     /// - unknown:  neutral gray
     static func heRisk(_ risk: RiskLevel) -> Color {
         switch risk {
-        case .normal:   return Color.heDynamic(light: 0x2E8B7F, dark: 0x55C2A8)
-        case .watch:    return Color.heDynamic(light: 0xC9881F, dark: 0xE6B450)
-        case .elevated: return Color.heDynamic(light: 0xD06A5C, dark: 0xE8897A)
+        case .normal:   return Color.heDynamic(light: 0x2E8B7F, dark: 0x34D399)
+        case .watch:    return Color.heDynamic(light: 0xC9881F, dark: 0xFBBF24)
+        case .elevated: return Color.heDynamic(light: 0xD06A5C, dark: 0xFB7185)
         case .unknown:  return Color.heDynamic(light: 0x8593A0, dark: 0x70808C)
         }
     }
