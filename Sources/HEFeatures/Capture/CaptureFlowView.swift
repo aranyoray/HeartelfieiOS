@@ -589,15 +589,12 @@ struct CaptureResultSummary: View {
                     }
 
                     HStack(spacing: HESpacing.sm) {
-                        TierBadge(reading.tier)
-                        ConfidenceMeter(reading.confidence)
+                        HEHeroChip(reading.tier.shortLabel, systemImage: "camera.viewfinder")
+                        HEHeroChip(
+                            "\(reading.confidence.band.displayName) · \(Int((reading.confidence.value * 100).rounded()))%",
+                            systemImage: "gauge.with.needle"
+                        )
                     }
-                    .padding(.horizontal, HESpacing.xs)
-                    .padding(.vertical, HESpacing.xxs)
-                    .background(RoundedRectangle(cornerRadius: HERadius.md, style: .continuous).fill(.white.opacity(0.92)))
-                    // The strip is a fixed white surface; dynamic dark-mode text
-                    // colors would render near-white-on-white.
-                    .environment(\.colorScheme, .light)
                 }
             }
 

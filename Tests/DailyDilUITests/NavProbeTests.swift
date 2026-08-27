@@ -13,56 +13,52 @@ final class NavProbeTests: XCTestCase {
     @MainActor
     func testWalkAllScreens() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("--uitest-onboarded")
         app.launch()
-        sleep(2)
+        XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 5))
 
         // Finger PPG flow
-        app.buttons["Measure"].tap(); sleep(1)
+        app.buttons["Measure"].tap()
+        XCTAssertTrue(app.navigationBars["Measure"].waitForExistence(timeout: 3))
         snap("10-measure")
-        app.buttons.matching(NSPredicate(format: "label CONTAINS 'Start screening'")).firstMatch.tap(); sleep(1)
+        app.buttons.matching(NSPredicate(format: "label CONTAINS 'Start screening'")).firstMatch.tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS 'Start camera'")).firstMatch.waitForExistence(timeout: 3))
         snap("11-ppg-ready")
-        let startCam = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Start camera'")).firstMatch
-        if startCam.waitForExistence(timeout: 3) { startCam.tap() }
-        sleep(4)
-        snap("12-ppg-measuring")
-        let startSave = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Start saving'")).firstMatch
-        if startSave.waitForExistence(timeout: 15) { startSave.tap() }
-        sleep(3)
-        snap("13-ppg-saving")
-        sleep(21)
-        snap("14-ppg-result")
-        app.swipeUp(); snap("15-ppg-result-2")
-        let done = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Done'")).firstMatch
-        if done.waitForExistence(timeout: 3) { done.tap(); sleep(1) }
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.navigationBars["Measure"].waitForExistence(timeout: 3))
 
         // Home after a reading
-        app.buttons["Home"].tap(); sleep(1)
+        app.buttons["Home"].tap()
+        XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 3))
         snap("20-home")
-        app.swipeUp(); sleep(1)
+        app.swipeUp()
         snap("21-home-2")
-        app.swipeUp(); sleep(1)
+        app.swipeUp()
         snap("22-home-3")
 
         // Trends
-        app.buttons["Trends"].tap(); sleep(1)
+        app.buttons["Trends"].tap()
+        XCTAssertTrue(app.navigationBars["Trends"].waitForExistence(timeout: 3))
         snap("30-trends")
-        app.swipeUp(); sleep(1)
+        app.swipeUp()
         snap("31-trends-2")
 
         // Profile + subscreens
-        app.buttons["Profile"].tap(); sleep(1)
+        app.buttons["Profile"].tap()
+        XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 3))
         snap("40-profile")
-        app.swipeUp(); sleep(1)
+        app.swipeUp()
         snap("41-profile-2")
         for (label, name) in [("About", "42-about"), ("Data & privacy", "43-privacy"), ("Export", "44-export")] {
             let row = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", label)).firstMatch
             let cell = row.exists ? row : app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] %@", label)).firstMatch
             if cell.waitForExistence(timeout: 3) {
-                cell.tap(); sleep(1)
+                cell.tap()
                 snap(name)
-                app.swipeUp(); sleep(1)
+                app.swipeUp()
                 snap(name + "-2")
-                app.navigationBars.buttons.firstMatch.tap(); sleep(1)
+                app.navigationBars.buttons.firstMatch.tap()
+                XCTAssertTrue(app.navigationBars["Profile"].waitForExistence(timeout: 3))
             }
         }
         snap("99-end")

@@ -79,7 +79,8 @@ public final class AppEnvironment {
         }
 
         self.profile = .empty
-        self.hasCompletedOnboarding = defaults.bool(forKey: Self.onboardedKey)
+        self.hasCompletedOnboarding = ProcessInfo.processInfo.arguments.contains("--uitest-onboarded")
+            || defaults.bool(forKey: Self.onboardedKey)
     }
 
     /// A fully in-memory, seeded environment for SwiftUI previews and demos.

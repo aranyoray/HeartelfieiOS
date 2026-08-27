@@ -336,7 +336,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -480,6 +480,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = App/DailyDilWidget/DailyDilWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 15;
 				INFOPLIST_FILE = App/DailyDilWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -487,6 +488,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.ios.widget;
 				PRODUCT_NAME = DailyDilWidget;
 				SDKROOT = iphoneos;
@@ -500,6 +502,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = App/DailyDilWidget/DailyDilWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 15;
 				INFOPLIST_FILE = App/DailyDilWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -507,6 +510,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.heartelfie.ios.widget;
 				PRODUCT_NAME = DailyDilWidget;
 				SDKROOT = iphoneos;
@@ -541,7 +545,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = App/Heartelfie/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;

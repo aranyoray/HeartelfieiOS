@@ -27,7 +27,8 @@ public struct MetricCardView: View {
                     Text(metric.kind.displayName)
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
-                        .lineLimit(1)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.9)
                         .minimumScaleFactor(0.8)
 
                     Spacer(minLength: HESpacing.sm)
