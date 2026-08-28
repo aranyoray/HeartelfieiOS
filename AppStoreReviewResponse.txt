@@ -2,7 +2,7 @@ App Review Response
 
 Submission ID: ed97f05c-48a9-4e3d-8bec-15ba3e8c98e2
 Version reviewed: 1.0 (3)
-This reply applies to the new binary 1.1.0 (16).
+This reply applies to the new binary 1.1.0 (17).
 
 Note on the app name: this binary uses "DailyDil" for the display name,
 in-app branding, and all user-facing copy. The bundle identifier

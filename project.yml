@@ -69,7 +69,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.ios
         PRODUCT_NAME: DailyDil
         MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "16"
+        CURRENT_PROJECT_VERSION: "17"
         INFOPLIST_FILE: App/DailyDil/Info.plist
         TARGETED_DEVICE_FAMILY: "1,2"
         ENABLE_PREVIEWS: "YES"
@@ -101,7 +101,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.heartelfie.ios.widget
         PRODUCT_NAME: DailyDilWidget
         MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "16"
+        CURRENT_PROJECT_VERSION: "17"
         SWIFT_VERSION: "6.0"
         SKIP_INSTALL: "YES"
 
