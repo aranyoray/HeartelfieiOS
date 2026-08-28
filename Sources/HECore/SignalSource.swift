@@ -3,7 +3,7 @@ import Foundation
 /// Where a raw physiological signal physically originates.
 ///
 /// Surfacing the source is part of being *architecturally honest* about each
-/// signal. Heartelfie screenings come from the phone cameras only.
+/// signal. DailyDil screenings come from the phone cameras only.
 public enum SignalSource: String, Codable, Sendable, CaseIterable, Hashable {
     /// Rear camera + torch (transmissive finger PPG).
     case rearCamera

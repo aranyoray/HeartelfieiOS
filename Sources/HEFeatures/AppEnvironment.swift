@@ -116,7 +116,7 @@ public final class AppEnvironment {
             var checkedToday: Bool
             var updated: Date
         }
-        guard let shared = UserDefaults(suiteName: HeartelfieConfig.appGroupID) else { return }
+        guard let shared = UserDefaults(suiteName: DailyDilConfig.appGroupID) else { return }
         let snapshot = Snapshot(
             score: todayScore.value,
             hasData: todayScore.contributingReadings > 0,

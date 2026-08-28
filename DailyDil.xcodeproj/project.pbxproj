@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05921EFC6DAD3541518270B4 /* DailyDilApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AFE2B5353284BEFD905177 /* DailyDilApp.swift */; };
 		1E03A2D5BBCF9A0135643CD8 /* DailyDilWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDD642F767D0D8EDFC8E07D1 /* DailyDilWidget.swift */; };
-		315FD524BE13B9CBCB644EEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB777D939E2709187AAA4B6F /* Assets.xcassets */; };
-		36A390B4C21D8F0963CE8719 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */; };
-		3C4A79E7E089A938DD63473E /* HeartelfieApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */; };
+		81FFDFC59085A9878F2B3CA5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6172701E0D71037D93206616 /* PrivacyInfo.xcprivacy */; };
 		9B86C2488C82C9CCD8716C56 /* NavProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E923AA02076F7A41D00D5BB /* NavProbeTests.swift */; };
 		A91D31C72F2375D17C0B6E16 /* HEFeatures in Frameworks */ = {isa = PBXBuildFile; productRef = 6A065A302DB4B96C39EC2989 /* HEFeatures */; };
+		F0EEBC5670A6EB44E2B722B7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A036F9AE86BEE116C506F325 /* Assets.xcassets */; };
 		F6C6A6B8C2C47D609712E6AB /* DailyDilWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6AC75D7AAAF683D13FB899DE /* DailyDilWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -50,17 +50,17 @@
 /* Begin PBXFileReference section */
 		05746B85BCFE25F3A6F78524 /* DailyDilUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DailyDilUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B614E795763C472C8A7E7DA /* DailyDil.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = DailyDil.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		4E923AA02076F7A41D00D5BB /* NavProbeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavProbeTests.swift; sourceTree = "<group>"; };
-		4EFAC08ACC9D65B1496A85A5 /* Heartelfie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Heartelfie.entitlements; sourceTree = "<group>"; };
 		60A2DF766F94C46495BB9C18 /* HeartelfieiOS */ = {isa = PBXFileReference; lastKnownFileType = folder; name = HeartelfieiOS; path = .; sourceTree = SOURCE_ROOT; };
+		6172701E0D71037D93206616 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		66A645353EBC143A510DD926 /* DailyDilWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DailyDilWidget.entitlements; sourceTree = "<group>"; };
 		6AC75D7AAAF683D13FB899DE /* DailyDilWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DailyDilWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		866AC0BD6DF2E88881DCDE99 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		89AFE2B5353284BEFD905177 /* DailyDilApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyDilApp.swift; sourceTree = "<group>"; };
+		8B6DBF25ABFE9D21D61BE37F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A036F9AE86BEE116C506F325 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AAF99FEFD145B1662B16F7B5 /* DailyDil.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DailyDil.entitlements; sourceTree = "<group>"; };
 		BDD642F767D0D8EDFC8E07D1 /* DailyDilWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyDilWidget.swift; sourceTree = "<group>"; };
-		E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartelfieApp.swift; sourceTree = "<group>"; };
-		EB777D939E2709187AAA4B6F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		EFF700A72BD677EA5C8A6686 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,11 +91,23 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		4E6CF45DC376FD5164782884 /* DailyDil */ = {
+			isa = PBXGroup;
+			children = (
+				A036F9AE86BEE116C506F325 /* Assets.xcassets */,
+				AAF99FEFD145B1662B16F7B5 /* DailyDil.entitlements */,
+				89AFE2B5353284BEFD905177 /* DailyDilApp.swift */,
+				8B6DBF25ABFE9D21D61BE37F /* Info.plist */,
+				6172701E0D71037D93206616 /* PrivacyInfo.xcprivacy */,
+			);
+			path = DailyDil;
+			sourceTree = "<group>";
+		};
 		8B4DD9B53560E0775BF24A7F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				4E6CF45DC376FD5164782884 /* DailyDil */,
 				C4087BD49536509400699CB5 /* DailyDilWidget */,
-				DE8264589047012733EFCAF7 /* Heartelfie */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -126,18 +138,6 @@
 				6AC75D7AAAF683D13FB899DE /* DailyDilWidget.appex */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		DE8264589047012733EFCAF7 /* Heartelfie */ = {
-			isa = PBXGroup;
-			children = (
-				EB777D939E2709187AAA4B6F /* Assets.xcassets */,
-				4EFAC08ACC9D65B1496A85A5 /* Heartelfie.entitlements */,
-				E0CCE15C65CE4FBF6C86C299 /* HeartelfieApp.swift */,
-				EFF700A72BD677EA5C8A6686 /* Info.plist */,
-				25234A812DF2FA76149082CC /* PrivacyInfo.xcprivacy */,
-			);
-			path = Heartelfie;
 			sourceTree = "<group>";
 		};
 		EC8F205BE7C01F356BA07847 = {
@@ -263,8 +263,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				315FD524BE13B9CBCB644EEC /* Assets.xcassets in Resources */,
-				36A390B4C21D8F0963CE8719 /* PrivacyInfo.xcprivacy in Resources */,
+				F0EEBC5670A6EB44E2B722B7 /* Assets.xcassets in Resources */,
+				81FFDFC59085A9878F2B3CA5 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,7 +283,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3C4A79E7E089A938DD63473E /* HeartelfieApp.swift in Sources */,
+				05921EFC6DAD3541518270B4 /* DailyDilApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,11 +334,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
+				CODE_SIGN_ENTITLEMENTS = App/DailyDil/DailyDil.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = App/Heartelfie/Info.plist;
+				INFOPLIST_FILE = App/DailyDil/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -480,7 +480,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = App/DailyDilWidget/DailyDilWidget.entitlements;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				INFOPLIST_FILE = App/DailyDilWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -502,7 +502,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = App/DailyDilWidget/DailyDilWidget.entitlements;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				INFOPLIST_FILE = App/DailyDilWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -543,11 +543,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = App/Heartelfie/Heartelfie.entitlements;
+				CODE_SIGN_ENTITLEMENTS = App/DailyDil/DailyDil.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = App/Heartelfie/Info.plist;
+				INFOPLIST_FILE = App/DailyDil/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

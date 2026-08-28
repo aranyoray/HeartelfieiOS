@@ -18,7 +18,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    if (typeof console !== 'undefined') console.error('Heartelfie crashed:', error, info)
+    if (typeof console !== 'undefined') console.error('DailyDil crashed:', error, info)
   }
 
   render() {
@@ -26,7 +26,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <div className="boot" role="alert">
         <div className="boot-pulse" />
-        <strong>Heartelfie hit an unexpected error.</strong>
+        <strong>DailyDil hit an unexpected error.</strong>
         <span style={{ maxWidth: 420, textAlign: 'center', lineHeight: 1.5 }}>
           Try reloading the page. If the problem keeps happening, email{' '}
           <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> and include what you were doing.

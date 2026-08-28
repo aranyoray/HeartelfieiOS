@@ -1,11 +1,11 @@
 // swift-tools-version: 6.0
 import PackageDescription
 
-// Heartelfie — modular Swift package containing all library modules used by the
-// `Heartelfie` iOS app target (the app target itself lives in the Xcode project
+// DailyDil — modular Swift package containing all library modules used by the
+// DailyDil iOS app target (the app target itself lives in the Xcode project
 // generated from `project.yml`). Every module is iOS-first; build via Xcode.
 let package = Package(
-    name: "Heartelfie",
+    name: "DailyDil",
     defaultLocalization: "en",
 platforms: [
 .iOS(.v17),

@@ -5,7 +5,7 @@ import HEDesign
 /// A self-contained, scrollable legal document rendered natively so the Privacy
 /// Policy and Terms are always available in-app without any network dependency
 /// (App Store Review Guideline 5.1.1). Content mirrors the web versions at
-/// heartelfie.app; update both when the policy changes.
+/// the public website; update both when the policy changes.
 struct LegalDocumentView: View {
     let document: LegalDocument
 
@@ -72,7 +72,7 @@ struct LegalDocument {
     let updated: String
     let sections: [Section]
 
-    static let supportEmail = "support@heartelfie.app"
+    static let supportEmail = "support@dailydil.app"
 
     struct Section: Identifiable {
         let id = UUID()

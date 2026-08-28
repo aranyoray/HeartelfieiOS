@@ -1,9 +1,9 @@
 {
-  "name": "heartelfieweb",
+  "name": "dailydilweb",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Heartelfie — US county & state heart & circulatory wellness-awareness atlas (CDC PLACES). Tilted 3D map of age-adjusted, community-level wellness indicators across years. Describes geographic areas, never individuals; not medical advice.",
+  "description": "DailyDil — US county & state heart & circulatory wellness-awareness atlas (CDC PLACES). Tilted 3D map of age-adjusted, community-level wellness indicators across years. Describes geographic areas, never individuals; not medical advice.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/prerender-routes.mjs",

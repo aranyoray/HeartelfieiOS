@@ -199,7 +199,7 @@ struct ResultDetailView: View {
                 systemImage: "list.bullet.rectangle"
             )
 
-            if reading.metrics.isEmpty {
+            if reading.visibleMetrics.isEmpty {
                 HECard {
                     Text("No metrics were produced for this reading.")
                         .font(.heCallout)
@@ -208,7 +208,7 @@ struct ResultDetailView: View {
                 }
             } else {
                 VStack(spacing: HESpacing.md) {
-                    ForEach(reading.metrics) { metric in
+                    ForEach(reading.visibleMetrics) { metric in
                         MetricCardView(metric: metric)
                     }
                 }

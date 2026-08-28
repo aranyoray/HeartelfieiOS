@@ -198,7 +198,7 @@ public struct CaptureFlowView: View {
                 Text("Ready to take a reading")
                     .font(.heHeadline)
                     .foregroundStyle(Color.heTextPrimary)
-                Text("\(HeartelfieConfig.appName) turns on the camera only after you start. Rest a fingertip over the rear camera and hold still while the estimate settles.")
+                Text("\(DailyDilConfig.appName) turns on the camera only after you start. Rest a fingertip over the rear camera and hold still while the estimate settles.")
                     .font(.heCallout)
                     .foregroundStyle(Color.heTextSecondary)
                     .multilineTextAlignment(.center)
@@ -576,7 +576,7 @@ struct CaptureResultSummary: View {
                         .font(.heHeadline)
                         .foregroundStyle(.white)
 
-                    if let hr = reading.metrics.first(where: { $0.kind == .heartRate }) {
+                    if let hr = reading.visibleMetrics.first(where: { $0.kind == .heartRate }) {
                         HStack(alignment: .firstTextBaseline, spacing: HESpacing.xs) {
                             Text(verbatim: "\(Int(hr.value))")
                                 .font(.heMetricNumeralCompact)
@@ -598,7 +598,7 @@ struct CaptureResultSummary: View {
                 }
             }
 
-            ForEach(reading.metrics.filter { $0.kind != .heartRate }) { metric in
+            ForEach(reading.visibleMetrics.filter { $0.kind != .heartRate }) { metric in
                 MetricCardView(metric: metric)
             }
 

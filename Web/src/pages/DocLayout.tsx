@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 // Placeholder support contact — replace with your real, monitored support
 // address before App Store / Play Store submission (Apple requires a working
 // support URL + contact).
-export const SUPPORT_EMAIL = 'support@heartelfie.app'
+export const SUPPORT_EMAIL = 'support@dailydil.app'
 
 export default function DocLayout({
   title,
@@ -26,7 +26,7 @@ export default function DocLayout({
       <header className="doc-header">
         <Link to="/" className="doc-brand">
           <span className="brand-pulse" aria-hidden />
-          <span>Heartelfie</span>
+          <span>DailyDil</span>
         </Link>
         <nav className="doc-nav">
           <Link to="/">Atlas</Link>
@@ -42,7 +42,7 @@ export default function DocLayout({
         {children}
         <footer className="doc-footer">
           <p>
-            Heartelfie · U.S. Heart & Circulatory Wellness Atlas · Questions?{' '}
+            DailyDil · U.S. Heart & Circulatory Wellness Atlas · Questions?{' '}
             <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
           </p>
           <p className="doc-footer-disclaimer">

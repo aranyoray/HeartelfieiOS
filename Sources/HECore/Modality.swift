@@ -1,6 +1,6 @@
 import Foundation
 
-/// Phone screening modalities Heartelfie supports. Each is pinned to its trust
+/// Phone screening modalities DailyDil supports. Each is pinned to its trust
 /// `tier`, physical `source`, and the metrics that source can legitimately produce.
 ///
 /// Hardware-device modalities were removed from the product. Unknown legacy raw
@@ -40,7 +40,7 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
     public var supportedMetrics: [MetricKind] {
         switch self {
         case .fingerPPG:
-            return [.heartRate, .hrvSDNN, .hrvRMSSD, .rhythmIrregularity, .respiratoryRate, .spo2Estimate]
+            return [.heartRate, .hrvSDNN, .hrvRMSSD, .rhythmIrregularity, .respiratoryRate]
         case .facialRPPG:
             return [.heartRate, .hrvSDNN, .hrvRMSSD]
         }
@@ -57,7 +57,7 @@ public enum Modality: String, Codable, Sendable, CaseIterable, Hashable, Identif
     public var summary: String {
         switch self {
         case .fingerPPG:
-            return "Place a fingertip over the rear camera and torch to screen heart rate, rhythm, and oxygen wellness."
+            return "Place a fingertip over the rear camera and torch to screen heart rate, rhythm, and breathing rate."
         case .facialRPPG:
             return "Look at the front camera for a contactless heart-rate screen."
         }

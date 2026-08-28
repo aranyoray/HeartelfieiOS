@@ -265,7 +265,7 @@ struct ProfileView: View {
     private var aboutSection: some View {
         Section {
             NavigationLink(value: AppRoute.about) {
-                Label("About \(HeartelfieConfig.appName)", systemImage: "info.circle")
+                Label("About \(DailyDilConfig.appName)", systemImage: "info.circle")
             }
         }
     }
@@ -277,7 +277,7 @@ struct ProfileView: View {
             EmptyView()
         } footer: {
             VStack(alignment: .leading, spacing: HESpacing.xxs) {
-                Text("\(HeartelfieConfig.appName) \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.1.0") (\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "5"))")
+                Text("\(DailyDilConfig.appName) \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.1.0") (\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "5"))")
                     .font(.heCaption.weight(.medium))
                     .foregroundStyle(Color.heTextSecondary)
                 Text("Wellness and screening only — not a medical device. Model name and version are shown with each reading.")

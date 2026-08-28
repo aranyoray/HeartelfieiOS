@@ -1,7 +1,7 @@
 import SwiftUI
 import HECore
 
-/// The standard Heartelfie surface: a rounded, softly elevated card with
+/// The standard DailyDil surface: a rounded, softly elevated card with
 /// generous padding. Wraps arbitrary content.
 public struct HECard<Content: View>: View {
     private let content: Content

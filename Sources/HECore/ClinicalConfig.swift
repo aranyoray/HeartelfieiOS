@@ -34,7 +34,7 @@ public struct ClinicalRange: Codable, Sendable, Hashable {
 /// ⚠️ PLACEHOLDER CLINICAL CONFIGURATION ⚠️
 ///
 /// This is the **single source of truth** for every reference range, threshold,
-/// and gate Heartelfie uses. Every number here is an illustrative placeholder for
+/// and gate DailyDil uses. Every number here is an illustrative placeholder for
 /// a wellness/screening product — **not** validated medical guidance. Replace
 /// these with values reviewed by qualified clinicians before any real-world use.
 ///
@@ -72,7 +72,9 @@ public enum ClinicalConfig {
         case .rhythmIrregularity:
             return ClinicalRange(low: 0, high: 5, unit: "%")
         case .spo2Estimate, .spo2Clinical:
-            return ClinicalRange(low: 95, high: 100, unit: "%")
+            // Retired product surface: legacy readings embed their own range,
+            // and no live path may classify oxygen values anymore.
+            return nil
         case .hemoglobin:
             // Coarse placeholder; real ranges differ by age/sex/pregnancy.
             if profile?.biologicalSex == .female {
@@ -94,21 +96,6 @@ public enum ClinicalConfig {
     public static func risk(for kind: MetricKind, value: Double, profile: HealthProfile? = nil) -> RiskLevel {
         guard let range = referenceRange(for: kind, profile: profile) else { return .unknown }
         return range.classify(value)
-    }
-
-    // MARK: - Screening estimation calibration (placeholders)
-
-    /// Rough ratio-of-ratios calibration for the **phone SpO₂ estimate** only.
-    /// Phones lack a true IR channel, so this is an approximation labelled as such
-    /// in the UI. Intercept/slope are placeholders — replace with a calibrated fit.
-    public static let spo2EstimateIntercept: Double = 104
-    public static let spo2EstimateSlope: Double = 17
-
-    /// Map a red/green ratio-of-ratios to an approximate SpO₂ percentage, clamped
-    /// to a plausible screening range. Placeholder calibration.
-    public static func estimatedSpO2(ratioOfRatios r: Double) -> Double {
-        let estimate = spo2EstimateIntercept - spo2EstimateSlope * r
-        return min(max(estimate, 70), 100)
     }
 
     // MARK: - BMI categories (placeholders)
@@ -137,8 +124,7 @@ public enum ClinicalConfig {
     public static func seekCareSignal(for kind: MetricKind, value: Double) -> SeekCareSignal? {
         switch kind {
         case .spo2Estimate, .spo2Clinical:
-            guard value < 92 else { return nil }
-            return SeekCareSignal(kind: kind, message: "Repeated low oxygen-wellness readings can be compared with your recent baseline.")
+            return nil
         case .heartRate:
             guard value > 120 || value < 40 else { return nil }
             return SeekCareSignal(kind: kind, message: "This heart-rate reading is far from the typical wellness range. Retake it while rested and compare with your trend.")

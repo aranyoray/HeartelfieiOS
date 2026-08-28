@@ -59,7 +59,7 @@ public struct MetricCardView: View {
                         .foregroundStyle(Color.heTextTertiary)
                 }
 
-                // Note (e.g. "approximate" for screening SpO₂).
+                // Optional metric note.
                 if let note = metric.note {
                     Text(note)
                         .font(.heCaption)
@@ -91,14 +91,6 @@ public struct MetricCardView: View {
             if let metric = SampleData.fingerPPGReading().metrics.first {
                 MetricCardView(metric: metric)
             }
-            MetricCardView(
-                metric: CardioMetric(
-                    kind: .spo2Estimate,
-                    value: 97,
-                    note: "Approximate — screening only",
-                    profile: SampleData.profile
-                )
-            )
             MetricCardView(
                 metric: CardioMetric(
                     kind: .hemoglobin,

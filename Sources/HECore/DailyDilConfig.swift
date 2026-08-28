@@ -2,7 +2,7 @@ import Foundation
 
 /// Single source of truth for replaceable identifiers: product naming and
 /// persistence keys.
-public enum HeartelfieConfig {
+public enum DailyDilConfig {
 
     // MARK: - Branding
 
@@ -21,3 +21,6 @@ public enum HeartelfieConfig {
     /// non-sensitive dashboard rollup (score + streak), never readings.
     public static let appGroupID = "group.com.heartelfie.ios"
 }
+
+@available(*, deprecated, renamed: "DailyDilConfig")
+public typealias HeartelfieConfig = DailyDilConfig

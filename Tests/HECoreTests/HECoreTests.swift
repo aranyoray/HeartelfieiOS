@@ -11,8 +11,8 @@ final class HECoreTests: XCTestCase {
         }
     }
 
-    /// The core constraint: phone modalities must never surface device-only metrics
-    /// (ECG, clinical SpO₂, hemoglobin, etc.).
+    /// The core constraint: phone modalities must never surface device-only or
+    /// hidden legacy metrics (ECG, hemoglobin, etc.).
     func testPhoneModalitiesNeverExposeDeviceOnlyMetrics() {
         for modality in Modality.allCases {
             for metric in modality.supportedMetrics {
@@ -24,9 +24,11 @@ final class HECoreTests: XCTestCase {
         }
     }
 
-    func testFingerPPGSupportsScreeningOxygenEstimate() {
-        XCTAssertTrue(Modality.fingerPPG.supportedMetrics.contains(.spo2Estimate))
+    func testPhoneModalitiesDoNotSurfaceLegacySpO2Metrics() {
+        XCTAssertFalse(Modality.fingerPPG.supportedMetrics.contains(.spo2Estimate))
+        XCTAssertFalse(Modality.fingerPPG.supportedMetrics.contains(.spo2Clinical))
         XCTAssertFalse(Modality.facialRPPG.supportedMetrics.contains(.spo2Estimate))
+        XCTAssertFalse(Modality.facialRPPG.supportedMetrics.contains(.spo2Clinical))
     }
 
     func testModalityTierMatchesSensorTierContract() {
@@ -95,6 +97,23 @@ final class HECoreTests: XCTestCase {
         XCTAssertEqual(reading.overallRisk, .elevated)
     }
 
+    func testHiddenLegacyOxygenMetricsDoNotAffectVisibleReadingRisk() {
+        let reading = CardioReading(
+            modality: .fingerPPG,
+            metrics: [
+                CardioMetric(kind: .heartRate, value: 72),
+                CardioMetric(kind: .spo2Clinical, value: 88)
+            ],
+            confidence: Confidence(0.8),
+            signalQuality: .pristine,
+            provenance: .onDeviceDSP,
+            interpretation: ""
+        )
+
+        XCTAssertEqual(reading.visibleMetrics.map(\.kind), [.heartRate])
+        XCTAssertEqual(reading.overallRisk, .normal)
+    }
+
     func testReadingTierDefaultsToModalityTier() {
         let reading = CardioReading(
             modality: .fingerPPG,
@@ -112,7 +131,7 @@ final class HECoreTests: XCTestCase {
     func testSeekCareSignalsTriggerOnlyOutsideRange() {
         XCTAssertNil(ClinicalConfig.seekCareSignal(for: .heartRate, value: 70))
         XCTAssertNotNil(ClinicalConfig.seekCareSignal(for: .heartRate, value: 130))
-        XCTAssertNotNil(ClinicalConfig.seekCareSignal(for: .spo2Clinical, value: 88))
+        XCTAssertNil(ClinicalConfig.seekCareSignal(for: .spo2Clinical, value: 88))
         XCTAssertNil(ClinicalConfig.seekCareSignal(for: .spo2Clinical, value: 98))
     }
 

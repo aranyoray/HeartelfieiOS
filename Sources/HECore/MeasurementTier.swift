@@ -1,6 +1,6 @@
 import Foundation
 
-/// The two explicit trust tiers that flow through every reading in Heartelfie.
+/// The explicit trust tier that flows through every reading in DailyDil.
 ///
 /// Phone camera checks are wellness-grade `.screening`. `.measurement` remains so
 /// older saved hardware readings can still decode and display honestly.

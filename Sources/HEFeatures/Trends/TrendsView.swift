@@ -36,7 +36,7 @@ struct TrendsView: View {
     /// Phone screening metrics shown by default; historical device-only metrics
     /// are appended when they still appear in saved readings.
     private static let baseMetrics: [MetricKind] = [
-        .heartRate, .hrvSDNN, .hrvRMSSD, .rhythmIrregularity, .respiratoryRate, .spo2Estimate
+        .heartRate, .hrvSDNN, .hrvRMSSD, .rhythmIrregularity, .respiratoryRate
     ]
 
     var body: some View {
@@ -511,8 +511,8 @@ struct TrendsView: View {
     /// Base metrics plus any device metrics that actually appear in the data.
     private static func metrics(in readings: [CardioReading]) -> [MetricKind] {
         var result = baseMetrics
-        let present = Set(readings.flatMap { $0.metrics.map(\.kind) })
-        for kind in present where kind.isDeviceOnly && !result.contains(kind) {
+        let present = Set(readings.flatMap { $0.visibleMetrics.map(\.kind) })
+        for kind in present where kind.isDeviceOnly && kind.isVisibleInDailyDil && !result.contains(kind) {
             result.append(kind)
         }
         // Only keep metrics we actually have data for, but always keep heart rate.

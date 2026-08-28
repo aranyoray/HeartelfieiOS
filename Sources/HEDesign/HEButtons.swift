@@ -3,7 +3,7 @@ import HECore
 
 // MARK: - Button style
 
-/// The Heartelfie primary button style: a soft, gradient-filled, pill-shaped
+/// The DailyDil primary button style: a soft, gradient-filled, pill-shaped
 /// control with a gentle press response that respects Reduce Motion.
 public struct PrimaryButtonStyle: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion

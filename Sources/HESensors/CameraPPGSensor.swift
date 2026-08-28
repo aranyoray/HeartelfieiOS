@@ -35,7 +35,7 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
     #if canImport(AVFoundation)
     private let session = AVCaptureSession()
     private let output = AVCaptureVideoDataOutput()
-    private let sampleQueue = DispatchQueue(label: "com.heartelfie.camera.ppg")
+    private let sampleQueue = DispatchQueue(label: "com.dailydil.camera.ppg")
     private var captureDevice: AVCaptureDevice?
     #endif
 
@@ -267,7 +267,7 @@ extension CameraPPGSensor: AVCaptureVideoDataOutputSampleBufferDelegate {
 /// Emits ~30 Hz synthetic finger-PPG frames from `HESignal.SyntheticSignal.ppg`.
 /// The green plane carries the base PPG; the red plane is a scaled variant and the
 /// blue plane a smaller one, so a plausible ratio-of-ratios exists for downstream
-/// (screening-grade) SpO₂ estimation.
+/// richer signal-quality checks.
 public actor MockCameraPPGSensor: CardioSensor {
 
     public nonisolated var modality: Modality { .fingerPPG }

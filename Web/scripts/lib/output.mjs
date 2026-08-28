@@ -76,7 +76,7 @@ export function writeDataset({ measureValues, years, source, isPlaceholder, note
   }
 
   const meta = {
-    title: 'Heartelfie — U.S. Heart & Circulatory Wellness Atlas',
+    title: 'DailyDil — U.S. Heart & Circulatory Wellness Atlas',
     source,
     sourceUrl: 'https://www.cdc.gov/places/',
     isPlaceholder,

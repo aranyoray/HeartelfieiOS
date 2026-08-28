@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Typography
 
-/// Heartelfie type ramp, built entirely from system (SF Pro) fonts so full
+/// DailyDil type ramp, built entirely from system (SF Pro) fonts so full
 /// Dynamic Type works automatically. Big metric numerals use a rounded design
 /// for a friendlier, glanceable feel.
 public extension Font {

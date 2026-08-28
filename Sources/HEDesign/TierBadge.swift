@@ -2,7 +2,7 @@ import SwiftUI
 import HECore
 
 /// A pill that makes a reading's trust tier unmistakable — a *Critical
-/// Constraint* of Heartelfie. Screening (phone) vs. measurement (device) is
+/// Constraint* of DailyDil. Screening (phone) vs. measurement (device) is
 /// surfaced with both an icon and color, and the accessible label spells out the
 /// full tier name.
 public struct TierBadge: View {

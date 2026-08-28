@@ -27,7 +27,7 @@ public enum SampleData {
                 CardioMetric(kind: .hrvSDNN, value: 58, profile: profile),
                 CardioMetric(kind: .hrvRMSSD, value: 42, profile: profile),
                 CardioMetric(kind: .rhythmIrregularity, value: 2, profile: profile),
-                CardioMetric(kind: .spo2Estimate, value: 97, note: "Approximate — screening only", profile: profile)
+                CardioMetric(kind: .respiratoryRate, value: 16, profile: profile)
             ],
             confidence: Confidence(0.82),
             signalQuality: SignalQuality(sqi: 0.88, isAcceptable: true, issues: []),

@@ -4,7 +4,7 @@ export default function SupportPage() {
   return (
     <DocLayout title="Support & Help" updated="July 5, 2026">
       <p>
-        Need help with Heartelfie, found a bug, or have a feature idea? We’re happy to hear from you.
+        Need help with DailyDil, found a bug, or have a feature idea? We’re happy to hear from you.
       </p>
 
       <div className="support-contact">
@@ -21,9 +21,9 @@ export default function SupportPage() {
         </p>
       </div>
 
-      <h2>About Heartelfie</h2>
+      <h2>About DailyDil</h2>
       <p>
-        Heartelfie is an interactive atlas of U.S. heart &amp; circulatory wellness awareness. Each
+        DailyDil is an interactive atlas of U.S. heart &amp; circulatory wellness awareness. Each
         county or state is colored by a community-level, age-adjusted wellness-awareness indicator —{' '}
         <strong>Circulatory Strain</strong>, <strong>Heart Health</strong>, or{' '}
         <strong>Brain Circulation</strong> — redder means a higher community indicator — on a map you
@@ -83,13 +83,13 @@ export default function SupportPage() {
       <h3>Why is a county missing or greyed out?</h3>
       <p>
         A small number of areas may lack a published estimate for a given measure or year; those
-        appear muted with “No data” on hover. Heartelfie covers the 50 states and the District of
+        appear muted with “No data” on hover. DailyDil covers the 50 states and the District of
         Columbia.
       </p>
 
       <h3>Can I rely on these numbers for medical decisions?</h3>
       <p>
-        No. Heartelfie is for information and education only and is not medical advice. These are
+        No. DailyDil is for information and education only and is not medical advice. These are
         area-level estimates, not measurements of any individual. Consult a healthcare professional
         for personal health questions.
       </p>
@@ -116,7 +116,7 @@ export default function SupportPage() {
 
       <h2>Accessibility &amp; Feedback</h2>
       <p>
-        We want Heartelfie to work well for everyone. If you encounter an accessibility barrier or have
+        We want DailyDil to work well for everyone. If you encounter an accessibility barrier or have
         a suggestion, please email{' '}
         <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> and we’ll do our best to address it.
       </p>

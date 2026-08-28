@@ -26,23 +26,22 @@ public enum HealthKitError: Error, Sendable, CustomStringConvertible {
 
 #if canImport(HealthKit)
 
-/// Bridges Heartelfie readings to and from Apple HealthKit.
+/// Bridges DailyDil readings to and from Apple HealthKit.
 ///
-/// **Read** scope: heart rate, HRV (SDNN), resting heart rate, blood oxygen,
-/// respiratory rate, and (as optional, supplementary context) the availability of
-/// Apple Watch ECG samples.
+/// **Read** scope: heart rate, HRV (SDNN), resting heart rate, respiratory rate,
+/// and (as optional, supplementary context) the availability of Apple Watch ECG
+/// samples.
 ///
-/// **Write** scope: heart rate, HRV (SDNN), blood oxygen, respiratory rate only.
+/// **Write** scope: heart rate, HRV (SDNN), respiratory rate only.
 ///
-/// - Important: Heartelfie's custom waveforms and screening-only metrics that
-///   have no HealthKit equivalent (rhythm-irregularity %, approximate oxygen
-///   wellness, and historical device-only rows such as hemoglobin) are
-///   **not** representable as standard HealthKit sample types and
-///   are therefore never written to HealthKit — they live only in the encrypted
-///   on-device store. ``write(reading:)`` silently skips them. Camera-based
-///   screening estimates of heart rate, HRV, and respiratory rate **are**
-///   written when the user grants share access — see the committed tier policy
-///   on ``write(reading:)``.
+/// - Important: DailyDil's custom waveforms and screening-only metrics that
+///   have no HealthKit equivalent (rhythm-irregularity % and historical
+///   device-only rows such as hemoglobin) are **not** representable as standard
+///   HealthKit sample types and are therefore never written to HealthKit — they
+///   live only in the encrypted on-device store. ``write(reading:)`` silently
+///   skips them. Camera-based screening estimates of heart rate, HRV, and
+///   respiratory rate **are** written when the user grants share access — see the
+///   committed tier policy on ``write(reading:)``.
 ///
 /// `@MainActor` because `HKHealthStore` callbacks and authorization UI are
 /// main-actor friendly and we keep all access serialised there.
@@ -55,13 +54,12 @@ public final class HealthKitBridge {
 
     // MARK: - Type sets
 
-    /// Quantity types Heartelfie reads from HealthKit.
+    /// Quantity types DailyDil reads from HealthKit.
     public static var readTypes: Set<HKObjectType> {
         var types: Set<HKObjectType> = []
         if let t = HKObjectType.quantityType(forIdentifier: .heartRate) { types.insert(t) }
         if let t = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) { types.insert(t) }
         if let t = HKObjectType.quantityType(forIdentifier: .restingHeartRate) { types.insert(t) }
-        if let t = HKObjectType.quantityType(forIdentifier: .oxygenSaturation) { types.insert(t) }
         if let t = HKObjectType.quantityType(forIdentifier: .respiratoryRate) { types.insert(t) }
         // Apple Watch ECG (supplementary context only).
         if #available(iOS 14.0, *) {
@@ -70,13 +68,21 @@ public final class HealthKitBridge {
         return types
     }
 
-    /// Quantity types Heartelfie writes to HealthKit (a strict subset of reads).
+    /// Quantity types DailyDil writes to HealthKit (a strict subset of reads).
     public static var writeTypes: Set<HKSampleType> {
         var types: Set<HKSampleType> = []
         if let t = HKObjectType.quantityType(forIdentifier: .heartRate) { types.insert(t) }
         if let t = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) { types.insert(t) }
-        if let t = HKObjectType.quantityType(forIdentifier: .oxygenSaturation) { types.insert(t) }
         if let t = HKObjectType.quantityType(forIdentifier: .respiratoryRate) { types.insert(t) }
+        return types
+    }
+
+    /// Types written by retired product surfaces (SpO₂ screening wrote
+    /// oxygenSaturation). Delete-all must keep covering them for upgraders
+    /// even though nothing writes them anymore.
+    public static var legacyWriteTypes: Set<HKSampleType> {
+        var types: Set<HKSampleType> = []
+        if let t = HKObjectType.quantityType(forIdentifier: .oxygenSaturation) { types.insert(t) }
         return types
     }
 
@@ -103,7 +109,7 @@ public final class HealthKitBridge {
         guard HKHealthStore.isHealthDataAvailable() else { return true }
         let predicate = HKQuery.predicateForObjects(from: HKSource.default())
         var complete = true
-        for type in Self.writeTypes {
+        for type in Self.writeTypes.union(Self.legacyWriteTypes) {
             guard store.authorizationStatus(for: type) == .sharingAuthorized else {
                 complete = false
                 continue
@@ -137,13 +143,6 @@ public final class HealthKitBridge {
         await latestQuantity(.restingHeartRate, unit: HKUnit.count().unitDivided(by: .minute()))
     }
 
-    /// Most recent blood-oxygen sample, as a percentage (0–100).
-    public func latestBloodOxygen() async -> Double? {
-        // HealthKit stores oxygen saturation as a 0...1 fraction; surface as %.
-        guard let fraction = await latestQuantity(.oxygenSaturation, unit: .percent()) else { return nil }
-        return fraction * 100.0
-    }
-
     /// Most recent respiratory rate, in breaths/min.
     public func latestRespiratoryRate() async -> Double? {
         await latestQuantity(.respiratoryRate, unit: HKUnit.count().unitDivided(by: .minute()))
@@ -170,22 +169,19 @@ public final class HealthKitBridge {
     // MARK: - Writes
 
     /// Writes the HealthKit-supported sample types contained in `reading`
-    /// (heart rate, HRV SDNN, blood oxygen, respiratory rate). Device-only and
-    /// custom metrics (hemoglobin, waveforms, etc.) are silently skipped because
-    /// HealthKit has no standard type for them.
+    /// (heart rate, HRV SDNN, respiratory rate). Device-only and custom metrics
+    /// (hemoglobin, waveforms, etc.) are silently skipped because HealthKit has
+    /// no standard type for them.
     ///
     /// **Tier policy (committed):** screening-tier camera estimates of heart
     /// rate, HRV (SDNN), and respiratory rate *are* written. HealthKit labels
     /// every sample with this app as its source and the user opts in per-type
     /// via the share grant, so wellness-grade estimates are acceptable there.
-    /// The one screening metric excluded is the camera's `.spo2Estimate`: an
-    /// oxygenSaturation sample implies pulse-oximeter data, so only
-    /// device-grade `.spo2Clinical` maps to it (see ``makeSample``).
     public func write(reading: CardioReading) async throws {
         guard HKHealthStore.isHealthDataAvailable() else { throw HealthKitError.unavailable }
 
         var samples: [HKSample] = []
-        for metric in reading.metrics {
+        for metric in reading.visibleMetrics {
             if let sample = Self.makeSample(metric: metric, timestamp: reading.timestamp) {
                 samples.append(sample)
             }
@@ -207,7 +203,7 @@ public final class HealthKitBridge {
 
     /// Maps a single ``CardioMetric`` to an `HKQuantitySample`, or `nil` if the
     /// metric has no HealthKit-writable counterpart. Performs unit conversions
-    /// from Heartelfie's units to HealthKit's expected units.
+    /// from DailyDil's units to HealthKit's expected units.
     private static func makeSample(metric: CardioMetric, timestamp: Date) -> HKQuantitySample? {
         switch metric.kind {
         case .heartRate:
@@ -217,28 +213,19 @@ public final class HealthKitBridge {
 
         case .hrvSDNN:
             guard let type = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) else { return nil }
-            // Heartelfie stores SDNN in ms; HealthKit expects time (use ms unit).
+            // DailyDil stores SDNN in ms; HealthKit expects time (use ms unit).
             let unit = HKUnit.secondUnit(with: .milli)
             return quantitySample(type: type, unit: unit, value: metric.value, date: timestamp)
-
-        case .spo2Clinical:
-            // Only device-grade clinical SpO₂ is written to Health. The phone
-            // camera's `.spo2Estimate` is screening-grade and unvalidated, so it is
-            // never written as a HealthKit oxygenSaturation sample (see skip case).
-            guard let type = HKObjectType.quantityType(forIdentifier: .oxygenSaturation) else { return nil }
-            // Heartelfie stores % (0–100); HealthKit expects a 0...1 fraction.
-            let unit = HKUnit.percent()
-            return quantitySample(type: type, unit: unit, value: metric.value / 100.0, date: timestamp)
 
         case .respiratoryRate:
             guard let type = HKObjectType.quantityType(forIdentifier: .respiratoryRate) else { return nil }
             let unit = HKUnit.count().unitDivided(by: .minute())
             return quantitySample(type: type, unit: unit, value: metric.value, date: timestamp)
 
-        // No standard HealthKit type, or an unvalidated phone-screening estimate —
-        // kept only in the encrypted on-device store, never written to Health.
-        case .spo2Estimate, .hrvRMSSD, .rhythmIrregularity, .hemoglobin, .anemiaRisk,
-             .perfusionIndex, .hydration:
+        // No standard HealthKit type, hidden legacy rows, or custom metrics kept
+        // only in the encrypted on-device store.
+        case .spo2Estimate, .spo2Clinical, .hrvRMSSD, .rhythmIrregularity,
+             .hemoglobin, .anemiaRisk, .perfusionIndex, .hydration:
             return nil
         }
     }
@@ -326,7 +313,6 @@ public final class HealthKitBridge {
     public func latestHeartRate() async -> Double? { nil }
     public func recentHRV(days: Int) async -> [TimeSeriesPoint] { [] }
     public func restingHeartRate() async -> Double? { nil }
-    public func latestBloodOxygen() async -> Double? { nil }
     public func latestRespiratoryRate() async -> Double? { nil }
     public func appleWatchECGAvailable() async -> Bool { false }
 

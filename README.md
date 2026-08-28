@@ -2,9 +2,9 @@
 
 A production-grade iOS app for **daily cardiovascular wellness self-checks**
 using only the phone's cameras, plus a companion **web wellness atlas** (see
-[`Web/`](Web/)). Formerly named *Heartelfie*; the bundle identifier
-(`com.heartelfie.ios`) and on-disk/Keychain identifiers intentionally keep the
-old name so existing installs keep their data.
+[`Web/`](Web/)). The bundle identifier (`com.heartelfie.ios`) and
+on-disk/Keychain identifiers intentionally keep their original values so
+existing installs keep their data.
 
 > **DailyDil offers wellness and screening insights. It is not a medical
 > device and does not diagnose, treat, cure, or prevent any medical
@@ -35,7 +35,7 @@ trust it** — enforced in the type system, not just the UI.
 ## Modules (Swift Package Manager)
 
 The library layer is a single local package (`./Package.swift`); a thin app
-target lives in `App/Heartelfie` (folder name kept for project stability).
+target lives in `App/DailyDil`.
 
 | Module | Purpose |
 |--------|---------|

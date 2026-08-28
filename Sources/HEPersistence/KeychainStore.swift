@@ -31,8 +31,8 @@ public enum KeychainError: Error, Sendable, CustomStringConvertible {
 /// Stores and loads the symmetric encryption key used by ``CryptoBox`` in the
 /// system Keychain.
 ///
-/// The key data lives under ``HeartelfieConfig/keychainService`` /
-/// ``HeartelfieConfig/encryptionKeyAccount`` as a generic-password item. On first
+/// The key data lives under ``DailyDilConfig/keychainService`` /
+/// ``DailyDilConfig/encryptionKeyAccount`` as a generic-password item. On first
 /// run a fresh 256-bit key is generated and persisted; subsequent runs load it.
 ///
 /// On platforms without the Security framework (e.g. Linux CI) a clearly-marked
@@ -44,14 +44,14 @@ public enum KeychainError: Error, Sendable, CustomStringConvertible {
 /// the backing store), and the fallback uses a process-wide lock.
 public struct KeychainStore: Sendable {
 
-    /// Keychain service identifier (defaults to the configured Heartelfie value).
+    /// Keychain service identifier (defaults to the configured app value).
     public let service: String
-    /// Keychain account name (defaults to the configured Heartelfie value).
+    /// Keychain account name (defaults to the configured app value).
     public let account: String
 
     public init(
-        service: String = HeartelfieConfig.keychainService,
-        account: String = HeartelfieConfig.encryptionKeyAccount
+        service: String = DailyDilConfig.keychainService,
+        account: String = DailyDilConfig.encryptionKeyAccount
     ) {
         self.service = service
         self.account = account

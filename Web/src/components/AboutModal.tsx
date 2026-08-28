@@ -25,7 +25,7 @@ export default function AboutModal({ meta }: { meta: Meta }) {
       <button
         className="icon-btn"
         title="About & data sources"
-        aria-label="About Heartelfie and data sources"
+        aria-label="About DailyDil and data sources"
         onClick={() => setOpen(true)}
       >
         ⓘ
@@ -42,7 +42,7 @@ export default function AboutModal({ meta }: { meta: Meta }) {
             <button className="modal-close" onClick={() => setOpen(false)} aria-label="Close">
               ✕
             </button>
-            <h2 id={titleId}>Heartelfie</h2>
+            <h2 id={titleId}>DailyDil</h2>
             <p className="modal-tag">
               An interactive 3D atlas of U.S. heart &amp; circulatory wellness awareness by county
               and state.
@@ -92,7 +92,7 @@ export default function AboutModal({ meta }: { meta: Meta }) {
             )}
 
             <div className="modal-warn modal-warn-med" role="note">
-              <strong>Not medical advice.</strong> Heartelfie is for information and education only.
+              <strong>Not medical advice.</strong> DailyDil is for information and education only.
               Figures describe geographic areas, never individuals. Consult a qualified healthcare
               professional for any medical concern.
             </div>

@@ -32,7 +32,7 @@ struct AboutView: View {
     private var headerCard: some View {
         HECard {
             VStack(alignment: .leading, spacing: HESpacing.xs) {
-                Text(HeartelfieConfig.appName)
+                Text(DailyDilConfig.appName)
                     .font(.heTitle)
                     .foregroundStyle(Color.heTextPrimary)
                 Text("Version 1.0")
@@ -171,7 +171,7 @@ struct AboutView: View {
                     }
                     .buttonStyle(.plain)
                     Divider().overlay(Color.heSeparator)
-                    creditRow(title: "© \(currentYear) \(HeartelfieConfig.appName)", detail: "")
+                    creditRow(title: "© \(currentYear) \(DailyDilConfig.appName)", detail: "")
                 }
             }
         }

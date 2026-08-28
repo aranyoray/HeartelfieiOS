@@ -26,7 +26,7 @@ export default function App() {
     return (
       <div className="boot">
         <div className="boot-pulse" />
-        <span>Loading Heartelfie…</span>
+        <span>Loading DailyDil…</span>
       </div>
     )
   }

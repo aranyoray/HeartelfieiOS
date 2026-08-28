@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Skin-tone equity is a first-class feature: this value is captured optionally
 /// during onboarding, passed into the processing/ML layer (optical PPG signals
-/// vary with melanin), and its use is disclosed to the user. Heartelfie targets
+/// vary with melanin), and its use is disclosed to the user. DailyDil targets
 /// equitable performance across MST 4–10.
 public struct MonkSkinTone: Codable, Sendable, Hashable, Identifiable, Comparable {
     /// The 1...10 MST position. 1 is lightest, 10 is darkest.
@@ -42,7 +42,7 @@ public struct MonkSkinTone: Codable, Sendable, Hashable, Identifiable, Comparabl
 
     public var accessibilityLabel: String { "Monk skin tone \(value) of 10" }
 
-    /// User-facing disclosure of why Heartelfie asks for this and how it's used.
+    /// User-facing disclosure of why DailyDil asks for this and how it's used.
     public static let usageDisclosure = """
     Optical heart readings can behave differently across skin tones. Sharing your \
     skin tone (optional) helps DailyDil calibrate signal processing so screenings \

@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Spacing
 
-/// The Heartelfie spacing scale. Generous whitespace is a core part of the
+/// The DailyDil spacing scale. Generous whitespace is a core part of the
 /// "clinical-calm meets premium" tone, so steps grow on an 8-pt rhythm with a
 /// couple of finer values for tight, glanceable layouts.
 public enum HESpacing {
@@ -59,7 +59,7 @@ public enum HEShadow {
 }
 
 public extension View {
-    /// Applies the standard soft Heartelfie card elevation.
+    /// Applies the standard soft DailyDil card elevation.
     func heCardShadow() -> some View {
         let s = HEShadow.card()
         return shadow(color: s.color, radius: s.radius, x: s.x, y: s.y)

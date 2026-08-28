@@ -174,7 +174,7 @@ public enum ReadingAggregator {
         for reading in readings {
             // Deduct per-metric for softened risk, capped so a single noisy reading
             // can't tank the score.
-            for metric in reading.metrics {
+            for metric in reading.visibleMetrics {
                 switch metric.risk {
                 case .elevated:
                     score -= 12
@@ -250,6 +250,7 @@ public enum ReadingAggregator {
         calendar: Calendar = .current
     ) -> [TimeSeriesPoint] {
         guard days > 0 else { return [] }
+        guard metric.isVisibleInDailyDil else { return [] }
         let today = calendar.startOfDay(for: now)
         guard let cutoff = calendar.date(byAdding: .day, value: -(days - 1), to: today) else { return [] }
 

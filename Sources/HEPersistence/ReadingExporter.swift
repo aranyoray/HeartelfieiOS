@@ -8,7 +8,7 @@ import UIKit
 import PDFKit
 #endif
 
-/// Exports Heartelfie readings for full data portability (CSV + PDF).
+/// Exports DailyDil readings for full data portability (CSV + PDF).
 ///
 /// CSV is one row per metric per reading; PDF is a clean, human-readable summary.
 /// Both always carry the non-diagnostic disclaimers (`Disclaimers.notDiagnostic`
@@ -44,12 +44,13 @@ public struct ReadingExporter: Sendable {
             let provenance = reading.provenance.shortLabel
 
             // Emit one line per metric so each value is independently analysable.
-            if reading.metrics.isEmpty {
+            let metrics = reading.metrics
+            if metrics.isEmpty {
                 // Still emit a single row so a metric-less reading isn't lost.
                 let fields = [timestamp, modality, tier, "", "", "", reading.overallRisk.displayName, confidence, provenance]
                 rows.append(fields.map(Self.escapeCSV).joined(separator: ","))
             } else {
-                for metric in reading.metrics {
+                for metric in metrics {
                     let fields = [
                         timestamp, modality, tier,
                         metric.kind.displayName,
@@ -132,7 +133,7 @@ extension ReadingExporter {
             var cursorY = Layout.margin
 
             cursorY = drawText(
-                "\(HeartelfieConfig.appName) — Health Export",
+                "\(DailyDilConfig.appName) — Health Export",
                 at: cursorY, font: .boldSystemFont(ofSize: 22)
             )
             cursorY += 4
@@ -194,10 +195,11 @@ extension ReadingExporter {
             attributes: titleAttrs
         ))
 
-        if reading.metrics.isEmpty {
+        let metrics = reading.metrics
+        if metrics.isEmpty {
             result.append(NSAttributedString(string: "No metrics.\n", attributes: bodyAttrs))
         } else {
-            for metric in reading.metrics {
+            for metric in metrics {
                 let line = "• \(metric.kind.displayName): \(metric.formattedValueWithUnit)  [\(metric.risk.displayName)]\n"
                 result.append(NSAttributedString(string: line, attributes: bodyAttrs))
             }

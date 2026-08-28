@@ -9,7 +9,7 @@ public struct CardioMetric: Identifiable, Codable, Sendable, Hashable {
     public let unit: String
     public let risk: RiskLevel
     public let referenceRange: ClinicalRange?
-    /// Optional note, e.g. "approximate" for screening SpO₂.
+    /// Optional note for extra context about a metric.
     public let note: String?
 
     public init(

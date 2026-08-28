@@ -156,12 +156,12 @@ struct DataAndPrivacyView: View {
                     privacyPoint(
                         icon: "arrow.down.heart.fill",
                         title: "What DailyDil reads",
-                        detail: "With your permission, DailyDil reads supported Apple Health values such as heart rate, heart-rate variability, resting heart rate, oxygen wellness, breathing rate, and available Apple Watch rhythm data."
+                        detail: "With your permission, DailyDil reads supported Apple Health values such as heart rate, heart-rate variability, resting heart rate, breathing rate, and available Apple Watch rhythm data."
                     )
                     privacyPoint(
                         icon: "arrow.up.heart.fill",
                         title: "What DailyDil writes",
-                        detail: "With your permission, DailyDil saves your camera-based wellness estimates — heart rate, heart-rate variability, and breathing rate — to Apple Health, labelled as coming from DailyDil. Face frames, custom waveforms, and camera oxygen estimates that HealthKit does not represent are not written."
+                        detail: "With your permission, DailyDil saves your camera-based wellness estimates — heart rate, heart-rate variability, and breathing rate — to Apple Health, labelled as coming from DailyDil. Face frames and custom waveforms are not written."
                     )
                     Text("You can change Apple Health permissions any time in the Health app.")
                         .font(.heCaption)

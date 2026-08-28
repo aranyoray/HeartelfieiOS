@@ -95,7 +95,7 @@ public final class OnDeviceModels: Sendable {
     // MARK: - Drop real weights here
     //
     // To ship a real on-device rhythm screen:
-    //   1. Add `HeartelfieRhythm.mlpackage` (or `.mlmodel`) to the HEML target's
+    //   1. Add `DailyDilRhythm.mlpackage` (or `.mlmodel`) to the HEML target's
     //      resources (declare `resources: [.process("Models")]` in Package.swift
     //      for this target, or bundle it in the app and pass the URL in).
     //   2. Xcode auto-compiles `.mlmodel` → `.mlmodelc` and generates a Swift
@@ -116,14 +116,14 @@ public final class OnDeviceModels: Sendable {
     /// Lazily-loaded CoreML rhythm model, or `nil` when no weights are bundled.
     /// Computed (not stored) to keep `OnDeviceModels` immutable & `Sendable`.
     static var loadedRhythmModel: MLModel? {
-        // TODO: Replace "HeartelfieRhythm" with the real compiled model resource.
+        // TODO: Replace "DailyDilRhythm" with the real compiled model resource.
         // We resolve the bundle via a class anchor (`Bundle(for:)`) rather than
         // `Bundle.module`, because `Bundle.module` is only synthesised when the
         // SwiftPM target declares `resources:` — which HEML does not yet. Once you
         // add a resources rule for the model, switch this to `Bundle.module`.
         // Returns nil today (no weights bundled) → heuristic fallback.
         guard let url = Bundle(for: ModelBundleAnchor.self)
-            .url(forResource: "HeartelfieRhythm", withExtension: "mlmodelc") else {
+            .url(forResource: "DailyDilRhythm", withExtension: "mlmodelc") else {
             return nil
         }
         let config = MLModelConfiguration()

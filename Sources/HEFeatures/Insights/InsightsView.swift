@@ -355,7 +355,7 @@ struct InsightsView: View {
         // Look across recent readings (most recent first).
         let recent = allReadings.sorted { $0.timestamp > $1.timestamp }.prefix(30)
         for reading in recent {
-            for metric in reading.metrics {
+            for metric in reading.visibleMetrics {
                 guard !seenKinds.contains(metric.kind) else { continue }
                 if let signal = ClinicalConfig.seekCareSignal(for: metric.kind, value: metric.value) {
                     seenKinds.insert(metric.kind)

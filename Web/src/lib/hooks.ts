@@ -3,7 +3,7 @@ import type { GeoFeature, GeoMode, MeasureData, Meta, Places } from './types'
 import { loadGeometry, loadMeasure, loadMeta, loadPlaces } from './data'
 
 function logError(label: string, err: unknown) {
-  if (typeof console !== 'undefined') console.error(`[Heartelfie] ${label}:`, err)
+  if (typeof console !== 'undefined') console.error(`[DailyDil] ${label}:`, err)
 }
 
 export function useMeta(): Meta | null {

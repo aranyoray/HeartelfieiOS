@@ -10,7 +10,7 @@ export default function TopBar({ meta }: { meta: Meta }) {
       <div className="brand">
         <span className="brand-pulse" aria-hidden />
         <div className="brand-text">
-          <span className="brand-name">Heartelfie</span>
+          <span className="brand-name">DailyDil</span>
           <span className="brand-sub">U.S. Cardiovascular Atlas</span>
         </div>
         {meta.isPlaceholder && <span className="demo-badge" title={meta.source}>DEMO DATA</span>}

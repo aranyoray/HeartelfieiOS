@@ -195,10 +195,9 @@ final class HESignalTests: XCTestCase {
         XCTAssertTrue(kinds.contains(.heartRate))
     }
 
-    func testSignalProcessorEmitsScreeningSpO2WhenRedAndGreenPresent() {
+    func testSignalProcessorDoesNotEmitSpO2WhenRedAndGreenPresent() {
         let fs = 100.0
         let green = SyntheticSignal.ppg(durationSeconds: 25, sampleRate: fs, heartRateBPM: 72, hrvMS: 12, noise: 0.02)
-        // Same pulsatile shape, different DC/AC so the ratio-of-ratios is defined.
         let red = green.map { $0 * 0.7 + 40 }
         let result = SignalProcessor().process(
             channels: [.green: green, .red: red],
@@ -209,11 +208,12 @@ final class HESignalTests: XCTestCase {
         guard case .success(let processed) = result else {
             return XCTFail("Expected success")
         }
-        XCTAssertNotNil(processed.metrics.first { $0.kind == .spo2Estimate })
+        XCTAssertNil(processed.metrics.first { $0.kind == .spo2Estimate })
+        XCTAssertNil(processed.metrics.first { $0.kind == .spo2Clinical })
         XCTAssertFalse(processed.metrics.contains { $0.kind.isDeviceOnly })
     }
 
-    func testSignalProcessorOmitsSpO2WhenNotSupported() {
+    func testSignalProcessorOmitsSpO2ForFacialRPPG() {
         let fs = 100.0
         let green = SyntheticSignal.ppg(durationSeconds: 25, sampleRate: fs, heartRateBPM: 68, noise: 0.02)
         let red = green.map { $0 * 0.7 + 40 }
@@ -227,6 +227,7 @@ final class HESignalTests: XCTestCase {
             return XCTFail("Expected success")
         }
         XCTAssertNil(processed.metrics.first { $0.kind == .spo2Estimate })
+        XCTAssertNil(processed.metrics.first { $0.kind == .spo2Clinical })
     }
 
     // MARK: - Audit regression tests

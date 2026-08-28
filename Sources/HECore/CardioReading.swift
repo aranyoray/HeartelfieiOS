@@ -51,15 +51,55 @@ public struct CardioReading: Identifiable, Codable, Sendable, Hashable {
 
     /// The headline metric for compact cards (heart rate when present).
     public var primaryMetric: CardioMetric? {
-        metrics.first(where: { $0.kind == .heartRate }) ?? metrics.first
+        visibleMetrics.first(where: { $0.kind == .heartRate }) ?? visibleMetrics.first
+    }
+
+    /// Metrics shown in DailyDil's current product surface.
+    public var visibleMetrics: [CardioMetric] {
+        metrics.filter { $0.kind.isVisibleInDailyDil }
     }
 
     /// The worst (highest) risk across all metrics — drives the overall status.
     public var overallRisk: RiskLevel {
-        metrics.map(\.risk).max() ?? .unknown
+        visibleMetrics.map(\.risk).max() ?? .unknown
     }
 
     public func metric(_ kind: MetricKind) -> CardioMetric? {
         metrics.first(where: { $0.kind == kind })
+    }
+
+    // MARK: - Resilient decoding
+
+    private enum CodingKeys: String, CodingKey {
+        case id, timestamp, modality, tier, metrics, confidence,
+             signalQuality, provenance, interpretation, monkSkinTone,
+             waveformPreview
+    }
+
+    /// Decodes `T` if possible, otherwise `nil` — used to skip individual
+    /// metrics whose kind no longer exists without dropping the whole reading
+    /// (and its heart-rate/HRV history) from the store.
+    private struct LossyMetric: Decodable {
+        let value: CardioMetric?
+        init(from decoder: Decoder) throws {
+            value = try? CardioMetric(from: decoder)
+        }
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decode(UUID.self, forKey: .id)
+        self.timestamp = try c.decode(Date.self, forKey: .timestamp)
+        self.modality = try c.decode(Modality.self, forKey: .modality)
+        let modality = self.modality
+        self.tier = (try? c.decode(MeasurementTier.self, forKey: .tier)) ?? modality.tier
+        let lossy = (try? c.decode([LossyMetric].self, forKey: .metrics)) ?? []
+        self.metrics = lossy.compactMap(\.value)
+        self.confidence = try c.decode(Confidence.self, forKey: .confidence)
+        self.signalQuality = try c.decode(SignalQuality.self, forKey: .signalQuality)
+        self.provenance = try c.decode(Provenance.self, forKey: .provenance)
+        self.interpretation = try c.decode(String.self, forKey: .interpretation)
+        self.monkSkinTone = try c.decodeIfPresent(MonkSkinTone.self, forKey: .monkSkinTone)
+        self.waveformPreview = try c.decodeIfPresent([Double].self, forKey: .waveformPreview) ?? []
     }
 }

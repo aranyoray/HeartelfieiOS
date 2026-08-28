@@ -1,4 +1,4 @@
-# Heartelfie — U.S. Heart & Circulatory Wellness Atlas
+# DailyDil — U.S. Heart & Circulatory Wellness Atlas
 
 An interactive **3D atlas** of U.S. county- and state-level **heart & circulatory
 wellness awareness**. Every county is shaded on a **pink → red** ramp (redder = a
@@ -113,7 +113,7 @@ works with an equivalent SPA fallback.
 ## Support, privacy & terms
 
 In-app **/support**, **/privacy**, and **/terms** pages are included for App
-Store / Play Store review. Support contact: **support@heartelfie.app** (placeholder —
+Store / Play Store review. Support contact: **support@dailydil.app** (placeholder —
 set a real, monitored address before submission).
 
 ## Disclaimer

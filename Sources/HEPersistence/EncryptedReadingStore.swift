@@ -82,8 +82,8 @@ public actor EncryptedReadingStore: ReadingRepository {
 
     /// Creates the store.
     /// - Parameters:
-    ///   - directory: Directory for the encrypted file. Defaults to
-    ///     `Application Support/Heartelfie`, created if needed.
+    ///   - directory: Directory for the encrypted file. Defaults to the app's
+    ///     original Application Support directory, created if needed.
     ///   - crypto: Encryption box (defaults to one keyed from the Keychain).
     ///   - fileName: Name of the encrypted blob on disk.
     public init(
@@ -106,7 +106,7 @@ public actor EncryptedReadingStore: ReadingRepository {
         self.decoder = decoder
     }
 
-    /// Default directory: `Application Support/Heartelfie`.
+    /// Default directory, frozen to the original app support path for upgrades.
     public static func defaultDirectory() throws -> URL {
         let base = try FileManager.default.url(
             for: .applicationSupportDirectory,
@@ -114,7 +114,7 @@ public actor EncryptedReadingStore: ReadingRepository {
             appropriateFor: nil,
             create: true
         )
-        return base.appendingPathComponent(HeartelfieConfig.storageDirectoryName, isDirectory: true)
+        return base.appendingPathComponent(DailyDilConfig.storageDirectoryName, isDirectory: true)
     }
 
     private static func ensureDirectoryExists(_ url: URL) throws {

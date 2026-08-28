@@ -67,7 +67,7 @@ public final class DailyReminderScheduler {
 
         let content = UNMutableNotificationContent()
         content.title = "Time for today's check"
-        content.body = "A calm minute with \(HeartelfieConfig.appName) keeps your wellness trend honest."
+        content.body = "A calm minute with \(DailyDilConfig.appName) keeps your wellness trend honest."
         content.sound = .default
 
         var trigger = DateComponents()
@@ -118,7 +118,7 @@ struct DailyReminderSection: View {
 
                 if scheduler.permissionDenied {
                     VStack(alignment: .leading, spacing: HESpacing.xs) {
-                        Text("Notifications are off for \(HeartelfieConfig.appName) in iOS Settings, so the reminder can't be delivered.")
+                        Text("Notifications are off for \(DailyDilConfig.appName) in iOS Settings, so the reminder can't be delivered.")
                             .font(.heCaption)
                             .foregroundStyle(Color.heTextSecondary)
                         Button("Open Settings") {

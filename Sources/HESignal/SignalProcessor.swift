@@ -2,7 +2,7 @@ import Foundation
 import HECore
 
 /// The DSP-computable result of one capture: metrics the on-device signal pipeline
-/// can derive itself (HR, HRV, rhythm, screening SpO₂, respiration).
+/// can derive itself (HR, HRV, rhythm, respiration).
 public struct ProcessedSignal: Sendable {
     public let metrics: [CardioMetric]
     public let signalQuality: SignalQuality
@@ -109,17 +109,6 @@ public struct SignalProcessor: Sendable {
             metrics.append(CardioMetric(kind: .rhythmIrregularity, value: features.irregularityPercent.rounded(), profile: profile))
         }
 
-        // Screening SpO₂ estimate — phone tier only, requires red + green channels.
-        if allowed.contains(.spo2Estimate),
-           let estimate = screeningSpO2(channels: channels, sampleRate: sampleRate) {
-            metrics.append(CardioMetric(
-                kind: .spo2Estimate,
-                value: estimate.rounded(),
-                note: "Approximate — screening only, not a medical SpO₂.",
-                profile: profile
-            ))
-        }
-
         // Respiratory rate — optional, only when a clear respiratory rhythm exists.
         if allowed.contains(.respiratoryRate),
            let breathsPerMin = respiratoryRate(filtered: filtered, sampleRate: sampleRate) {
@@ -155,21 +144,6 @@ public struct SignalProcessor: Sendable {
         let regularityFactor = 1.0 - min(features.irregularityPercent / 100.0, 0.6)
         let raw = quality.sqi * (0.5 + 0.5 * countFactor) * (0.6 + 0.4 * regularityFactor)
         return Confidence(raw)
-    }
-
-    /// Ratio-of-ratios screening SpO₂ estimate from red + green camera channels.
-    private func screeningSpO2(channels: [SignalChannel: [Double]], sampleRate: Double) -> Double? {
-        guard let red = channels[.red], let green = channels[.green],
-              red.count > 8, green.count > 8 else { return nil }
-        let band = (low: 0.7, high: 3.5)
-        let redF = BandpassFilter(lowHz: band.low, highHz: band.high, sampleRate: sampleRate).filtfilt(red)
-        let greenF = BandpassFilter(lowHz: band.low, highHz: band.high, sampleRate: sampleRate).filtfilt(green)
-        let acRed = Vector.std(redF), dcRed = abs(Vector.mean(red))
-        let acGreen = Vector.std(greenF), dcGreen = abs(Vector.mean(green))
-        guard dcRed > 1e-6, dcGreen > 1e-6, acGreen > 1e-9 else { return nil }
-        let ratio = (acRed / dcRed) / (acGreen / dcGreen)
-        guard ratio.isFinite, ratio > 0 else { return nil }
-        return ClinicalConfig.estimatedSpO2(ratioOfRatios: ratio)
     }
 
     /// Rough respiratory rate (breaths/min) from PPG amplitude modulation (RIIV),

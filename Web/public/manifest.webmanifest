@@ -1,6 +1,6 @@
 {
-  "name": "Heartelfie — U.S. Cardiovascular Health Atlas",
-  "short_name": "Heartelfie",
+  "name": "DailyDil — U.S. Cardiovascular Health Atlas",
+  "short_name": "DailyDil",
   "description": "Interactive atlas of U.S. county and state cardiovascular health (CDC PLACES). For information only — not medical advice.",
   "start_url": "/",
   "scope": "/",

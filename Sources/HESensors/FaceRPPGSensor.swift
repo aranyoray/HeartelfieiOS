@@ -37,7 +37,7 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
     #if canImport(AVFoundation)
     private let session = AVCaptureSession()
     private let output = AVCaptureVideoDataOutput()
-    private let sampleQueue = DispatchQueue(label: "com.heartelfie.camera.rppg")
+    private let sampleQueue = DispatchQueue(label: "com.dailydil.camera.rppg")
     #endif
 
     public override init() { super.init() }

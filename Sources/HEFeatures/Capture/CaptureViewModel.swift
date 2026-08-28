@@ -407,7 +407,9 @@ public final class CaptureViewModel {
 
     /// Compose a concise, explicitly non-diagnostic interpretation string.
     static func interpretation(metrics: [CardioMetric], confidence: Confidence, tier: MeasurementTier) -> String {
-        let risk = metrics.map(\.risk).max() ?? .unknown
+        // Gate on visible kinds like every other aggregation, so a hidden
+        // legacy metric can never steer the user-facing summary.
+        let risk = metrics.filter { $0.kind.isVisibleInDailyDil }.map(\.risk).max() ?? .unknown
         var parts: [String] = []
         if confidence.isLow {
             parts.append("Confidence was low, so treat this as a rough screen and try again when you can.")
