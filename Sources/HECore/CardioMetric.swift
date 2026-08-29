@@ -32,9 +32,21 @@ public struct CardioMetric: Identifiable, Codable, Sendable, Hashable {
         self.note = note
     }
 
-    /// Value formatted to the metric's natural precision (no unit).
+    /// Value formatted to the metric's natural precision (no unit). Locale-aware —
+    /// for on-screen display only.
     public var formattedValue: String {
         return value.formatted(.number.precision(.fractionLength(kind.fractionDigits)))
+    }
+
+    /// Machine-readable value for exports: fixed precision with a `.` decimal
+    /// separator regardless of locale, so a comma-decimal locale can't corrupt the
+    /// CSV `value` column (e.g. "72,5") or make it inconsistent with the ISO
+    /// timestamp column.
+    public var exportValue: String {
+        return value.formatted(
+            .number.precision(.fractionLength(kind.fractionDigits))
+                .locale(Locale(identifier: "en_US_POSIX"))
+        )
     }
 
     /// Value plus unit, e.g. "72 bpm".

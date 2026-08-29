@@ -36,15 +36,33 @@ struct SnapshotProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SnapshotEntry) -> Void) {
-        completion(SnapshotEntry(date: .now, snapshot: DashboardSnapshot.load() ?? .placeholder))
+        // Only the gallery/preview gets fabricated sample data. A real widget —
+        // including a freshly added one before the app has ever written a snapshot
+        // — shows the true state (nil → "Take today's check"), never a fake 82.
+        let snap = context.isPreview ? .placeholder : Self.corrected(DashboardSnapshot.load())
+        completion(SnapshotEntry(date: .now, snapshot: snap))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SnapshotEntry>) -> Void) {
-        let entry = SnapshotEntry(date: .now, snapshot: DashboardSnapshot.load())
-        // The app refreshes the snapshot on every dashboard load; an hourly
-        // timeline keeps "checked today" from going stale across midnight.
-        let next = Calendar.current.date(byAdding: .hour, value: 1, to: .now) ?? .now
-        completion(Timeline(entries: [entry], policy: .after(next)))
+        let now = Date.now
+        let entry = SnapshotEntry(date: now, snapshot: Self.corrected(DashboardSnapshot.load()))
+        // Refresh hourly, but no later than the next local midnight so the day
+        // actually rolls over on its own — the app is the only snapshot writer, so
+        // without this the widget would show yesterday's "checked today" until the
+        // app is next foregrounded.
+        let hourly = now.addingTimeInterval(3600)
+        let nextMidnight = Calendar.current.nextDate(
+            after: now, matching: DateComponents(hour: 0, minute: 0, second: 0), matchingPolicy: .nextTime
+        ) ?? hourly
+        completion(Timeline(entries: [entry], policy: .after(min(hourly, nextMidnight))))
+    }
+
+    /// Age-correct a stored snapshot: if it isn't from the current day, "checked
+    /// today" is no longer true, so the widget flips back to the check-in prompt.
+    private static func corrected(_ snapshot: DashboardSnapshot?) -> DashboardSnapshot? {
+        guard var snap = snapshot else { return nil }
+        if !Calendar.current.isDateInToday(snap.updated) { snap.checkedToday = false }
+        return snap
     }
 }
 

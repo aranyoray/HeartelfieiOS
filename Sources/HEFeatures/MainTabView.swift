@@ -56,8 +56,6 @@ public struct MainTabView: View {
             InsightsView()
         case .metricTrend(let metric):
             MetricTrendView(metric: metric)
-        case .settings:
-            ProfileView()
         case .dataAndPrivacy:
             DataAndPrivacyView()
         case .exportData:

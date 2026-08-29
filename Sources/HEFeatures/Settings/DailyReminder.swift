@@ -54,17 +54,39 @@ public final class DailyReminderScheduler {
         defaults.set(components.hour ?? 9, forKey: Self.hourKey)
         defaults.set(components.minute ?? 0, forKey: Self.minuteKey)
         if isEnabled {
-            await requestAndSchedule()
+            await reschedule()
         }
     }
 
+    /// Enable path: request permission once, then schedule.
     private func requestAndSchedule() async {
         #if canImport(UserNotifications)
         let center = UNUserNotificationCenter.current()
         let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
         permissionDenied = !granted
         guard granted else { return }
+        await schedule()
+        #endif
+    }
 
+    /// Time-change path: reschedule against the CURRENT authorization status
+    /// without ever re-requesting — dragging the picker must not re-prompt, and a
+    /// permission revoked later in iOS Settings surfaces here instead of silently
+    /// dropping the reminder while the toggle still reads "on".
+    private func reschedule() async {
+        #if canImport(UserNotifications)
+        let center = UNUserNotificationCenter.current()
+        let status = await center.notificationSettings().authorizationStatus
+        let authorized = status == .authorized || status == .provisional || status == .ephemeral
+        permissionDenied = !authorized
+        guard authorized else { return }
+        await schedule()
+        #endif
+    }
+
+    private func schedule() async {
+        #if canImport(UserNotifications)
+        let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
         content.title = "Time for today's check"
         content.body = "A calm minute with \(DailyDilConfig.appName) keeps your wellness trend honest."
@@ -115,6 +137,7 @@ struct DailyReminderSection: View {
                     ),
                     displayedComponents: .hourAndMinute
                 )
+                .transition(.opacity.combined(with: .move(edge: .top)))
 
                 if scheduler.permissionDenied {
                     VStack(alignment: .leading, spacing: HESpacing.xs) {
@@ -129,6 +152,7 @@ struct DailyReminderSection: View {
                         .font(.heCaption.weight(.semibold))
                         .foregroundStyle(Color.hePrimary)
                     }
+                    .transition(.opacity)
                 }
             }
         } header: {
@@ -136,5 +160,8 @@ struct DailyReminderSection: View {
         } footer: {
             Text("A gentle local nudge, scheduled on this device. The notification never includes your results.")
         }
+        // Reveal the time picker / permission notice with a settled spring.
+        .animation(HEMotion.snappy, value: scheduler.isEnabled)
+        .animation(HEMotion.snappy, value: scheduler.permissionDenied)
     }
 }

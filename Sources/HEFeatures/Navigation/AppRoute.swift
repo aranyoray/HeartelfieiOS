@@ -41,7 +41,6 @@ public enum AppRoute: Hashable, Sendable {
     /// Per-metric trend detail.
     case metricTrend(MetricKind)
     /// Settings sub-screens.
-    case settings
     case dataAndPrivacy
     case exportData
     case about

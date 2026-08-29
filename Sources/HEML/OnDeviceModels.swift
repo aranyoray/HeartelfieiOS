@@ -113,9 +113,15 @@ public final class OnDeviceModels: Sendable {
     /// `Bundle(for:)`. Has no instances and holds no state.
     private final class ModelBundleAnchor {}
 
-    /// Lazily-loaded CoreML rhythm model, or `nil` when no weights are bundled.
-    /// Computed (not stored) to keep `OnDeviceModels` immutable & `Sendable`.
-    static var loadedRhythmModel: MLModel? {
+    /// The CoreML rhythm model, resolved from disk exactly once and cached, or
+    /// `nil` when no weights are bundled. `loadedRhythmModel` is read on the
+    /// inference path (once real weights ship), so resolving + compiling the model
+    /// on every reading would be needless disk/CPU — a `static let` loads it lazily
+    /// on first use and reuses it thereafter. `nonisolated(unsafe)` because `MLModel`
+    /// isn't `Sendable`; it is safe to share for read-only inference.
+    nonisolated(unsafe) static let loadedRhythmModel: MLModel? = OnDeviceModels.loadRhythmModel()
+
+    private static func loadRhythmModel() -> MLModel? {
         // TODO: Replace "DailyDilRhythm" with the real compiled model resource.
         // We resolve the bundle via a class anchor (`Bundle(for:)`) rather than
         // `Bundle.module`, because `Bundle.module` is only synthesised when the

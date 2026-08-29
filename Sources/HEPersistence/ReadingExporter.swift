@@ -54,7 +54,7 @@ public struct ReadingExporter: Sendable {
                     let fields = [
                         timestamp, modality, tier,
                         metric.kind.displayName,
-                        metric.formattedValue,
+                        metric.exportValue,
                         metric.unit,
                         metric.risk.displayName,
                         confidence,
