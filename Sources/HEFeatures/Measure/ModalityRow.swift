@@ -30,7 +30,7 @@ struct ModalityRow: View {
             Image(systemName: modality.systemImage)
                 .font(.title2)
                 .foregroundStyle(Color.hePrimary)
-                .frame(width: 34, height: 34)
+                .frame(width: HEIcon.lg, height: HEIcon.lg)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: HESpacing.xs) {
@@ -73,6 +73,8 @@ struct ModalityRow: View {
             .accessibilityLabel(heading + ": " + modality.supportedMetrics
                 .map(\.displayName)
                 .joined(separator: ", "))
+            .transition(.opacity.combined(with: .move(edge: .top)))
+            .animation(HEMotion.snappy, value: modality.supportedMetrics)
         }
     }
 
@@ -93,12 +95,14 @@ struct ModalityRow: View {
                 Image(systemName: "info.circle")
                     .font(.title3)
                     .foregroundStyle(Color.hePrimary)
-                    .frame(width: 44, height: 44)
+                    .frame(width: HEIcon.tap, height: HEIcon.tap)
                     .background(
                         Circle().fill(Color.hePrimary.opacity(0.12))
                     )
+                    // Guarantee a >=44pt hit target even if the glyph frame shrinks.
+                    .contentShape(Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(HECardButtonStyle())
             .accessibilityLabel("What this does and doesn't mean")
             .accessibilityHint("Explains \(modality.displayName).")
         }

@@ -25,30 +25,37 @@ struct ProfileView: View {
             versionSection
         }
         .scrollContentBackground(.hidden)
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Header
 
+    // A bolder hero treatment for the profile identity: avatar + name on the
+    // deep brand gradient (glow already baked into HEHeroCard). The row sits in a
+    // plain, chrome-free Section so the card reads edge-to-edge.
     private var headerSection: some View {
         Section {
-            HStack(spacing: HESpacing.md) {
-                avatar
+            HEHeroCard {
+                HStack(spacing: HESpacing.md) {
+                    avatar
 
-                VStack(alignment: .leading, spacing: HESpacing.xxs) {
-                    Text(env.profile.name == "PID001" ? "Your profile" : env.profile.name)
-                        .font(.heHeadline)
-                        .foregroundStyle(Color.heTextPrimary)
-                    Text(profileSummary)
-                        .font(.heCallout)
-                        .foregroundStyle(Color.heTextSecondary)
+                    VStack(alignment: .leading, spacing: HESpacing.xxs) {
+                        Text(env.profile.name == "PID001" ? "Your profile" : env.profile.name)
+                            .font(.heHeadline)
+                            .foregroundStyle(.white)
+                        Text(profileSummary)
+                            .font(.heCallout)
+                            .foregroundStyle(.white.opacity(0.85))
+                    }
+
+                    Spacer(minLength: 0)
                 }
-
-                Spacer(minLength: 0)
             }
             .padding(.vertical, HESpacing.xs)
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Profile for \(env.profile.name). \(profileSummary)")
         }
@@ -57,19 +64,19 @@ struct ProfileView: View {
     private var avatar: some View {
         ZStack {
             Circle()
-                .fill(Color.hePrimary.opacity(0.15))
+                .fill(.white.opacity(0.18))
                 .frame(width: 56, height: 56)
 
             if let tone = env.profile.monkSkinTone {
                 Circle()
                     .fill(Color(hex: tone.swatchHex))
                     .frame(width: 44, height: 44)
-                    .overlay(Circle().strokeBorder(Color.heSeparator, lineWidth: 1))
+                    .overlay(Circle().strokeBorder(.white.opacity(0.6), lineWidth: 1))
                     .accessibilityHidden(true)
             } else {
                 Image(systemName: "person.crop.circle.fill")
                     .font(.system(size: 40, weight: .regular))
-                    .foregroundStyle(Color.hePrimary)
+                    .foregroundStyle(.white)
                     .accessibilityHidden(true)
             }
         }
@@ -128,6 +135,7 @@ struct ProfileView: View {
                 Spacer()
                 Text(bmi.formatted(.number.precision(.fractionLength(1))))
                     .monospacedDigit()
+                    .contentTransition(.numericText())
                     .foregroundStyle(Color.heTextPrimary)
                 Text(category.label)
                     .font(.heCaption.weight(.medium))
@@ -135,6 +143,7 @@ struct ProfileView: View {
                     .padding(.horizontal, HESpacing.sm)
                     .padding(.vertical, 2)
                     .background(Capsule().fill(Color.heRisk(category.risk).opacity(0.15)))
+                    .animation(HEMotion.snappy, value: bmi)
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("B M I \(bmi.formatted(.number.precision(.fractionLength(1)))), \(category.label)")
@@ -153,6 +162,7 @@ struct ProfileView: View {
                     .accessibilityHidden(true)
                 Text("\(tone.value)")
                     .monospacedDigit()
+                    .contentTransition(.numericText())
                     .foregroundStyle(Color.heTextSecondary)
             } else {
                 Text("Not set").foregroundStyle(Color.heTextTertiary)
@@ -305,6 +315,7 @@ private struct AppleHealthRow: View {
             HStack(spacing: HESpacing.sm) {
                 Image(systemName: "heart.fill")
                     .foregroundStyle(Color.hePrimary)
+                    .frame(width: HEIcon.sm, height: HEIcon.sm)
                     .accessibilityHidden(true)
                     Text("Apple Health / HealthKit")
                     .font(.heBody)
@@ -316,6 +327,7 @@ private struct AppleHealthRow: View {
                 Label("HealthKit permission requested. You can change it in the Health app.", systemImage: "checkmark.circle.fill")
                     .font(.heCaption)
                     .foregroundStyle(Color.heTextSecondary)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
             } else {
                 HESecondaryButton(
                     "Continue",
@@ -324,9 +336,11 @@ private struct AppleHealthRow: View {
                 ) {
                     connect()
                 }
+                .transition(.opacity)
             }
         }
         .padding(.vertical, HESpacing.xxs)
+        .animation(HEMotion.snappy, value: didRequest)
     }
 
     private func connect() {

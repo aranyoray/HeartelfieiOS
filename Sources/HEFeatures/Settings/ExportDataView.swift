@@ -51,14 +51,17 @@ struct ExportDataView: View {
                     subtitle: "Take a full copy of your readings with you.",
                     systemImage: "square.and.arrow.up.fill"
                 )
+                .heEntrance(0)
 
                 content
+                    .heEntrance(1)
 
                 NonDiagnosticFooter()
+                    .heEntrance(2)
             }
             .padding(HESpacing.md)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("Export data")
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
@@ -110,6 +113,7 @@ struct ExportDataView: View {
                     Label("\(count) \(count == 1 ? "reading" : "readings") ready", systemImage: "checkmark.circle.fill")
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
+                        .contentTransition(.numericText())
                     Text("Share a spreadsheet-friendly CSV or a formatted PDF. The PDF includes the wellness and screening disclaimer. Files are built when you tap share and removed afterwards.")
                         .font(.heCallout)
                         .foregroundStyle(Color.heTextSecondary)
@@ -139,6 +143,7 @@ struct ExportDataView: View {
             .foregroundStyle(.white)
             .background(Color.hePrimary, in: RoundedRectangle(cornerRadius: HERadius.md))
             .opacity(isBuilding ? 0.6 : 1)
+            .animation(HEMotion.fade, value: isBuilding)
     }
 
     // MARK: - Load / build

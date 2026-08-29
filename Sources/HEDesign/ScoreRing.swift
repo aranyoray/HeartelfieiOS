@@ -29,12 +29,19 @@ public struct ScoreRing: View {
             Circle()
                 .stroke(Color.heSeparator, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
 
+            // Soft glow that traces the arc, giving the ring a lit, premium halo.
+            Circle()
+                .trim(from: 0, to: max(0.0001, animatedProgress))
+                .stroke(tint.opacity(0.55), style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .blur(radius: 14)
+
             // Progress arc.
             Circle()
                 .trim(from: 0, to: max(0.0001, animatedProgress))
                 .stroke(
                     AngularGradient(
-                        gradient: Gradient(colors: [tint.opacity(0.65), tint]),
+                        gradient: Gradient(colors: [tint.opacity(0.55), tint, tint.opacity(0.85)]),
                         center: .center
                     ),
                     style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)

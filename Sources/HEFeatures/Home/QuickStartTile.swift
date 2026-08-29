@@ -11,7 +11,7 @@ struct QuickStartTile: View {
         NavigationLink(value: AppRoute.capture(modality)) {
             tileContent
         }
-        .buttonStyle(.plain)
+        .buttonStyle(HECardButtonStyle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(modality.displayName), \(modality.tier.displayName)")
         .accessibilityHint("Starts a \(modality.tier.shortLabel.lowercased()).")

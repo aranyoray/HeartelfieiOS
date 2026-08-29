@@ -12,11 +12,26 @@ public struct HEHeroCard<Content: View>: View {
 
     public var body: some View {
         content
-            .padding(HESpacing.md)
+            .padding(HESpacing.lg)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: HERadius.xl, style: .continuous)
                     .fill(Color.heHeroGradient)
+                    .overlay(
+                        // Decorative brand glow, clipped to the hero shape.
+                        RadialGradient(
+                            colors: [Color.white.opacity(0.18), .clear],
+                            center: .topTrailing,
+                            startRadius: 0,
+                            endRadius: 240
+                        )
+                    )
+                    .overlay(Color.heHeroHighlight)   // lit top wash
+                    .clipShape(RoundedRectangle(cornerRadius: HERadius.xl, style: .continuous))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: HERadius.xl, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
             )
             .heCardShadow()
     }

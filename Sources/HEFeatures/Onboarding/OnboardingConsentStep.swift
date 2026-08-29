@@ -19,6 +19,7 @@ struct OnboardingConsentStep: View {
                 subtitle: "A quick summary of what DailyDil is — and isn't.",
                 systemImage: "checkmark.shield.fill"
             )
+            .heEntrance(0)
 
             HECard {
                 Text(Disclaimers.consentSummary)
@@ -29,6 +30,7 @@ struct OnboardingConsentStep: View {
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Summary. \(Disclaimers.consentSummary)")
+            .heEntrance(1)
 
             HECard {
                 Label(Disclaimers.notMedicalDevice, systemImage: "info.circle")
@@ -39,12 +41,16 @@ struct OnboardingConsentStep: View {
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel(Disclaimers.notMedicalDevice)
+            .heEntrance(2)
 
             EmergencyNotice()
+                .heEntrance(3)
 
             privacyCard
+                .heEntrance(4)
 
             consentToggle
+                .heEntrance(5)
         }
     }
 

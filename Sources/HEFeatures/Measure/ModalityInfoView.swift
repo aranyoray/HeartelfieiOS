@@ -18,25 +18,31 @@ struct ModalityInfoView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.lg) {
                 headerCard
+                    .heEntrance(0)
                 measuresCard
+                    .heEntrance(1)
                 meaningCard(
                     title: "What this means",
                     systemImage: "checkmark.seal.fill",
                     tint: Color.heRisk(.normal),
                     text: Disclaimers.whatItMeans(for: modality)
                 )
+                .heEntrance(2)
                 meaningCard(
                     title: "What this does not mean",
                     systemImage: "exclamationmark.shield.fill",
                     tint: Color.heRisk(.watch),
                     text: Disclaimers.whatItDoesNotMean(for: modality)
                 )
+                .heEntrance(3)
                 NonDiagnosticFooter()
+                    .heEntrance(4)
                 EmergencyNotice()
+                    .heEntrance(5)
             }
             .padding(HESpacing.md)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle(modality.shortName)
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -21,13 +21,20 @@ struct OnboardingProfileStep: View {
                 subtitle: "All optional — it helps put your readings in context. Share only what you like.",
                 systemImage: "person.text.rectangle"
             )
+            .heEntrance(0)
 
             unitsCard
+                .heEntrance(1)
             ageCard
+                .heEntrance(2)
             biologicalSexCard
+                .heEntrance(3)
             heightCard
+                .heEntrance(4)
             weightCard
+                .heEntrance(5)
             conditionsCard
+                .heEntrance(6)
         }
     }
 
@@ -296,6 +303,8 @@ private struct OptionalFieldCard<Content: View>: View {
                         .transition(.opacity)
                 }
             }
+            // The revealed field settles in with a shared, snappy curve.
+            .animation(HEMotion.snappy, value: isOn)
         }
     }
 }

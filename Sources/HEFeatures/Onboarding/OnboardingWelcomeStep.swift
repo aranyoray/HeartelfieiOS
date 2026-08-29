@@ -11,6 +11,7 @@ struct OnboardingWelcomeStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: HESpacing.lg) {
             hero
+                .heEntrance(0)
 
             VStack(alignment: .leading, spacing: HESpacing.sm) {
                 Text("A gentle daily check-in for your heart")
@@ -24,6 +25,7 @@ struct OnboardingWelcomeStep: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .accessibilityElement(children: .combine)
+            .heEntrance(1)
 
             VStack(alignment: .leading, spacing: HESpacing.md) {
                 Text("How you check in")
@@ -37,38 +39,43 @@ struct OnboardingWelcomeStep: View {
                     detail: "Quick, everyday wellness snapshots from your phone's camera. Great for spotting trends."
                 )
             }
+            .heEntrance(2)
 
             Label(Disclaimers.notDiagnostic, systemImage: "info.circle")
                 .font(.heCaption)
                 .foregroundStyle(Color.heTextSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityElement(children: .combine)
+                .heEntrance(3)
         }
     }
 
     // MARK: - Hero
 
     private var hero: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: HERadius.xl, style: .continuous)
-                .fill(Color.hePrimaryGradient)
-
+        HEHeroCard {
             VStack(spacing: HESpacing.sm) {
-                Image(systemName: "heart.text.square.fill")
-                    .font(.system(size: 56, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .accessibilityHidden(true)
+                // A softly pulsing heart, framed inside the app glyph, for a warm
+                // living first impression. Calm/static under Reduce Motion.
+                ZStack {
+                    Image(systemName: "heart.text.square.fill")
+                        .font(.system(size: 56, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    PulseHeartView(bpm: 68)
+                        .frame(width: HEIcon.md, height: HEIcon.md)
+                        .offset(y: 2)
+                }
+                .accessibilityHidden(true)
 
                 Text("Welcome to DailyDil")
                     .font(.heTitle)
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
             }
-            .padding(HESpacing.lg)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, HESpacing.lg)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 200)
-        .heCardShadow()
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Welcome to DailyDil")
     }

@@ -16,12 +16,18 @@ public struct HECard<Content: View>: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous)
-                    .fill(Color.heSurface.opacity(0.72))
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous))
+                    .fill(Color.heSurface.opacity(0.68))
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous))
+            )
+            .overlay(
+                // Lit top-edge sheen over a hairline separator — reads as glass.
+                RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous)
+                    .strokeBorder(Color.heGlassStroke, lineWidth: 1)
+                    .blendMode(.overlay)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous)
-                    .strokeBorder(Color.heSeparator.opacity(0.8), lineWidth: 1)
+                    .strokeBorder(Color.heSeparator.opacity(0.5), lineWidth: 0.5)
             )
             .heCardShadow()
     }

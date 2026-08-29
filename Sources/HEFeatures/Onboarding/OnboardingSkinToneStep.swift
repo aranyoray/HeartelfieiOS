@@ -25,6 +25,7 @@ struct OnboardingSkinToneStep: View {
                 subtitle: "Optional — pick the swatch closest to your skin, or skip.",
                 systemImage: "circle.lefthalf.filled"
             )
+            .heEntrance(0)
 
             HECard {
                 LazyVGrid(columns: columns, spacing: HESpacing.md) {
@@ -46,10 +47,15 @@ struct OnboardingSkinToneStep: View {
                     }
                 }
             }
+            .heEntrance(1)
 
             selectionStatus
+                // The confirmation cross-fades as the selection changes.
+                .animation(HEMotion.snappy, value: draft.monkSkinTone)
+                .heEntrance(2)
 
             preferNotToSayButton
+                .heEntrance(3)
 
             HECard {
                 VStack(alignment: .leading, spacing: HESpacing.sm) {
@@ -63,6 +69,7 @@ struct OnboardingSkinToneStep: View {
                 }
                 .accessibilityElement(children: .combine)
             }
+            .heEntrance(4)
         }
     }
 

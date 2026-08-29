@@ -28,11 +28,15 @@ struct CalendarHeatmap: View {
     private let cellSize: CGFloat = 26
     private let cellSpacing: CGFloat = HESpacing.xs
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         VStack(alignment: .leading, spacing: HESpacing.sm) {
             grid
             legend
         }
+        // Settle the cell fills in gently as checks load / refresh.
+        .animation(reduceMotion ? nil : HEMotion.fade, value: checks.count)
     }
 
     // MARK: - Grid

@@ -21,11 +21,18 @@ public struct PrimaryButtonStyle: ButtonStyle {
             .background(
                 RoundedRectangle(cornerRadius: HERadius.pill, style: .continuous)
                     .fill(Color.hePrimaryGradient)
+                    .overlay(
+                        // Faint top-edge shine for a lit, tactile pill.
+                        RoundedRectangle(cornerRadius: HERadius.pill, style: .continuous)
+                            .strokeBorder(Color.heGlassStroke, lineWidth: 1)
+                            .blendMode(.overlay)
+                    )
                     .opacity(isEnabled ? 1 : 0.5)
             )
-            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1)
+            .shadow(color: Color.hePrimary.opacity(isEnabled ? 0.28 : 0), radius: 12, x: 0, y: 6)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.96 : 1)
             .opacity(configuration.isPressed ? 0.92 : 1)
-            .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: configuration.isPressed)
+            .animation(reduceMotion ? nil : HEMotion.snappy, value: configuration.isPressed)
     }
 }
 

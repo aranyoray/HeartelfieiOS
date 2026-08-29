@@ -28,29 +28,44 @@ struct ResultDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
+                // Staggered entrances so the reward screen arrives section by section.
                 headerSection
+                    .heEntrance(0)
                 if reading.confidence.isLow {
                     recheckSection
+                        .heEntrance(1)
+                        .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 waveformSection
+                    .heEntrance(2)
                 qualitySection
+                    .heEntrance(3)
                 metricsSection
+                    .heEntrance(4)
                 interpretationSection
+                    .heEntrance(5)
                 if CareGuidance.shouldSurfaceCare(tier: reading.tier, risk: reading.overallRisk) {
                     CareAccessCard(
                         tier: reading.tier,
                         risk: reading.overallRisk,
                         lowConfidence: reading.confidence.isLow
                     )
+                    .heEntrance(6)
+                    .transition(.scale(scale: 0.96).combined(with: .opacity))
                 }
                 provenanceSection
+                    .heEntrance(7)
                 actionsSection
+                    .heEntrance(8)
                 NonDiagnosticFooter()
+                    .heEntrance(9)
                 EmergencyNotice()
+                    .heEntrance(10)
             }
             .padding(HESpacing.md)
+            .animation(HEMotion.snappy, value: reading.confidence.isLow)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle(reading.modality.shortName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { exportToolbarItem }
@@ -100,7 +115,8 @@ struct ResultDetailView: View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
             HStack(alignment: .top, spacing: HESpacing.md) {
                 Image(systemName: "arrow.clockwise.circle.fill")
-                    .font(.system(size: 30))
+                    .font(.system(size: HEIcon.md))
+                    .frame(width: HEIcon.lg, height: HEIcon.lg)
                     .foregroundStyle(Color.heConfidence(.low))
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: HESpacing.xs) {
@@ -320,7 +336,7 @@ struct ResultDetailView: View {
         HStack(spacing: HESpacing.sm) {
             Image(systemName: icon)
                 .foregroundStyle(Color.hePrimary)
-                .frame(width: 24)
+                .frame(width: HEIcon.sm)
                 .accessibilityHidden(true)
             Text(label)
                 .font(.heCallout)
@@ -349,6 +365,8 @@ struct ResultDetailView: View {
             }
             .accessibilityHint("Prepares a CSV of this reading to share outside DailyDil if you choose.")
         }
+        // Gently animate the export button's loading state flip.
+        .animation(HEMotion.snappy, value: isPreparingExport)
     }
 
     // MARK: - Export toolbar
@@ -369,12 +387,16 @@ struct ResultDetailView: View {
             } label: {
                 if isPreparingExport {
                     ProgressView()
+                        .transition(.opacity)
                 } else {
                     Image(systemName: "square.and.arrow.up")
+                        .transition(.opacity)
                 }
             }
+            .animation(HEMotion.snappy, value: isPreparingExport)
             .disabled(isPreparingExport)
             .accessibilityLabel("Share this reading")
+            .accessibilityHint("Opens export options to share this reading outside DailyDil.")
         }
     }
 

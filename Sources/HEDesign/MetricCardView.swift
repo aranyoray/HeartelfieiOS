@@ -28,7 +28,6 @@ public struct MetricCardView: View {
                         .font(.heHeadline)
                         .foregroundStyle(Color.heTextPrimary)
                         .lineLimit(2)
-                        .minimumScaleFactor(0.9)
                         .minimumScaleFactor(0.8)
 
                     Spacer(minLength: HESpacing.sm)
@@ -42,6 +41,7 @@ public struct MetricCardView: View {
                         .font(.heMetricNumeralCompact)
                         .foregroundStyle(Color.heTextPrimary)
                         .monospacedDigit()
+                        .contentTransition(.numericText())
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
 

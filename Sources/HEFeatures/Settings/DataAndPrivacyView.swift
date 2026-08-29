@@ -18,16 +18,23 @@ struct DataAndPrivacyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
                 consentSection
+                    .heEntrance(0)
                 storageSection
+                    .heEntrance(1)
                 faceDataSection
+                    .heEntrance(2)
                 cloudSection
+                    .heEntrance(3)
                 healthKitSection
+                    .heEntrance(4)
                 deleteSection
+                    .heEntrance(5)
                 NonDiagnosticFooter()
+                    .heEntrance(6)
             }
             .padding(HESpacing.md)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("Data & privacy")
         .navigationBarTitleDisplayMode(.inline)
         .alert("Delete all data?", isPresented: $showDeleteConfirm) {
@@ -184,6 +191,7 @@ struct DataAndPrivacyView: View {
                         Label("All local DailyDil data has been deleted from this device.", systemImage: "checkmark.circle.fill")
                             .font(.heCallout)
                             .foregroundStyle(Color.heTextSecondary)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
                         if env.healthCleanupIncomplete {
                             Text("Some samples DailyDil wrote to Apple Health may remain — you can remove them in the Health app under Browse → Data Sources.")
                                 .font(.heCaption)
@@ -195,6 +203,7 @@ struct DataAndPrivacyView: View {
                                 .font(.heCallout)
                                 .foregroundStyle(Color.heRisk(.watch))
                                 .fixedSize(horizontal: false, vertical: true)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
 
                         Text("Permanently remove every reading and profile value stored on this device, along with exported report files. DailyDil also asks Apple Health to delete the samples it wrote.")
@@ -214,6 +223,9 @@ struct DataAndPrivacyView: View {
                         .disabled(isDeleting)
                     }
                 }
+                // Settle between the delete control and the result banners.
+                .animation(HEMotion.snappy, value: didDelete)
+                .animation(HEMotion.snappy, value: deleteFailed)
             }
         }
     }
@@ -223,7 +235,7 @@ struct DataAndPrivacyView: View {
             Image(systemName: icon)
                 .font(.heHeadline)
                 .foregroundStyle(Color.hePrimary)
-                .frame(width: 28)
+                .frame(width: HEIcon.md)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: HESpacing.xxs) {

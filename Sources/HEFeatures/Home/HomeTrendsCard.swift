@@ -27,12 +27,14 @@ struct HomeTrendsCard: View {
             NavigationLink(value: AppRoute.metricTrend(.heartRate)) {
                 MiniTrendChart(metric: .heartRate, points: heartRate, profile: env.profile)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(HECardButtonStyle())
+            .accessibilityHint("Opens the full heart rate trend.")
 
             NavigationLink(value: AppRoute.metricTrend(.hrvSDNN)) {
                 MiniTrendChart(metric: .hrvSDNN, points: hrv, profile: env.profile)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(HECardButtonStyle())
+            .accessibilityHint("Opens the full heart rate variability trend.")
         }
         .task {
             guard !hasLoaded else { return }
@@ -57,6 +59,8 @@ private struct MiniTrendChart: View {
     let points: [TimeSeriesPoint]
     let profile: HealthProfile?
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     private var range: ClinicalRange? {
         ClinicalConfig.referenceRange(for: metric, profile: profile)
     }
@@ -67,10 +71,13 @@ private struct MiniTrendChart: View {
                 header
                 if points.count < 2 {
                     emptyChart
+                        .transition(.opacity)
                 } else {
                     chart
                 }
             }
+            // Ease the empty/chart swap and line redraw as points load in.
+            .animation(reduceMotion ? nil : HEMotion.spring, value: points.count)
         }
     }
 
@@ -89,6 +96,7 @@ private struct MiniTrendChart: View {
                 Text(latest.value.formatted(.number.precision(.fractionLength(metric.fractionDigits))))
                     .font(.heTitle)
                     .monospacedDigit()
+                    .contentTransition(.numericText())
                     .foregroundStyle(Color.heTextPrimary)
                 Text(metric.unit)
                     .font(.heCaption)
@@ -101,6 +109,7 @@ private struct MiniTrendChart: View {
                 .foregroundStyle(Color.heTextTertiary)
                 .accessibilityHidden(true)
         }
+        .animation(HEMotion.snappy, value: points.last?.value)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilitySummary)
         .accessibilityAddTraits(.isButton)
@@ -119,6 +128,7 @@ Image(systemName: "arrow.right").foregroundStyle(Color.heTextTertiary)
 }
 }
 .font(.heCaption.weight(.bold))
+.contentTransition(.symbolEffect(.replace))
 .accessibilityHidden(true)
 }
 

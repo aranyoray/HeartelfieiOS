@@ -9,12 +9,15 @@ import HEPersistence
 /// the non-diagnostic footer. Reached via `AppRoute.metricTrend(metric)`.
 struct MetricTrendView: View {
     @Environment(AppEnvironment.self) private var env
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let metric: MetricKind
 
     @State private var range: TrendDetailRange = .month
     @State private var series: [TimeSeriesPoint] = []
     @State private var hasLoaded = false
+    /// Date the reader is scrubbing to on the chart (nil when not touching).
+    @State private var selectedDate: Date?
 
     init(metric: MetricKind) {
         self.metric = metric
@@ -23,16 +26,18 @@ struct MetricTrendView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
-                rangePicker
-                chartCard
-                statsCard
-                trendCallout
-                referenceCard
-                NonDiagnosticFooter()
+                rangePicker.heEntrance(0)
+                chartCard.heEntrance(1)
+                statsCard.heEntrance(2)
+                trendCallout.heEntrance(3)
+                referenceCard.heEntrance(4)
+                NonDiagnosticFooter().heEntrance(5)
             }
             .padding(HESpacing.md)
+            // Animate the trend callout / stats reflow when the loaded series changes.
+            .animation(HEMotion.snappy, value: series.count)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle(metric.displayName)
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
@@ -77,6 +82,15 @@ struct MetricTrendView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(chartAccessibilitySummary)
+        .accessibilityHint("Touch and drag across the chart to hear individual readings.")
+    }
+
+    /// The series point nearest the scrubbed date, for the highlight overlay.
+    private var selectedPoint: TimeSeriesPoint? {
+        guard let selectedDate else { return nil }
+        return series.min(by: {
+            abs($0.date.timeIntervalSince(selectedDate)) < abs($1.date.timeIntervalSince(selectedDate))
+        })
     }
 
     private var chart: some View {
@@ -136,7 +150,36 @@ struct MetricTrendView: View {
                     }
                     .accessibilityHidden(true)
             }
+
+            // Scrub highlight: a soft rule + emphasized dot at the touched point.
+            if let point = selectedPoint {
+                RuleMark(x: .value("Date", point.date))
+                    .lineStyle(StrokeStyle(lineWidth: 1))
+                    .foregroundStyle(Color.hePrimary.opacity(0.35))
+                    .accessibilityHidden(true)
+                PointMark(
+                    x: .value("Date", point.date),
+                    y: .value(metric.shortName, point.value)
+                )
+                .foregroundStyle(Color.hePrimary)
+                .symbolSize(120)
+                .annotation(position: .top, spacing: HESpacing.xs, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
+                    Text("\(formatted(point.value)) \(metric.unit)")
+                        .font(.heCaption.weight(.semibold))
+                        .monospacedDigit()
+                        .contentTransition(.numericText())
+                        .foregroundStyle(Color.heTextPrimary)
+                        .padding(.horizontal, HESpacing.sm)
+                        .padding(.vertical, HESpacing.xxs)
+                        .background(Color.heSurface, in: Capsule())
+                }
+                .accessibilityHidden(true)
+            }
         }
+        .chartXSelection(value: $selectedDate)
+        .animation(reduceMotion ? nil : HEMotion.snappy, value: selectedDate)
+        // Redraw the line when the range changes; large motion off under Reduce Motion.
+        .animation(reduceMotion ? nil : HEMotion.spring, value: range)
         .chartYScale(domain: yDomain)
         .chartXAxis {
             AxisMarks(preset: .aligned) { _ in
@@ -192,6 +235,8 @@ struct MetricTrendView: View {
                         .foregroundStyle(Color.heTextSecondary)
                 }
             }
+            // Animate the numeric roll and empty/stats swap when the range changes.
+            .animation(HEMotion.snappy, value: stats?.latest)
         }
     }
 
@@ -203,6 +248,7 @@ struct MetricTrendView: View {
             Text(formatted(value))
                 .font(.heHeadline.weight(.semibold))
                 .monospacedDigit()
+                .contentTransition(.numericText())
                 .foregroundStyle(Color.heTextPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
@@ -224,6 +270,7 @@ struct MetricTrendView: View {
                 Image(systemName: trendIcon)
                     .font(.heHeadline)
                     .foregroundStyle(Color.hePrimary)
+                    .contentTransition(.symbolEffect(.replace))
                     .accessibilityHidden(true)
                 Text(message)
                     .font(.heCallout)
@@ -236,6 +283,7 @@ struct MetricTrendView: View {
                 RoundedRectangle(cornerRadius: HERadius.lg, style: .continuous)
                     .fill(Color.hePrimary.opacity(0.08))
             )
+            .transition(.opacity)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(message)
         }

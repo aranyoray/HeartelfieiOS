@@ -12,7 +12,7 @@ struct RecentReadingRow: View {
         NavigationLink(value: AppRoute.readingDetail(reading)) {
             rowContent
         }
-        .buttonStyle(.plain)
+        .buttonStyle(HECardButtonStyle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityHint("Opens the full reading detail.")

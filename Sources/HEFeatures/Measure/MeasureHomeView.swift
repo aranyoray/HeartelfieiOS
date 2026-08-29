@@ -11,6 +11,7 @@ struct MeasureHomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
                 screeningExplainer
+                    .heEntrance(0)
 
                 section(
                     title: "Phone screening",
@@ -20,10 +21,12 @@ struct MeasureHomeView: View {
                 )
 
                 EmergencyNotice()
+                    // Footer arrives last, after the explainer and modality list.
+                    .heEntrance(Modality.allCases.count + 1)
             }
             .padding(HESpacing.md)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("Measure")
         .navigationBarTitleDisplayMode(.large)
     }
@@ -63,8 +66,10 @@ struct MeasureHomeView: View {
         VStack(alignment: .leading, spacing: HESpacing.md) {
             HESectionHeader(title: title, subtitle: subtitle, systemImage: systemImage)
 
-            ForEach(modalities) { modality in
+            // Stagger rows after the explainer (index 0): first row is index 1.
+            ForEach(Array(modalities.enumerated()), id: \.element) { index, modality in
                 ModalityRow(modality: modality)
+                    .heEntrance(index + 1)
             }
         }
     }

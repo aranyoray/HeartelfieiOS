@@ -12,17 +12,25 @@ struct AboutView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
                 headerCard
+                    .heEntrance(0)
                 EmergencyNotice()
+                    .heEntrance(1)
                 whatItIsSection
+                    .heEntrance(2)
                 tiersSection
+                    .heEntrance(3)
                 modelAttributionSection
+                    .heEntrance(4)
                 regulatorySection
+                    .heEntrance(5)
                 creditsSection
+                    .heEntrance(6)
                 NonDiagnosticFooter()
+                    .heEntrance(7)
             }
             .padding(HESpacing.md)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -96,7 +104,7 @@ struct AboutView: View {
             Image(systemName: icon)
                 .font(.title3)
                 .foregroundStyle(Color.hePrimary)
-                .frame(width: 28)
+                .frame(width: HEIcon.md)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: HESpacing.xxs) {
                 Text(title)
@@ -163,6 +171,7 @@ struct AboutView: View {
                         creditRow(title: "Privacy Policy", detail: "", showsChevron: true)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityHint("Opens the full privacy policy")
                     Divider().overlay(Color.heSeparator)
                     NavigationLink {
                         LegalDocumentView(document: .termsOfUse)
@@ -170,6 +179,7 @@ struct AboutView: View {
                         creditRow(title: "Terms of Use", detail: "", showsChevron: true)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityHint("Opens the full terms of use")
                     Divider().overlay(Color.heSeparator)
                     creditRow(title: "© \(currentYear) \(DailyDilConfig.appName)", detail: "")
                 }

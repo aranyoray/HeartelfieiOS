@@ -21,22 +21,24 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
-                greetingHeader
+                greetingHeader.heEntrance(0)
                 if env.storageDegraded {
                     storageWarningCard
+                        .transition(.move(edge: .top).combined(with: .opacity))
                 }
-                snapshotSection
-                HomeTrendsCard()
-                StreakCard(streak: env.streak, recentReadings: env.recentReadings)
-                quickStartSection
-                recentReadingsSection
-                insightsLink
-                EmergencyNotice()
+                snapshotSection.heEntrance(1)
+                HomeTrendsCard().heEntrance(2)
+                StreakCard(streak: env.streak, recentReadings: env.recentReadings).heEntrance(3)
+                quickStartSection.heEntrance(4)
+                recentReadingsSection.heEntrance(5)
+                insightsLink.heEntrance(6)
+                EmergencyNotice().heEntrance(7)
             }
             .padding(.horizontal, HESpacing.screen)
             .padding(.vertical, HESpacing.md)
+            .animation(HEMotion.snappy, value: env.storageDegraded)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("DailyDil")
         .navigationBarTitleDisplayMode(.inline)
         .task { await env.refreshDashboard() }

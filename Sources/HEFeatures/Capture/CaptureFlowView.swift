@@ -15,6 +15,7 @@ public struct CaptureFlowView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public let modality: Modality
     @State private var vm: CaptureViewModel?
@@ -38,15 +39,25 @@ public struct CaptureFlowView: View {
                 header
                 if let vm {
                     content(for: vm)
+                        // Each phase's card stack fades and lifts in, so moving
+                        // through prepare → coach → capture → result feels guided
+                        // rather than a hard content swap.
+                        .transition(reduceMotion
+                            ? .opacity
+                            : .opacity.combined(with: .move(edge: .bottom)))
                 } else {
                     LoadingStateView(message: "Preparing sensor…")
-                        .frame(height: 280)
+                        .frame(minHeight: 280)
                 }
             }
             .padding(.horizontal, HESpacing.screen)
             .padding(.vertical, HESpacing.md)
+            .animation(HEMotion.spring, value: vm?.phase)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
+        .onChange(of: vm?.phase) { _, newPhase in
+            announce(phase: newPhase)
+        }
         .navigationTitle(modality.shortName)
         .navigationBarTitleDisplayMode(.inline)
         // A capture is a focused task; the tab bar only invites mid-capture
@@ -136,8 +147,10 @@ public struct CaptureFlowView: View {
                 Spacer()
                 if let vm, vm.phase == .coaching || vm.phase == .capturing {
                     livePill
+                        .transition(.scale.combined(with: .opacity))
                 }
             }
+            .animation(HEMotion.snappy, value: vm?.phase)
             Text(modality.summary)
                 .font(.heCallout)
                 .foregroundStyle(Color.heTextSecondary)
@@ -146,17 +159,44 @@ public struct CaptureFlowView: View {
     }
 
     private var livePill: some View {
-        HStack(spacing: HESpacing.xs) {
-            Circle()
-                .fill(Color.heAccent)
-                .frame(width: 7, height: 7)
-            Text("Live")
-                .font(.heCaption)
-                .foregroundStyle(Color.heTextSecondary)
+        // Distinct read for the two look-alike phases: accent "Live" while
+        // coaching, coral "Recording" once the reading is actually being saved.
+        let recording = vm?.phase == .capturing
+        let tint = recording ? Color.heRisk(.elevated) : Color.heAccent
+        return HStack(spacing: HESpacing.xs) {
+            LiveDot(color: tint)
+            Text(recording ? "Recording" : "Live")
+                .font(.heCaption.weight(.semibold))
+                .foregroundStyle(tint)
+                .contentTransition(.opacity)
         }
         .padding(.horizontal, HESpacing.sm)
         .padding(.vertical, HESpacing.xs)
-        .background(Color.heSurface, in: Capsule())
+        .background(tint.opacity(0.12), in: Capsule())
+        .overlay(Capsule().strokeBorder(tint.opacity(0.35), lineWidth: 1))
+        .accessibilityElement()
+        .accessibilityLabel(recording ? "Recording in progress" : "Live signal")
+    }
+
+    // MARK: - Accessibility
+
+    /// Posts a concise VoiceOver announcement on every phase change, so a non-visual
+    /// user follows prepare → coach → record → result without seeing the cards swap.
+    private func announce(phase: CaptureViewModel.Phase?) {
+        guard let phase, let message = spokenStatus(for: phase) else { return }
+        AccessibilityNotification.Announcement(message).post()
+    }
+
+    private func spokenStatus(for phase: CaptureViewModel.Phase) -> String? {
+        switch phase {
+        case .idle:       return nil
+        case .preparing:  return "Getting the camera ready."
+        case .coaching:   return "Camera ready. Rest a fingertip on the rear camera and hold still."
+        case .capturing:  return "Recording your reading. Keep holding still."
+        case .processing: return "Analyzing your reading."
+        case .completed:  return "Reading saved."
+        case .failed:     return "The reading didn’t complete. You can try again."
+        }
     }
 
     // MARK: - Phase content
@@ -346,9 +386,26 @@ public struct CaptureFlowView: View {
                             .contentTransition(.numericText())
                         Spacer()
                     }
-                    ProgressView(value: min(max(vm.captureProgress, 0), 1))
-                        .progressViewStyle(.linear)
-                        .tint(Color.hePrimary)
+                    // Chunky, gradient-filled progress bar with an elapsed/total
+                    // readout — far more legible mid-capture than the 4pt default.
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color.heSeparator.opacity(0.5))
+                            Capsule()
+                                .fill(Color.hePrimaryGradient)
+                                .frame(width: max(8, geo.size.width * min(max(vm.captureProgress, 0), 1)))
+                        }
+                    }
+                    .frame(height: 10)
+                    .animation(HEMotion.snappy, value: vm.captureProgress)
+                    HStack {
+                        Text("\(Int(vm.elapsedSeconds))s")
+                            .contentTransition(.numericText())
+                        Spacer()
+                        Text("of \(Int(captureWindow))s")
+                    }
+                    .font(.heCaption)
+                    .foregroundStyle(Color.heTextSecondary)
                     if vm.captureWasInterrupted {
                         Text("The signal was interrupted, so this save restarted from the steady part.")
                             .font(.heCaption)
@@ -356,13 +413,16 @@ public struct CaptureFlowView: View {
                     }
                     if vm.secondsUntilFinishAllowed > 0 {
                         Text("Keep holding — about \(Int(vm.secondsUntilFinishAllowed.rounded(.up)))s more for a valid reading.")
-                            .font(.heCaption)
-                            .foregroundStyle(Color.heTextTertiary)
+                            .font(.heFootnote)
+                            .foregroundStyle(Color.heTextSecondary)
                     }
                     HEPrimaryButton("Finish", systemImage: "stop.circle.fill") {
                         Task { await vm.finishEarly() }
                     }
                     .disabled(vm.secondsUntilFinishAllowed > 0)
+                    .accessibilityHint(vm.secondsUntilFinishAllowed > 0
+                        ? "Available after about \(Int(vm.secondsUntilFinishAllowed.rounded(.up))) more seconds of steady signal."
+                        : "")
                     HESecondaryButton("Cancel", systemImage: "xmark") {
                         Task { await vm.abort(); dismiss() }
                     }
@@ -371,14 +431,18 @@ public struct CaptureFlowView: View {
                         vm.startCapture()
                     }
                     .disabled(vm.liveBPM == nil)
+                    .accessibilityHint(vm.liveBPM == nil
+                        ? "Waiting for a heart-rate estimate before you can start saving."
+                        : "")
                     if vm.liveBPM == nil {
-                        Text("Wait for a heart-rate estimate first.")
-                            .font(.heCaption)
-                            .foregroundStyle(Color.heTextTertiary)
+                        Label("Wait for a heart-rate estimate first.", systemImage: "waveform.path.ecg")
+                            .font(.heFootnote)
+                            .foregroundStyle(Color.heTextSecondary)
+                            .transition(.opacity)
                     } else {
                         Text("Saves about \(Int(captureWindow)) seconds of signal, then checks its quality on-device.")
                             .font(.heCaption)
-                            .foregroundStyle(Color.heTextTertiary)
+                            .foregroundStyle(Color.heTextSecondary)
                     }
                 }
             }
@@ -506,7 +570,7 @@ public struct CaptureFlowView: View {
     private var processingSection: some View {
         VStack(spacing: HESpacing.md) {
             LoadingStateView(message: "Analyzing your reading…")
-                .frame(height: 220)
+                .frame(minHeight: 220)
             Text("Running the signal-quality check and feature extraction on-device.")
                 .font(.heCaption)
                 .foregroundStyle(Color.heTextTertiary)
@@ -621,6 +685,29 @@ struct CaptureResultSummary: View {
 
             NonDiagnosticFooter()
         }
+    }
+}
+
+/// A small "recording" dot that gently breathes while a capture is live, so the
+/// active state reads at a glance. Falls still under Reduce Motion.
+private struct LiveDot: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulse = false
+    var color: Color = .heAccent
+
+    var body: some View {
+        Circle()
+            .fill(color)
+            .frame(width: 8, height: 8)
+            .scaleEffect(pulse ? 1.35 : 0.85)
+            .opacity(pulse ? 1 : 0.7)
+            .onAppear {
+                guard !reduceMotion else { return }
+                withAnimation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true)) {
+                    pulse = true
+                }
+            }
+            .accessibilityHidden(true)
     }
 }
 

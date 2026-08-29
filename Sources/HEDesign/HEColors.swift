@@ -109,19 +109,35 @@ public extension Color {
 
     // Gradients --------------------------------------------------------------
 
-    /// The bright action gradient — mint into cyan — for buttons and the ring.
+    /// The bright action gradient — mint through cyan into deep cyan — for buttons
+    /// and the ring. Three stops give it more depth than a flat two-tone.
     static let hePrimaryGradient = LinearGradient(
-        colors: [Color(hex: "2DD4BF"), Color(hex: "0891B2")],
+        colors: [Color(hex: "34E0C8"), Color(hex: "12B5C4"), Color(hex: "0891B2")],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
-    /// The deep hero gradient — cyan into indigo — for hero surfaces where
-    /// white text and translucent chips sit on top.
+    /// The deep hero gradient — teal → cyan → indigo — for hero surfaces where
+    /// white text and translucent chips sit on top. Richer diagonal sweep.
     static let heHeroGradient = LinearGradient(
-        colors: [Color(hex: "155E75"), Color(hex: "312E81")],
+        colors: [Color(hex: "0E7C86"), Color(hex: "155E9A"), Color(hex: "3B2E9E")],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
+    )
+
+    /// A soft top-edge sheen for glass surfaces: a bright hairline that fades out,
+    /// giving cards a subtle lit top edge.
+    static let heGlassStroke = LinearGradient(
+        colors: [Color.white.opacity(0.55), Color.white.opacity(0.06)],
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
+    /// A faint inner highlight wash layered at the top of hero surfaces.
+    static let heHeroHighlight = LinearGradient(
+        colors: [Color.white.opacity(0.22), .clear],
+        startPoint: .top,
+        endPoint: .center
     )
 }
 

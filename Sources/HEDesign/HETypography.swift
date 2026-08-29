@@ -33,6 +33,8 @@ public extension Font {
 
     static let heCallout = Font.system(.callout, design: .default)
 
+    static let heFootnote = Font.system(.footnote, design: .default)
+
     static let heCaption = Font.system(.caption, design: .default)
 
     /// Rounded caption used for unit suffixes next to big numerals.

@@ -13,6 +13,7 @@ import HEPersistence
 /// per-mark label plus a spoken summary element) so the data is never color-only.
 struct TrendsView: View {
     @Environment(AppEnvironment.self) private var env
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     // MARK: Selection state
     @State private var selectedMetric: MetricKind = .heartRate
@@ -42,15 +43,15 @@ struct TrendsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
-                trendSection
-                heatmapSection
-                historySection
-                NonDiagnosticFooter()
-                EmergencyNotice()
+                trendSection.heEntrance(0)
+                heatmapSection.heEntrance(1)
+                historySection.heEntrance(2)
+                NonDiagnosticFooter().heEntrance(3)
+                EmergencyNotice().heEntrance(4)
             }
             .padding(HESpacing.md)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("Trends")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { exportToolbarItem }
@@ -125,12 +126,14 @@ struct TrendsView: View {
                 Text(formatted(last.value))
                     .font(.heHeadline)
                     .monospacedDigit()
+                    .contentTransition(.numericText())
                     .foregroundStyle(Color.heTextPrimary)
                 Text(selectedMetric.unit)
                     .font(.heCaption)
                     .foregroundStyle(Color.heTextSecondary)
             }
         }
+        .animation(HEMotion.snappy, value: series.last?.value)
     }
 
     @ViewBuilder
@@ -200,6 +203,9 @@ struct TrendsView: View {
                     AxisValueLabel().font(.heCaption)
                 }
             }
+            // Redraw the line/band when the metric or range changes; large motion off under Reduce Motion.
+            .animation(reduceMotion ? nil : HEMotion.spring, value: selectedMetric)
+            .animation(reduceMotion ? nil : HEMotion.spring, value: range)
         }
     }
 
@@ -264,6 +270,7 @@ struct TrendsView: View {
 
             if anomalyCount > 0 {
                 anomalyCallout
+                    .transition(.move(edge: .top).combined(with: .opacity))
             }
 
             if filteredReadings.isEmpty {
@@ -276,10 +283,14 @@ struct TrendsView: View {
                             : "Your readings will appear here once you take a check."
                     )
                 }
+                .transition(.opacity)
             } else {
                 historyList
             }
         }
+        // Animate filter-driven appearance/disappearance of the callout and list swap.
+        .animation(HEMotion.snappy, value: anomalyCount)
+        .animation(HEMotion.snappy, value: filteredReadings.count)
     }
 
     private var filterControls: some View {
@@ -675,7 +686,7 @@ private struct TrendsHistoryRow: View {
                     Image(systemName: reading.modality.systemImage)
                         .font(.title3)
                         .foregroundStyle(Color.hePrimary)
-                        .frame(width: 30, height: 30)
+                        .frame(width: HEIcon.md, height: HEIcon.md)
                         .accessibilityHidden(true)
 
                     VStack(alignment: .leading, spacing: HESpacing.xs) {

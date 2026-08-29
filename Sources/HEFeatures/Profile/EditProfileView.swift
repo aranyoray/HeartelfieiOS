@@ -31,7 +31,7 @@ struct EditProfileView: View {
             disclosureSection
         }
         .scrollContentBackground(.hidden)
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("Edit profile")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -104,6 +104,8 @@ struct EditProfileView: View {
         } footer: {
             Text("BMI is calculated from your height and weight. It's a general guide, not a diagnosis.")
         }
+        // Smoothly relabel the steppers when the unit system flips.
+        .animation(HEMotion.snappy, value: draft.unitSystem)
     }
 
     @ViewBuilder
@@ -116,6 +118,7 @@ struct EditProfileView: View {
                 Text(bmi.formatted(.number.precision(.fractionLength(1))))
                     .font(.heBody.weight(.semibold))
                     .monospacedDigit()
+                    .contentTransition(.numericText())
                     .foregroundStyle(Color.heTextPrimary)
                 Text(category.label)
                     .font(.heCaption.weight(.medium))
@@ -126,6 +129,9 @@ struct EditProfileView: View {
                         Capsule().fill(Color.heRisk(category.risk).opacity(0.15))
                     )
             }
+            // BMI recomputes live as the height/weight steppers change; the
+            // numeric value ticks and the category chip settles with a spring.
+            .animation(HEMotion.snappy, value: bmi)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("B M I \(bmi.formatted(.number.precision(.fractionLength(1)))), \(category.label)")
         }

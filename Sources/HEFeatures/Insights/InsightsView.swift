@@ -27,15 +27,21 @@ struct InsightsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: HESpacing.xl) {
                 dailySummarySection
+                    .heEntrance(0)
                 trendCalloutsSection
+                    .heEntrance(1)
                 seekCareSection
+                    .heEntrance(2)
                 guidanceSection
+                    .heEntrance(3)
                 NonDiagnosticFooter()
+                    .heEntrance(4)
                 EmergencyNotice()
+                    .heEntrance(5)
             }
             .padding(HESpacing.md)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle("Insights")
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
@@ -63,7 +69,10 @@ struct InsightsView: View {
                                 .font(.heTitle)
                                 .monospacedDigit()
                                 .foregroundStyle(Color.heRisk(env.todayScore.risk))
+                                .contentTransition(.numericText())
                         }
+                        // Score animates as new readings roll in.
+                        .animation(HEMotion.snappy, value: env.todayScore.value)
                         .accessibilityHidden(true)
 
                         VStack(alignment: .leading, spacing: HESpacing.xxs) {
@@ -134,19 +143,23 @@ struct InsightsView: View {
 
             if trendCallouts.isEmpty {
                 HECard {
-                    Text("Take a few more checks over the coming days and your trend callouts will appear here.")
-                        .font(.heCallout)
-                        .foregroundStyle(Color.heTextSecondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    EmptyStateView(
+                        systemImage: "chart.line.uptrend.xyaxis",
+                        title: "Trends are still forming",
+                        message: "Take a few more checks over the coming days and your trend callouts will appear here."
+                    )
                 }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             } else {
                 VStack(spacing: HESpacing.md) {
                     ForEach(trendCallouts) { callout in
                         calloutCard(callout)
                     }
                 }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
+        .animation(HEMotion.snappy, value: trendCallouts.isEmpty)
     }
 
     private func calloutCard(_ callout: TrendCallout) -> some View {
@@ -156,7 +169,7 @@ struct InsightsView: View {
                     Image(systemName: callout.icon)
                         .font(.heTitle)
                         .foregroundStyle(Color.hePrimary)
-                        .frame(width: 32)
+                        .frame(width: HEIcon.md)
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: HESpacing.xxs) {
                         Text(callout.title)
@@ -211,6 +224,7 @@ struct InsightsView: View {
                     }
                     .accessibilityElement(children: .combine)
                 }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             } else {
                 VStack(spacing: HESpacing.md) {
                     ForEach(seekCareSignals) { signal in
@@ -218,8 +232,10 @@ struct InsightsView: View {
                     }
                     CareAccessCard(tier: .screening, risk: .watch)
                 }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
+        .animation(HEMotion.snappy, value: seekCareSignals.isEmpty)
     }
 
     private func seekCareCard(_ signal: SeekCareItem) -> some View {
@@ -227,7 +243,7 @@ struct InsightsView: View {
             Image(systemName: "exclamationmark.bubble.fill")
                 .font(.heTitle)
                 .foregroundStyle(Color.heRisk(.watch))
-                .frame(width: 32)
+                .frame(width: HEIcon.md)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: HESpacing.xs) {
                 Text("Compare with your trend")

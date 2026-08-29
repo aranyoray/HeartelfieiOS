@@ -15,20 +15,24 @@ struct OnboardingPermissionsStep: View {
                 subtitle: "We only request access when it is needed for a check, and we explain why first.",
                 systemImage: "hand.raised.fill"
             )
+            .heEntrance(0)
 
             VStack(spacing: HESpacing.sm) {
                 ForEach(PermissionPrimer.all) { primer in
                     PermissionRow(primer: primer)
                 }
             }
+            .heEntrance(1)
 
             HealthKitPrimingCard()
+                .heEntrance(2)
 
             Label("You stay in control. You can change permissions later in Settings and skip ones you do not need.", systemImage: "lock.shield")
                 .font(.heCaption)
                 .foregroundStyle(Color.heTextSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityElement(children: .combine)
+                .heEntrance(3)
         }
     }
 }

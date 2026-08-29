@@ -21,8 +21,9 @@ struct LegalDocumentView: View {
                         .font(.heCaption)
                         .foregroundStyle(Color.heTextTertiary)
                 }
+                .heEntrance(0)
 
-                ForEach(document.sections) { section in
+                ForEach(Array(document.sections.enumerated()), id: \.element.id) { index, section in
                     VStack(alignment: .leading, spacing: HESpacing.sm) {
                         if let heading = section.heading {
                             Text(heading)
@@ -51,15 +52,19 @@ struct LegalDocumentView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    // Stagger the first handful of sections, then settle so a long
+                    // legal document doesn't hold a visibly delayed tail.
+                    .heEntrance(min(index + 1, 6))
                 }
 
                 Link("Contact \(LegalDocument.supportEmail)", destination: URL(string: "mailto:\(LegalDocument.supportEmail)")!)
                     .font(.heCallout)
                     .foregroundStyle(Color.hePrimary)
+                    .heEntrance(7)
             }
             .padding(HESpacing.md)
         }
-        .background(Color.heBackground)
+        .heAmbientBackground()
         .navigationTitle(document.navTitle)
         .navigationBarTitleDisplayMode(.inline)
     }

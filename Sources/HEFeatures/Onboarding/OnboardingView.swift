@@ -46,8 +46,8 @@ struct OnboardingView: View {
 
             navigationBar
         }
-        .background(Color.heBackground.ignoresSafeArea())
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: step)
+        .heAmbientBackground()
+        .animation(reduceMotion ? nil : HEMotion.spring, value: step)
     }
 
     // MARK: - Step content
@@ -212,7 +212,7 @@ private struct OnboardingProgressBar: View {
                         .fill(Color.hePrimaryGradient)
                         .frame(width: max(8, proxy.size.width * fraction))
                         .animation(
-                            reduceMotion ? nil : .easeInOut(duration: 0.25),
+                            reduceMotion ? nil : HEMotion.spring,
                             value: fraction
                         )
                 }
@@ -222,6 +222,8 @@ private struct OnboardingProgressBar: View {
             Text("Step \(currentIndex + 1) of \(total)")
                 .font(.heCaption)
                 .foregroundStyle(Color.heTextTertiary)
+                // The step count ticks over with a numeric roll.
+                .contentTransition(.numericText())
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Onboarding progress")
