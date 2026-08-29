@@ -261,7 +261,20 @@ public actor EncryptedReadingStore: ReadingRepository {
         let plaintext = try encoder.encode(snapshot)
         let sealed = try crypto.seal(plaintext)
         try sealed.write(to: fileURL, options: Self.writeOptions)
+        Self.excludeFromBackup(fileURL)
         cache = snapshot
+    }
+
+    /// Keep the ciphertext out of iCloud/iTunes backups. The AES key lives in the
+    /// Keychain as `…ThisDeviceOnly`, so a backed-up blob could never be decrypted
+    /// on a restored device anyway — don't ship the health data off-device at all.
+    /// Best effort (never fails a save); re-applied after each atomic write because
+    /// the atomic replace produces a new file that doesn't inherit the flag.
+    private static func excludeFromBackup(_ url: URL) {
+        var url = url
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        try? url.setResourceValues(values)
     }
 
     /// Atomic write with a data-protection class matching the Keychain key

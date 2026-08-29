@@ -123,6 +123,10 @@ public final class CaptureViewModel {
         elapsedSeconds = 0
         captureWasInterrupted = false
         isFinishing = false
+        // Sensor is still streaming here (coaching → capturing, not a teardown), so
+        // clear the teardown guard explicitly rather than relying on resetBuffers'
+        // call order — a stale `true` would drop every ingested capture frame.
+        isTearingDown = false
         phase = .capturing
         startWatchdog()
     }
@@ -288,12 +292,19 @@ public final class CaptureViewModel {
     /// Effective sample rate from observed timestamps, falling back to nominal.
     /// Clamped to a physically plausible band: one bad timestamp can push the
     /// estimate past Nyquist limits and destabilize the bandpass biquad.
-    private var sampleRate: Double {
-        guard let first = timestamps.first, let last = timestamps.last,
-              last > first, timestamps.count > 1 else {
+    private var sampleRate: Double { sampleRate(overLast: timestamps.count) }
+
+    /// Sample rate estimated over only the most recent `n` timestamps. The live BPM
+    /// filters a trimmed waveform slice (`suffix(180)`), so it must estimate the rate
+    /// over that *same* window — a rate derived from the full, longer coaching buffer
+    /// can mismatch the slice being filtered and detune the bandpass biquad.
+    private func sampleRate(overLast n: Int) -> Double {
+        let window = timestamps.suffix(max(n, 2))
+        guard let first = window.first, let last = window.last,
+              last > first, window.count > 1 else {
             return modality.nominalSampleRate
         }
-        let estimated = Double(timestamps.count - 1) / (last - first)
+        let estimated = Double(window.count - 1) / (last - first)
         guard (3.0...120.0).contains(estimated) else { return modality.nominalSampleRate }
         return estimated
     }
@@ -330,7 +341,7 @@ public final class CaptureViewModel {
             return
         }
         let band = FilterBand.passband(for: modality)
-        let sr = sampleRate
+        let sr = sampleRate(overLast: liveWaveform.count)   // rate over the same slice we filter
         let filtered = BandpassFilter(lowHz: band.low, highHz: band.high, sampleRate: sr).filtfilt(liveWaveform)
         let peaks = PeakDetector().peakIndices(in: filtered, sampleRate: sr)
         let rr = PeakDetector().rrIntervalsMS(peakIndices: peaks, sampleRate: sr)

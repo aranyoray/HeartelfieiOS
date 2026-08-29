@@ -31,6 +31,7 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
 
     private var continuation: AsyncStream<SignalFrame>.Continuation?
     private var fallback: MockCameraPPGSensor?
+    private var isStopped = false
 
     #if canImport(AVFoundation)
     private let session = AVCaptureSession()
@@ -43,6 +44,7 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
 
     public func start() async -> AsyncStream<SignalFrame> {
         await stop()
+        isStopped = false
         #if canImport(AVFoundation)
         // Camera permission comes first: prompt if undetermined; if denied or
         // restricted, return a stream that finishes immediately — the view model
@@ -55,18 +57,14 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
         }
         guard status == .authorized else { return Self.finishedStream() }
         if configureSession() {
-            enableTorch(true)
-            await startSession()
+            await startSession()   // starts the session and lights the torch on the capture queue
             // Configuration can succeed yet the session still fail to start
             // (camera busy, resource contention). Without this guard we'd return
             // a stream that never emits and the capture UI would hang.
             guard session.isRunning else {
-                enableTorch(false)
+                await stopSession()
                 return await unavailableStream()
             }
-            // Starting the session can reset the torch, so re-assert it now that
-            // the session is confirmed running.
-            enableTorch(true)
             let (stream, continuation) = AsyncStream<SignalFrame>.makeStream()
             self.continuation = continuation
             continuation.onTermination = { [weak self] _ in
@@ -96,9 +94,10 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
     }
 
     public func stop() async {
+        if isStopped { return }   // idempotent: onTermination and the VM can both call stop()
+        isStopped = true
         #if canImport(AVFoundation)
-        enableTorch(false)
-        await stopSession()
+        await stopSession()       // turns the torch off on the capture queue before stopping
         #endif
         continuation?.finish()
         continuation = nil
@@ -146,8 +145,8 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
 
     /// Toggle the torch, which provides the constant illumination transmissive PPG
     /// depends on. Guarded so devices without a torch simply skip it.
-    private func enableTorch(_ on: Bool) {
-        guard let device = captureDevice, device.hasTorch,
+    nonisolated private static func setTorch(_ on: Bool, on device: AVCaptureDevice?) {
+        guard let device, device.hasTorch,
               (try? device.lockForConfiguration()) != nil else { return }
         defer { device.unlockForConfiguration() }
         if on {
@@ -162,9 +161,14 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
     /// stalls the UI. Awaits completion so the caller can read `session.isRunning`.
     private func startSession() async {
         nonisolated(unsafe) let session = self.session
+        nonisolated(unsafe) let device = self.captureDevice
         await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             sampleQueue.async {
                 session.startRunning()
+                // Light the torch here, on the capture queue, after the session is
+                // running. startRunning() can reset the torch, and configuring the
+                // device on any other queue would race the session start.
+                if session.isRunning { Self.setTorch(true, on: device) }
                 cont.resume()
             }
         }
@@ -173,8 +177,12 @@ public final class CameraPPGSensor: NSObject, CardioSensor {
     /// Stop the session off the main actor for the same reason as `startSession()`.
     private func stopSession() async {
         nonisolated(unsafe) let session = self.session
+        nonisolated(unsafe) let device = self.captureDevice
         await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             sampleQueue.async {
+                // Torch off first, on the capture queue: a silently-failed device
+                // lock can no longer leave the torch lit after teardown.
+                Self.setTorch(false, on: device)
                 if session.isRunning { session.stopRunning() }
                 cont.resume()
             }

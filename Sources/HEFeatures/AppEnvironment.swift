@@ -74,7 +74,10 @@ public final class AppEnvironment {
         } else if let encrypted = try? EncryptedReadingStore() {
             self.repository = encrypted
         } else {
-            self.repository = InMemoryReadingRepository()
+            // Degraded launch (Keychain locked pre-first-unlock). Seed EMPTY, not
+            // SampleData: retryStorageIfDegraded migrates this fallback into the real
+            // encrypted store, so demo readings here would become permanent fake history.
+            self.repository = InMemoryReadingRepository(readings: [], profile: nil)
             self.storageDegraded = true
         }
 
@@ -217,6 +220,11 @@ public final class AppEnvironment {
         let pending = (try? await repository.allReadings()) ?? []
         for reading in pending {
             try? await encrypted.save(reading)
+        }
+        // Migrate the profile too — onboarding completed during a degraded session
+        // writes it to the in-memory fallback, and it would otherwise be lost on swap.
+        if let profile = try? await repository.loadProfile() {
+            try? await encrypted.saveProfile(profile)
         }
         repository = encrypted
         storageDegraded = false
