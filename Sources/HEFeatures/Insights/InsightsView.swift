@@ -294,7 +294,7 @@ struct InsightsView: View {
     // MARK: - Derived models
 
     private struct TrendCallout: Identifiable {
-        let id = UUID()
+        var id: MetricKind { metric }   // stable identity: one callout per metric
         let metric: MetricKind
         let title: String
         let detail: String
@@ -302,7 +302,7 @@ struct InsightsView: View {
     }
 
     private struct SeekCareItem: Identifiable {
-        let id = UUID()
+        var id: MetricKind { kind }   // stable identity: deduped by kind upstream
         let kind: MetricKind
         let message: String
     }

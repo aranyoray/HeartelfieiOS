@@ -73,7 +73,13 @@ struct OnboardingProfileStep: View {
     private var unitBinding: Binding<UnitSystem> {
         Binding(
             get: { draft.unitSystem },
-            set: { draft.convertEnteredValues(to: $0) }
+            set: { newSystem in
+                draft.convertEnteredValues(to: newSystem)
+                // Rounding a converted extreme can land just outside the new
+                // system's Stepper range, wedging the +/- controls. Re-clamp.
+                draft.heightValue = min(max(draft.heightValue, heightRange.lowerBound), heightRange.upperBound)
+                draft.weightValue = min(max(draft.weightValue, weightRange.lowerBound), weightRange.upperBound)
+            }
         )
     }
 

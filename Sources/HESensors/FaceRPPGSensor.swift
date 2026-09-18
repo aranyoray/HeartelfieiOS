@@ -33,6 +33,7 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
 
     private var continuation: AsyncStream<SignalFrame>.Continuation?
     private var fallback: MockFaceRPPGSensor?
+    private var isStopped = false
 
     #if canImport(AVFoundation)
     private let session = AVCaptureSession()
@@ -44,6 +45,7 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
 
     public func start() async -> AsyncStream<SignalFrame> {
         await stop()
+        isStopped = false
         #if canImport(AVFoundation) && canImport(Vision)
         // Camera permission comes first: prompt if undetermined; if denied or
         // restricted, return a stream that finishes immediately — the view model
@@ -60,6 +62,7 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
             // Guard against a configured-but-not-running session (camera busy),
             // which would otherwise return a stream that never emits and hang the UI.
             guard session.isRunning else {
+                await stopSession()
                 return await unavailableStream()
             }
             let (stream, continuation) = AsyncStream<SignalFrame>.makeStream()
@@ -90,6 +93,8 @@ public final class FaceRPPGSensor: NSObject, CardioSensor {
     }
 
     public func stop() async {
+        if isStopped { return }   // idempotent: onTermination and the VM can both call stop()
+        isStopped = true
         #if canImport(AVFoundation)
         await stopSession()
         #endif

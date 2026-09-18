@@ -45,7 +45,9 @@ public struct SQIClassifier: Sendable {
         // 2. Amplitude / perfusion: AC range relative to DC level.
         let dc = abs(Vector.mean(raw))
         let acRange = Vector.maxValue(filtered) - Vector.minValue(filtered)
-        let normalizedAmplitude = dc > 1e-6 ? acRange / dc : acRange
+        // DC≈0 means perfusion is unmeasurable (no valid brightness baseline);
+        // treat as zero amplitude so a bad signal is flagged, not silently passed.
+        let normalizedAmplitude = dc > 1e-6 ? acRange / dc : 0
         let amplitudeScore = clamp01(normalizedAmplitude / amplitudeReference(for: modality))
         if amplitudeScore < 0.2 {
             issues.append(.lowAmplitude)

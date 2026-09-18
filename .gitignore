@@ -35,3 +35,13 @@ Secrets.local.xcconfig
 
 # Misc
 *.log
+node_modules/
+.next/
+dist/
+.env
+.env.*
+__pycache__/
+*.pyc
+.venv/
+venv/
+.history/
